@@ -7,7 +7,7 @@ package Bezel.Events
 	
 	import flash.events.Event;
 	import Bezel.BezelEvent;
-	public class KeyboardKeyDownEvent extends Event
+	public class IngameKeyDownEvent extends Event
 	{
 		private var _eventArgs:Object;
 		
@@ -16,7 +16,7 @@ package Bezel.Events
 			return _eventArgs;
 		}
 	
-		public function KeyboardKeyDownEvent(type:String, eventArgs:Object, bubbles:Boolean=false, cancelable:Boolean=false) 
+		public function IngameKeyDownEvent(type:String, eventArgs:Object, bubbles:Boolean=false, cancelable:Boolean=false) 
 		{
 			super(type, bubbles, cancelable);
 			this._eventArgs = eventArgs;

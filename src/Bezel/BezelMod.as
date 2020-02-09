@@ -20,6 +20,7 @@ package Bezel
 		public var instance: Object;
 		
 		private var successfulLoadCallback:Function;
+		private var failedLoadCallback:Function;
 		
 		public function BezelMod(fileName:String) 
 		{
@@ -32,9 +33,20 @@ package Bezel
 		public function load(successCallback:Function, failureCallback:Function): void
 		{
 			this.successfulLoadCallback = successCallback;
+			this.failedLoadCallback = failureCallback;
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loadedSuccessfully);
-			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, failureCallback);
+			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, failedLoadCallback);
 			loader.load(new URLRequest(this.fileName), new LoaderContext(false, ApplicationDomain.currentDomain));
+		}
+		
+		public function unload(): void
+		{
+			this.loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, loadedSuccessfully);
+			this.loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, failedLoadCallback);
+			this.loader.unloadAndStop(false);
+			this.instance.unload();
+			this.instance = null;
+			this.loader = null;
 		}
 		
 		private function loadedSuccessfully(e:Event): void

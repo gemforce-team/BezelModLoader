@@ -6,11 +6,12 @@ package Bezel
 	 */
 	
 	import Bezel.Events.InfoPanelFormedEvent;
-	import Bezel.Events.KeyboardKeyDownEvent;
+	import Bezel.Events.IngameKeyDownEvent;
 	import flash.display.*;
 	import flash.events.*;
 	import flash.system.*;
 	import flash.filesystem.*;
+	import flash.utils.getTimer;
 	import Bezel.Logger;
 	import Bezel.BezelEvent;
 
@@ -36,6 +37,8 @@ package Bezel
 		private var logger:Logger;
 		public var mods:Array;
 		private var appStorage:File;
+		
+		private var modsReloadedTimestamp:int;
 		
 		// Parameterless constructor for flash.display.Loader
 		public function Bezel()
@@ -92,12 +95,14 @@ package Bezel
 					newMod.load(successfulLoad, failedLoad);
 				}
 			}
+			this.modsReloadedTimestamp = getTimer();
 		}
 		
 		public function successfulLoad(mod: Object): void
 		{
 			logger.log("successfulLoad", "Loaded mod: " + mod.instance.MOD_NAME + " v" + mod.instance.VERSION);
-			mods.push(mod.instance.bind(this, this.gameObjects));
+			mods.push(mod);
+			mod.instance.bind(this, this.gameObjects);
 			logger.log("successfulLoad", "Bound mod: " + mod.instance.MOD_NAME);
 		}
 		
@@ -123,14 +128,38 @@ package Bezel
 			//this.logger.log("infoPanelFormed", "Dispatched event...");
 		}
 		
-		public function eh_keyboardKeyDown(e:KeyboardEvent): Boolean
+		public function eh_ingameKeyDown(e:KeyboardEvent): Boolean
 		{
 			//this.logger.log("infoPanelFormed", "Dispatching event...");
+			if (e.controlKey && e.altKey && e.shiftKey && e.keyCode == 36)
+			{
+				if (this.modsReloadedTimestamp + 10*1000 > getTimer())
+				{
+					GV.vfxEngine.createFloatingText4(GV.main.mouseX,GV.main.mouseY < 60?Number(GV.main.mouseY + 30):Number(GV.main.mouseY - 20),"Please wait 10 secods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
+					return false;
+				}
+				SB.playSound("sndalert");
+				GV.vfxEngine.createFloatingText4(GV.main.mouseX,GV.main.mouseY < 60?Number(GV.main.mouseY + 30):Number(GV.main.mouseY - 20),"Reloading mods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
+				reloadAllMods();
+				return false;
+			}
 			var kbKDEventArgs:Object = {"event": e, "continueDefault": true};
-			dispatchEvent(new KeyboardKeyDownEvent(BezelEvent.KEYBOARD_KEY_DOWN, kbKDEventArgs));
+			dispatchEvent(new IngameKeyDownEvent(BezelEvent.INGAME_KEY_DOWN, kbKDEventArgs));
 			return kbKDEventArgs.continueDefault;
 			
 			//this.logger.log("infoPanelFormed", "Dispatched event...");
+		}
+		
+		private function reloadAllMods(): void
+		{
+			logger.log("eh_keyboardKeyDown", "Reloading all mods!");
+			this.modsReloadedTimestamp = getTimer();
+			for each(var mod:BezelMod in mods)
+			{
+				mod.unload();
+			}
+			mods = new Array();
+			loadMods();
 		}
 	}
 }

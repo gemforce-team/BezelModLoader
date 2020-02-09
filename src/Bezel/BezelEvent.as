@@ -8,7 +8,7 @@ package Bezel
 	public class BezelEvent 
 	{
 		public static const GEM_INFO_PANEL_FORMED:String = "gemInfoPanelFormed";
-		public static const KEYBOARD_KEY_DOWN:String = "keyboardKeyDown";
+		public static const INGAME_KEY_DOWN:String = "ingameKeyDown";
 		
 		public function BezelEvent() 
 		{
