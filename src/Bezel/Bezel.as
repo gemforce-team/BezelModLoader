@@ -44,12 +44,11 @@ package Bezel
 		public function Bezel()
 		{
 			super();
-			prepareFoldersAndLogger();
+			prepareFolders();
+
+			Logger.init();
 			this.logger = Logger.getLogger("Bezel");
 			this.mods = new Array();
-			this.appStorage = File.applicationStorageDirectory;
-			//this.configuration = loadConfigurationOrDefault();
-			//this.configuration = updateConfig(this.configuration);
 			
 			this.logger.log("Bezel", "Bezel Mod Loader " + prettyVersion());
 		}
@@ -71,13 +70,12 @@ package Bezel
 			return this;
 		}
 
-		private function prepareFoldersAndLogger(): void
+		private function prepareFolders(): void
 		{
-			var storageFolder:File = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader");
+			this.appStorage = File.applicationStorageDirectory;
+			var storageFolder:File = this.appStorage.resolvePath("Bezel Mod Loader");
 			if(!storageFolder.isDirectory)
 				storageFolder.createDirectory();
-
-			Logger.init();
 		}
 		
 		private function loadMods(): void
@@ -102,6 +100,7 @@ package Bezel
 		{
 			logger.log("successfulLoad", "Loaded mod: " + mod.instance.MOD_NAME + " v" + mod.instance.VERSION);
 			mods.push(mod);
+			this.addChild(mod.instance);
 			mod.instance.bind(this, this.gameObjects);
 			logger.log("successfulLoad", "Bound mod: " + mod.instance.MOD_NAME);
 		}
@@ -123,9 +122,7 @@ package Bezel
 		
 		public function infoPanelFormed(infoPanel:Object, gem:Object, numberFormatter:Object): void
 		{
-			//this.logger.log("infoPanelFormed", "Dispatching event...");
 			dispatchEvent(new InfoPanelFormedEvent(BezelEvent.GEM_INFO_PANEL_FORMED, {"infoPanel": infoPanel, "gem": gem, "numberFormatter": numberFormatter}));
-			//this.logger.log("infoPanelFormed", "Dispatched event...");
 		}
 		
 		public function eh_ingameKeyDown(e:KeyboardEvent): Boolean
@@ -158,6 +155,7 @@ package Bezel
 			{
 				mod.unload();
 			}
+			this.removeChildren();
 			mods = new Array();
 			loadMods();
 		}

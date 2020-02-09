@@ -10,7 +10,7 @@ package Bezel
 	import Bezel.Logger;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
-	import flash.net.URLRequest;
+	import flash.net.*;
 	import flash.system.*;
 	 
 	internal class BezelMod 
@@ -36,7 +36,7 @@ package Bezel
 			this.failedLoadCallback = failureCallback;
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loadedSuccessfully);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, failedLoadCallback);
-			loader.load(new URLRequest(this.fileName), new LoaderContext(false, ApplicationDomain.currentDomain));
+			loader.load(new URLRequest(this.fileName));// , new LoaderContext(false, ApplicationDomain.currentDomain));
 		}
 		
 		public function unload(): void
