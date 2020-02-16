@@ -1,0 +1,5 @@
+16.02.2020 v0.1.0
+		Initial release!
+		Keep in mind that for this I'm using semantic versioning, so until I set the major release to 1 this is considered an alpha, expect the API to change.
+		There isn't much in way of documentation atm, releasing this so I can release Gemsmith before I go on a business trip for a few days.
+		More info in the readme.
