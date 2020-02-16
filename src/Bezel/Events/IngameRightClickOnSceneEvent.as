@@ -7,7 +7,7 @@ package Bezel.Events
 	
 	import flash.events.Event;
 	import Bezel.BezelEvent;
-	public class InfoPanelFormedEvent extends Event
+	public class IngameRightClickOnSceneEvent extends Event
 	{
 		private var _eventArgs:Object;
 		
@@ -16,7 +16,7 @@ package Bezel.Events
 			return _eventArgs;
 		}
 	
-		public function InfoPanelFormedEvent(type:String, eventArgs:Object, bubbles:Boolean=false, cancelable:Boolean=false) 
+		public function IngameRightClickOnSceneEvent(type:String, eventArgs:Object, bubbles:Boolean=false, cancelable:Boolean=false) 
 		{
 			super(type, bubbles, cancelable);
 			this._eventArgs = eventArgs;

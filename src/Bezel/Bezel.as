@@ -5,8 +5,6 @@ package Bezel
 	 * @author Hellrage
 	 */
 	
-	import Bezel.Events.InfoPanelFormedEvent;
-	import Bezel.Events.IngameKeyDownEvent;
 	import flash.display.*;
 	import flash.events.*;
 	import flash.system.*;
@@ -14,13 +12,14 @@ package Bezel
 	import flash.utils.getTimer;
 	import Bezel.Logger;
 	import Bezel.BezelEvent;
+	import Bezel.Events.*;
 
 	// We extend MovieClip so that flash.display.Loader accepts our class
-	// The loader also requires a parameterless constructor (AFAIK), so we also have a .Bind method to bind our class to the game
+	// The loader also requires a parameterless constructor (AFAIK), so we also have a .bind method to bind our class to the game
 	public class Bezel extends MovieClip
 	{
 		public const VERSION:String = "0.1.0";
-		public const GAME_VERSION:String = "1.0.19a";
+		public const GAME_VERSION:String = "1.0.20";
 		
 		// Game objects
 		public var gameObjects:Object;
@@ -120,14 +119,45 @@ package Bezel
 			return 'v' + VERSION + ' for ' + GAME_VERSION;
 		}
 		
-		public function infoPanelFormed(infoPanel:Object, gem:Object, numberFormatter:Object): void
+		// Called after the gem's info panel has been formed but before it's returned to the game for rendering
+		public function ingameGemInfoPanelFormed(infoPanel:Object, gem:Object, numberFormatter:Object): void
 		{
-			dispatchEvent(new InfoPanelFormedEvent(BezelEvent.GEM_INFO_PANEL_FORMED, {"infoPanel": infoPanel, "gem": gem, "numberFormatter": numberFormatter}));
+			dispatchEvent(new IngameGemInfoPanelFormedEvent(BezelEvent.INGAME_GEM_INFO_PANEL_FORMED, {"infoPanel": infoPanel, "gem": gem, "numberFormatter": numberFormatter}));
 		}
 		
+		// Called before any of the game's logic runs when starting to form an infopanel
+		// This method is called before infoPanelFormed (which should be renamed to ingameGemInfoPanelFormed)
+		public function ingamePreRenderInfoPanel(): Boolean
+		{
+			var eventArgs:Object = {"continueDefault": true};
+			dispatchEvent(new IngamePreRenderInfoPanelEvent(BezelEvent.INGAME_PRE_RENDER_INFO_PANEL, eventArgs));
+			//logger.log("ingamePreRenderInfoPanel", "Dispatched event!");
+			return eventArgs.continueDefault;
+		}
+		
+		// Called immediately as a click event is fired by the base game
+		// set continueDefault to false to prevent the base game's handler from running
+		public function ingameClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
+		{
+			var eventArgs:Object = {"continueDefault": true, "event":event, "mouseX":mouseX, "mouseY":mouseY, "buildingX": buildingX, "buildingY": buildingY };
+			dispatchEvent(new IngameClickOnSceneEvent(BezelEvent.INGAME_CLICK_ON_SCENE, eventArgs));
+			return eventArgs.continueDefault;
+		}
+		
+		// Called immediately as a right click event is fired by the base game
+		// set continueDefault to false to prevent the base game's handler from running
+		public function ingameRightClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
+		{
+			var eventArgs:Object = {"continueDefault": true, "event":event, "mouseX":mouseX, "mouseY":mouseY, "buildingX": buildingX, "buildingY": buildingY };
+			dispatchEvent(new IngameClickOnSceneEvent(BezelEvent.INGAME_RIGHT_CLICK_ON_SCENE, eventArgs));
+			return eventArgs.continueDefault;
+		}
+		
+		// TODO rename to ingameKeyDown
+		// Called after the game checks that a key should be handled, but before any of the actual handling logic
+		// Set continueDefault to false to prevent the base game's handler from running
 		public function eh_ingameKeyDown(e:KeyboardEvent): Boolean
 		{
-			//this.logger.log("infoPanelFormed", "Dispatching event...");
 			if (e.controlKey && e.altKey && e.shiftKey && e.keyCode == 36)
 			{
 				if (this.modsReloadedTimestamp + 10*1000 > getTimer())
@@ -143,8 +173,6 @@ package Bezel
 			var kbKDEventArgs:Object = {"event": e, "continueDefault": true};
 			dispatchEvent(new IngameKeyDownEvent(BezelEvent.INGAME_KEY_DOWN, kbKDEventArgs));
 			return kbKDEventArgs.continueDefault;
-			
-			//this.logger.log("infoPanelFormed", "Dispatched event...");
 		}
 		
 		private function reloadAllMods(): void
