@@ -19,7 +19,7 @@ package Bezel
 	public class Bezel extends MovieClip
 	{
 		public const VERSION:String = "0.1.0";
-		public const GAME_VERSION:String = "1.0.20a";
+		public const GAME_VERSION:String = "1.0.20c";
 		
 		// Game objects
 		public var gameObjects:Object;
