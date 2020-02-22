@@ -1,0 +1,108 @@
+  trait method QName(PackageNamespace(""), "ehLoadedBezelModLoader")
+   method
+    name "ehLoadedBezelModLoader"
+    refid "com.giab.games.gcfw.steam:Main/instance/ehLoadedBezelModLoader"
+    param QName(PackageNamespace("flash.events"), "Event")
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 85
+     localcount 2
+     initscopedepth 5
+     maxscopedepth 5
+     code
+      debug               1, "e", 0, 0
+      getlocal0
+      getlocal0
+      getproperty         QName(PackageNamespace(""), "bezelLoader")
+      getproperty         QName(PackageNamespace(""), "content")
+      callpropvoid        QName(PackageNamespace(""), "addChild"), 1
+
+      getlocal0
+      getlocal0
+      getproperty         QName(PackageNamespace(""), "bezelLoader")
+      getproperty         QName(PackageNamespace(""), "content")
+      pushstring          "main"
+      getlocal0
+      pushstring          "mods"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam"), "Mods")
+      pushstring          "GV"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam"), "GV")
+      pushstring          "SB"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam"), "SB")
+      pushstring          "prefs"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam"), "Prefs")
+      pushstring          "constants"
+      pushstring          "achievementIngameStatus"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "AchievementIngameStatus")
+      pushstring          "actionStatus"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "ActionStatus")
+      pushstring          "battleMode"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "BattleMode")
+      pushstring          "battleOutcome"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "BattleOutcome")
+      pushstring          "battleTraitId"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "BattleTraitId")
+      pushstring          "beaconType"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "BeaconType")
+      pushstring          "buildingType"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "BuildingType")
+      pushstring          "dropType"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "DropType")
+      pushstring          "epicCreatureType"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "EpicCreatureType")
+      pushstring          "gameMode"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "GameMode")
+      pushstring          "gemComponentType"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "GemComponentType")
+      pushstring          "gemEnhancementId"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "GemEnhancementId")
+      pushstring          "ingameStatus"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "IngameStatus")
+      pushstring          "monsterBodyPartType"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "MonsterBodyPartType")
+      pushstring          "monsterBuffId"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "MonsterBuffId")
+      pushstring          "monsterType"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "MonsterType")
+      pushstring          "pauseType"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "PauseType")
+      pushstring          "screenId"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "ScreenId")
+      pushstring          "selectorScreenStatus"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "SelectorScreenStatus")
+      pushstring          "skillId"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "SkillId")
+      pushstring          "skillType"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "SkillType")
+      pushstring          "stageType"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "StageType")
+      pushstring          "statId"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "StatId")
+      pushstring          "strikeSpellId"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "StrikeSpellId")
+      pushstring          "talismanFragmentType"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "TalismanFragmentType")
+      pushstring          "talismanPropertyId"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "TalismanPropertyId")
+      pushstring          "targetPriorityId"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "TargetPriorityId")
+      pushstring          "tutorialId"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "TutorialId")
+      pushstring          "url"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "Url")
+      pushstring          "waveFormation"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "WaveFormation")
+      pushstring          "wizLockType"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "WizLockType")
+      pushstring          "wizStashStatus"
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "WizStashStatus")
+      newobject           32
+      newobject           6
+      callproperty        QName(PackageNamespace(""), "bind"), 1
+      setproperty         QName(PackageNamespace(""), "bezel")
+
+      returnvoid
+     end ; code
+    end ; body
+   end ; method
+  end ; trait

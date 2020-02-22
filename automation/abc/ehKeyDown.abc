@@ -1,0 +1,11 @@
+     getlex              QName(PackageNamespace("com.giab.games.gcfw.steam"), "GV")
+     getproperty         QName(PackageNamespace(""), "main")
+     getproperty         QName(PackageNamespace(""), "bezel")
+     getlocal1
+     callproperty        QName(PackageNamespace(""), "eh_ingameKeyDown"), 1
+     not
+     iffalse             L55
+
+     returnvoid
+
+L55:

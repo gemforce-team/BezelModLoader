@@ -6,6 +6,7 @@ bin-release/
 
 # Other files and folders
 .settings/
+automation/output/
 
 # Executables
 *.swf

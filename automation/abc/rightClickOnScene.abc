@@ -1,0 +1,15 @@
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam"), "GV")
+      getproperty         QName(PackageNamespace(""), "main")
+      getproperty         QName(PackageNamespace(""), "bezel")                                                                                                                  getlocal1
+      getlocal            2
+      getlocal            3
+      getlocal            4
+      getlocal            5
+      callproperty        QName(PackageNamespace(""), "ingameRightClickOnScene"), 5
+      not
+      iffalse             L28
+
+      returnvoid
+
+L28:
+      label
