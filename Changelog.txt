@@ -5,5 +5,8 @@
 		More info in the readme.
 20.02.2020 v0.1.0 for 1.0.20c
 		Updated for 1.0.20c
-		No new feaures or anything.
+		No new features or anything.
 		Documentation still TBD!
+28.02.2020 v0.1.0 for 1.0.21
+		Updated for 1.0.21
+		Thanks to LA for the automatically created patch!

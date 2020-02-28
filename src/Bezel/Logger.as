@@ -37,9 +37,10 @@ package Bezel
 			logStream.open(logFile, FileMode.APPEND);
 			var df:DateTimeFormatter = new DateTimeFormatter("");
 			df.setDateTimePattern("yyyy-MM-dd HH:mm:ss");
-			var formattedId:String = id.substring(0, 10);
-			formattedId += "               ".substr(0, 10-formattedId.length);
-			logStream.writeUTFBytes(df.format(new Date()) + "\t[" + formattedId + "][" + source + "]:\t" + message + "\r\n");
+			var formattedId:String = id.substring(0, 20);
+			formattedId += "               ".substr(0, 20-formattedId.length);
+			//logStream.writeUTFBytes(df.format(new Date()) + "\t[" + formattedId + "][" + source + "]:\t" + message + "\r\n");
+			logStream.writeUTFBytes(df.format(new Date()) + "\t[" + formattedId + "]: " + message + "\r\n");
 			logStream.close();
 		}
 		
@@ -62,7 +63,7 @@ package Bezel
 			else
 			{
 				loggers[identifier] = new Logger(identifier);
-				writeLog("Logger", "getLogger", "Created a new logger: " + identifier);
+				//writeLog("Logger", "getLogger", "Created a new logger: " + identifier);
 				return loggers[identifier];
 			}
 			

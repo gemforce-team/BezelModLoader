@@ -9,7 +9,7 @@ package Bezel
 	import flash.events.*;
 	import flash.system.*;
 	import flash.filesystem.*;
-	import flash.utils.getTimer;
+	import flash.utils.*;
 	import Bezel.Logger;
 	import Bezel.BezelEvent;
 	import Bezel.Events.*;
@@ -19,7 +19,7 @@ package Bezel
 	public class Bezel extends MovieClip
 	{
 		public const VERSION:String = "0.1.0";
-		public const GAME_VERSION:String = "1.0.20c";
+		public const GAME_VERSION:String = "1.0.21";
 		
 		// Game objects
 		public var gameObjects:Object;
@@ -85,7 +85,7 @@ package Bezel
 			for(var f:int = 0; f < fileList.length; f++)
 			{
 				var fileName:String = fileList[f].name;
-				logger.log("loadMods", "Looking at " + fileName);
+				//logger.log("loadMods", "Looking at " + fileName);
 				if (fileName.substring(fileName.length - 4, fileName.length) == ".swf" && fileName != "BezelModLoader.swf")
 				{
 					var newMod:BezelMod = new BezelMod(fileName);

@@ -92,3 +92,5 @@ GemCraft - Frostborn Wrath is developed and owned by [gameinabottle](http://game
 
 # Credits
 Bezel Mod Loader is developed by Hellrage
+
+Special thanks to LA for automating swf patching and .diff generation!
