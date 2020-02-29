@@ -18,7 +18,7 @@ package Bezel
 	// The loader also requires a parameterless constructor (AFAIK), so we also have a .bind method to bind our class to the game
 	public class Bezel extends MovieClip
 	{
-		public const VERSION:String = "0.1.0";
+		public const VERSION:String = "0.2.0";
 		public const GAME_VERSION:String = "1.0.21";
 		
 		// Game objects
@@ -34,7 +34,7 @@ package Bezel
 		private var updateAvailable:Boolean;
 		
 		private var logger:Logger;
-		public var mods:Array;
+		private var mods:Object;
 		private var appStorage:File;
 		
 		private var modsReloadedTimestamp:int;
@@ -47,7 +47,7 @@ package Bezel
 
 			Logger.init();
 			this.logger = Logger.getLogger("Bezel");
-			this.mods = new Array();
+			this.mods = new Object();
 			
 			this.logger.log("Bezel", "Bezel Mod Loader " + prettyVersion());
 		}
@@ -98,10 +98,36 @@ package Bezel
 		public function successfulLoad(mod: Object): void
 		{
 			logger.log("successfulLoad", "Loaded mod: " + mod.instance.MOD_NAME + " v" + mod.instance.VERSION);
-			mods.push(mod);
+			mods[mod.instance.MOD_NAME] = mod;
 			this.addChild(mod.instance);
 			mod.instance.bind(this, this.gameObjects);
+			if (!this.bezelVersionCompatible(mod.instance.BEZEL_VERSION))
+			{
+				logger.log("Compatibility", "Bezel version is incompatible! Required: " + mod.instance.BEZEL_VERSION);
+				delete mods[mod.instance.MOD_NAME];
+				mod.unload();
+				throw new Error("Bezel version is incompatible! Bezel: " + VERSION + " while " + mod.instance.MOD_NAME+ " requires " + mod.instance.BEZEL_VERSION);
+			}
 			logger.log("successfulLoad", "Bound mod: " + mod.instance.MOD_NAME);
+		}
+		
+		public function bezelVersionCompatible(requiredVersion:String): Boolean
+		{
+			var bezelVer:Array = this.VERSION.split(".");
+			var thisVer:Array = requiredVersion.split(".");
+			if (bezelVer[0] != thisVer[0])
+				return false;
+			else
+			{
+				if (bezelVer[1] > thisVer[1])
+					return true;
+				else if(bezelVer[1] == thisVer[1])
+				{
+					return bezelVer[2] >= thisVer[2];
+				}
+			}
+			
+			return false;
 		}
 		
 		public function failedLoad(e:Event): void
@@ -112,6 +138,13 @@ package Bezel
 		public function getLogger(id:String): Logger
 		{
 			return Logger.getLogger(id);
+		}
+		
+		public function getModByName(modName:String): Object
+		{
+			if (this.mods[modName])
+				return this.mods[modName].instance;
+			return null;
 		}
 		
 		public function prettyVersion(): String
