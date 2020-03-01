@@ -152,6 +152,149 @@ package Bezel
 			return 'v' + VERSION + ' for ' + GAME_VERSION;
 		}
 		
+		public function ingamePrePlayerBuildingsEnterFrame(): void
+		{
+			//logger.log("ingamePrePlayerBuildingsEnterFrame", "Resorting arrays");
+			this.core.sortedMonsterArrays = new Object();
+			this.core.sortedMonsterArrays[0] = this.core.monstersOnScene.concat();// .sortOn(["distanceFromOrb"], Array.NUMERIC);
+			return;
+			this.core.sortedMonsterArrays[1] = this.core.monstersOnScene.concat().sortOn(["isSwarmlingForSorting","distanceFromOrb"], [Array.NUMERIC | Array.DESCENDING,Array.NUMERIC]);
+			this.core.sortedMonsterArrays[2] = this.core.monstersOnScene.concat().sortOn(["isGiantForSorting","distanceFromOrb"], [Array.NUMERIC | Array.DESCENDING,Array.NUMERIC]);
+			//this.core.sortedMonsterArrays[3] = this.core.monstersOnScene.concat().sortOn(["distanceFromOrb"], Array.NUMERIC); - RANDOM
+			this.core.sortedMonsterArrays[4] = this.core.sortedMonsterArrays[0]; //STRUCTURE
+			if(this.core.orblets.length == 0)
+				this.core.sortedMonsterArrays[5] = this.core.monstersOnScene.concat().sortOn(["calculatedRelativeBanishmentCost"], Array.NUMERIC);
+			else
+				this.core.sortedMonsterArrays[5] = this.core.monstersOnScene.concat().sortOn(["carriedOrbletsNum","calculatedRelativeBanishmentCost"], Array.NUMERIC);
+			this.core.sortedMonsterArrays[6] = this.core.monstersOnScene.concat().sortOn(["shield","armorLevelForSorting"], [Array.NUMERIC | Array.DESCENDING,Array.NUMERIC | Array.DESCENDING]);
+			this.core.sortedMonsterArrays[7] = this.core.monstersOnScene.concat().sortOn(["hpForSorting"], Array.NUMERIC);
+			this.core.sortedMonsterArrays[14] = this.core.monstersOnScene.concat().sortOn(["numOfEffects"], Array.NUMERIC);
+		}
+		
+		public function ingameAcquireLanternTargets(lantern:Object, rangeSq:Number): void
+		{
+			//logger.log("lanternTarget", "Acquiring lantern target...");
+			lantern.targets = [];
+			var targetPriority:int = lantern.insertedGem.targetPriority;
+			if (targetPriority == 4)
+				lantern.targets = pickMonsters(14, lantern.targetLimit, rangeSq, lantern.x, lantern.y);
+			else if (targetPriority == 3)
+				lantern.targets = pickRandomMonsters(lantern.targetLimit, rangeSq, lantern.x, lantern.y);
+			else
+				lantern.targets = pickMonsters(targetPriority, lantern.targetLimit, rangeSq, lantern.x, lantern.y);
+				
+			if (lantern.targets.length > 0)
+				lantern.isTargetMarkableForDeath = true;
+		}
+		
+		public function ingameAcquireTowerTarget(tower:Object, rangeSq:Number): void
+		{
+			//logger.log("towerTarget", "Acquiring tower target...");
+			var targetPriority:int = tower.insertedGem.targetPriority;
+			var candidate:Object = null;
+			if (targetPriority == 3)
+				candidate = pickRandomMonsters(1, rangeSq, tower.x, tower.y)[0];
+			else
+				candidate = pickMonsters(targetPriority, 1, rangeSq, tower.x, tower.y)[0];
+				
+			if (!candidate)
+				return;
+			
+			//logger.log("towerTarget", "Got a candidate:" + candidate.toString());
+			tower.target = candidate;
+			tower.isTargetMarkableForDeath = true;
+		}
+		
+		public function ingameAcquirePylonTarget(pylon:Object, rangeSq:Number): void
+		{
+			//logger.log("pylonTarget", "Acquiring pylon target...");
+			var targetPriority:int = pylon.insertedGem.targetPriority;
+			var candidate:Object = null;
+			if (targetPriority == 3)
+				candidate = pickRandomMonsters(1, rangeSq, pylon.x, pylon.y)[0];
+			else
+				candidate = pickMonsters(targetPriority, 1, rangeSq, pylon.x, pylon.y)[0];
+				
+			if (!candidate)
+				return;
+				
+			pylon.target = candidate;
+			pylon.isTargetMarkableForDeath = true;
+		}
+		
+		public function ingameAcquireTrapTargets(trap:Object, rangeSq:Number): void
+		{
+			//logger.log("trapTarget", "Acquiring trap target...");
+			trap.targets = [];
+			var targetPriority:int = trap.insertedGem.targetPriority;
+			if (targetPriority == 4)
+				trap.targets = pickMonsters(14, Infinity, rangeSq, trap.x, trap.y);
+			else if (targetPriority == 3)
+				trap.targets = pickRandomMonsters(Infinity, rangeSq, trap.x, trap.y);
+			else
+				trap.targets = pickMonsters(targetPriority, Infinity, rangeSq, trap.x, trap.y);
+				
+			if (trap.targets.length > 0)
+				trap.isTargetMarkableForDeath = true;
+		}
+		
+		private function pickMonsters(targetPriority:int, count:int, rangeSq:Number, originX:Number, originY:Number): Array
+		{
+			//logger.log("pickMonsters", "Picking monsters on priority" + targetPriority.toString());
+			var result:Array = new Array();
+			var monsterCount:int = this.core.sortedMonsterArrays[0].length;
+			for (var m:int = 0; result.length < count && m < monsterCount; m++)
+			{
+				var monster:Object = this.core.sortedMonsterArrays[targetPriority][m];
+				if (this.canBeTargeted(monster, rangeSq, originX, originY))
+					result.push(monster);
+			}
+			return result;
+		}
+		
+		private function pickRandomMonsters(count:int, rangeSq:Number, originX:Number, originY:Number): Array
+		{
+			//logger.log("pickRandom", "Picking random monsters");
+			var result:Array = new Array();
+			for each(var monster:Object in this.core.monstersOnScene)
+			{
+				if (this.canBeTargeted(monster, rangeSq, originX, originY))
+					result.push(monster);
+			}
+			if (result.length < 2)
+				return result;
+				
+			var targets:Array = new Array();
+			var randomIndex:int = -1;
+			while (result.length > 0 && targets.length < count)
+			{
+				randomIndex = Math.floor(Math.random() * result.length);
+				targets.push(result[randomIndex]);
+				result[randomIndex] = result.pop();
+			}
+			
+			return targets;
+		}
+		
+		private function canBeTargeted(monster:Object, rangeSq:Number, originX:Number, originY:Number): Boolean
+		{
+			//logger.log("canBeTargeted", "Checking if monster can be targeted");
+			var dx:Number = monster.x - originX;
+			var dy:Number = monster.y - originY;
+			if(rangeSq > dx * dx + dy * dy)
+			{
+				if(!monster.isKillingShotOnTheWay)
+				{
+					//logger.log("canBeTargeted", "Yes: rangeSq" + rangeSq.toString() + " shooting " + monster.x + ";" + monster.y);
+					return true;
+				}
+				//logger.log("canBeTargeted", "No, killing shot on the way");
+				return false;
+			}
+			//logger.log("canBeTargeted", "No, out of range: rangeSq" + rangeSq.toString() + " shooting " + monster.x + ";" + monster.y);
+			return false;
+		}
+		
 		// Called after the gem's info panel has been formed but before it's returned to the game for rendering
 		public function ingameGemInfoPanelFormed(infoPanel:Object, gem:Object, numberFormatter:Object): void
 		{
