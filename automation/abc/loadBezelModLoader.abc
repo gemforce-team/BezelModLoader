@@ -1,7 +1,7 @@
   trait method QName(PackageNamespace(""), "loadBezelModLoader")
    method
     name "loadBezelModLoader"
-    refid "com.giab.games.gcfw.steam:Main/instance/loadBezelModLoader"
+    refid "com.giab.games.gcfw:Main/instance/loadBezelModLoader"
     returns QName(PackageNamespace(""), "void")
     body
      maxstack 5
@@ -14,11 +14,11 @@
 
       debug               1, "localThis", 0, 0
       pushnull
-      coerce              QName(PackageNamespace("com.giab.games.gcfw.steam"), "Main")
+      coerce              QName(PackageNamespace("com.giab.games.gcfw"), "Main")
       setlocal1
 
       getlocal0
-      coerce              QName(PackageNamespace("com.giab.games.gcfw.steam"), "Main")
+      coerce              QName(PackageNamespace("com.giab.games.gcfw"), "Main")
       setlocal1
 
       getlocal0

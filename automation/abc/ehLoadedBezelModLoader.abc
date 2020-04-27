@@ -1,7 +1,7 @@
   trait method QName(PackageNamespace(""), "ehLoadedBezelModLoader")
    method
     name "ehLoadedBezelModLoader"
-    refid "com.giab.games.gcfw.steam:Main/instance/ehLoadedBezelModLoader"
+    refid "com.giab.games.gcfw:Main/instance/ehLoadedBezelModLoader"
     param QName(PackageNamespace("flash.events"), "Event")
     returns QName(PackageNamespace(""), "void")
     body
@@ -24,78 +24,78 @@
       pushstring          "main"
       getlocal0
       pushstring          "mods"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam"), "Mods")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw"), "Mods")
       pushstring          "GV"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam"), "GV")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV")
       pushstring          "SB"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam"), "SB")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw"), "SB")
       pushstring          "prefs"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam"), "Prefs")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw"), "Prefs")
       pushstring          "constants"
       pushstring          "achievementIngameStatus"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "AchievementIngameStatus")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "AchievementIngameStatus")
       pushstring          "actionStatus"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "ActionStatus")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "ActionStatus")
       pushstring          "battleMode"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "BattleMode")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "BattleMode")
       pushstring          "battleOutcome"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "BattleOutcome")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "BattleOutcome")
       pushstring          "battleTraitId"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "BattleTraitId")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "BattleTraitId")
       pushstring          "beaconType"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "BeaconType")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "BeaconType")
       pushstring          "buildingType"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "BuildingType")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "BuildingType")
       pushstring          "dropType"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "DropType")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "DropType")
       pushstring          "epicCreatureType"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "EpicCreatureType")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "EpicCreatureType")
       pushstring          "gameMode"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "GameMode")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "GameMode")
       pushstring          "gemComponentType"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "GemComponentType")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "GemComponentType")
       pushstring          "gemEnhancementId"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "GemEnhancementId")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "GemEnhancementId")
       pushstring          "ingameStatus"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "IngameStatus")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "IngameStatus")
       pushstring          "monsterBodyPartType"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "MonsterBodyPartType")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "MonsterBodyPartType")
       pushstring          "monsterBuffId"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "MonsterBuffId")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "MonsterBuffId")
       pushstring          "monsterType"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "MonsterType")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "MonsterType")
       pushstring          "pauseType"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "PauseType")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "PauseType")
       pushstring          "screenId"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "ScreenId")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "ScreenId")
       pushstring          "selectorScreenStatus"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "SelectorScreenStatus")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "SelectorScreenStatus")
       pushstring          "skillId"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "SkillId")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "SkillId")
       pushstring          "skillType"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "SkillType")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "SkillType")
       pushstring          "stageType"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "StageType")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "StageType")
       pushstring          "statId"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "StatId")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "StatId")
       pushstring          "strikeSpellId"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "StrikeSpellId")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "StrikeSpellId")
       pushstring          "talismanFragmentType"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "TalismanFragmentType")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "TalismanFragmentType")
       pushstring          "talismanPropertyId"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "TalismanPropertyId")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "TalismanPropertyId")
       pushstring          "targetPriorityId"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "TargetPriorityId")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "TargetPriorityId")
       pushstring          "tutorialId"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "TutorialId")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "TutorialId")
       pushstring          "url"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "Url")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "Url")
       pushstring          "waveFormation"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "WaveFormation")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "WaveFormation")
       pushstring          "wizLockType"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "WizLockType")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "WizLockType")
       pushstring          "wizStashStatus"
-      getlex              QName(PackageNamespace("com.giab.games.gcfw.steam.constants"), "WizStashStatus")
+      getlex              QName(PackageNamespace("com.giab.games.gcfw.constants"), "WizStashStatus")
       newobject           32
       newobject           6
       callproperty        QName(PackageNamespace(""), "bind"), 1
