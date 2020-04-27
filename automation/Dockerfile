@@ -27,6 +27,7 @@ WORKDIR /workdir
 ENV GAME_NAME "GemCraft Frostborn Wrath"
 
 COPY --from=rabcdasm_builder /rabcdasm/bin /usr/local/bin
+COPY scripts/ /usr/local/bin/
 
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
@@ -38,6 +39,5 @@ RUN apt-get update && \
       nano \
       git && \
     rm -rf /var/lib/apt/lists/* && \
-    apt-get clean
-
-COPY scripts/ /usr/local/bin/
+    apt-get clean && \
+    chmod 0755 /usr/local/bin/*.sh
