@@ -24,9 +24,9 @@ Mods are kept in the game's folder, in a `Mods` subfolder. Any `.swf`s placed th
 
 * Mods use a single logger provided by Bezel, so all mods' messages are written to the same log file.
 
-* Mods are loaded from the `Mods` folder in the game's folder. The only released mod under this system right now is [Gemsmith](https://github.com/gemforce-team/gemsmith)
+* Mods are loaded from the `Mods` folder in the game's folder.
 
-* There are just a couple events provided by Bezel (the ones I use, currently) that mods can subscribe to to have some triggers. I believe you can also subscribe to game objects' events directly, but I haven't tested that yet.
+* There are a couple events provided by Bezel that mods can subscribe to. You can also subscribe to game objects' events directly.
 
 
 # Installation
