@@ -1,0 +1,9 @@
+# ignore .git and .cache folders
+.git
+.cache
+
+# ignore .swf, they will be used at run time
+.swf
+
+# we don't need anything in the output directory
+output
