@@ -1,0 +1,11 @@
+      getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV")
+      getproperty         QName(PackageNamespace(""), "main")
+      getproperty         QName(PackageNamespace(""), "bezel")
+      callproperty        QName(PackageNamespace(""), "ingamePreRenderInfoPanel"), 0
+      pushtrue
+      ifeq                L160
+
+      returnvoid
+
+L160:
+      label
