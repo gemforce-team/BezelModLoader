@@ -2,7 +2,7 @@ package Bezel.Events
 {
 	/**
 	 * ...
-	 * @author Hellrage
+	 * @author piepie62
 	 */
 	
 	import flash.events.Event;
