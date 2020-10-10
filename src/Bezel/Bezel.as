@@ -220,5 +220,10 @@ package Bezel
 			mods = new Array();
 			loadMods();
 		}
+
+		public function ingameNewScene(): void
+		{
+			dispatchEvent(new IngameNewSceneEvent(BezelEvent.INGAME_NEW_SCENE));
+		}
 	}
 }
