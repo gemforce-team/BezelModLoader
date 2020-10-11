@@ -220,5 +220,10 @@ package Bezel
 			mods = new Array();
 			loadMods();
 		}
+
+		public function loadSave(): void
+		{
+			dispatchEvent(new LoadSaveEvent(GV.ppd, BezelEvent.LOAD_SAVE));
+		}
 	}
 }
