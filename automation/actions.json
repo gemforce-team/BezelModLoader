@@ -116,5 +116,17 @@
         "file": "loadSave.abc"
       }
     ]
+  },
+  {
+    "script": "LoaderSaver.class",
+    "file": "com/giab/games/gcfw/utils/LoaderSaver.class.asasm",
+    "actions": [
+      {
+        "type": "insert",
+        "identifier": "callpropvoid.*addFloaterPanel",
+        "offset": "3",
+        "file": "saveSave.abc"
+      }
+    ]
   }
 ]

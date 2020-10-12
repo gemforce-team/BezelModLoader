@@ -13,6 +13,7 @@ package Bezel
 		public static const INGAME_CLICK_ON_SCENE:String = "ingameClickOnScene";
 		public static const INGAME_RIGHT_CLICK_ON_SCENE:String = "ingameRightClickOnScene";
 		public static const LOAD_SAVE:String = "loadSave";
+		public static const SAVE_SAVE:String = "saveSave";
 		
 		public function BezelEvent() 
 		{

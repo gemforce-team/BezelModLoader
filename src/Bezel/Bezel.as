@@ -225,5 +225,9 @@ package Bezel
 		{
 			dispatchEvent(new LoadSaveEvent(GV.ppd, BezelEvent.LOAD_SAVE));
 		}
+		public function saveSave(): void
+		{
+			dispatchEvent(new SaveSaveEvent(GV.ppd, BezelEvent.SAVE_SAVE));
+		}
 	}
 }
