@@ -208,12 +208,40 @@ package Bezel.Lattice
 
                 File.applicationStorageDirectory.resolvePath("gcfw-0").deleteDirectory(true);
                 File.applicationStorageDirectory.resolvePath("gcfw-0-clean").copyTo(File.applicationStorageDirectory.resolvePath("gcfw-0"));
+                checkConflicts();
                 doPatch();
                 callTool("rabcasm", ["gcfw-0/gcfw-0.main.asasm"]);
             }
             else
             {
                 dispatchEvent(new Event(LatticeEvent.REBUILD_DONE));
+            }
+        }
+
+        private function checkConflicts(): void
+        {
+            var replaced:Object = new Object();
+            for each (var patch:LatticePatch in patches)
+            {
+                if (patch.overwritten != 0)
+                {
+                    if (!(patch.filename in replaced))
+                    {
+                        replaced[patch.filename] = new Dictionary();
+                    }
+                    for (var i:int = patch.offset; i != patch.offset + patch.overwritten; ++i)
+                    {
+                        replaced[patch.filename][i] = patch;
+                    }
+                }
+            }
+
+            for each (patch in patches)
+            {
+                if (patch.filename in replaced && Dictionary(replaced[patch.filename])[patch.offset] != null && Dictionary(replaced[patch.filename])[patch.offset] != patch)
+                {
+                    throw new Error("Lattice: Modifications at line " + patch.offset + " conflict");
+                }
             }
         }
 
