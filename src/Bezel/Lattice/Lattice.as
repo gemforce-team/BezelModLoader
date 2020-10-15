@@ -22,6 +22,7 @@ package Bezel.Lattice
 
         private var process:NativeProcess;
         private var processInfo:NativeProcessStartupInfo;
+        private var processError:String;
 
         private var logger:Logger;
 
@@ -52,6 +53,7 @@ package Bezel.Lattice
             }
             processInfo.workingDirectory = File.applicationStorageDirectory;
             process.addEventListener(NativeProcessExitEvent.EXIT, this.toolFinished);
+            process.addEventListener("standardErrorData", this.onToolError);
             process.start(processInfo);
         }
 
@@ -59,28 +61,32 @@ package Bezel.Lattice
         {
             if (e.exitCode != 0)
             {
-                logger.log("toolFinished", currentTool + " failed");
+                logger.log("toolFinished", currentTool + " failed: " + this.processError);
+                throw new Error("Lattice patch tool " + currentTool + " failed. Check the log file for details");
             }
+
+            logger.log("toolFinished", currentTool + " has finished");
             switch (currentTool)
             {
                 case "abcexport":
-                    logger.log("toolFinished", currentTool + " has finished");
                     callTool("rabcdasm", ["gcfw-0.abc"]);
                     break;
                 case "rabcdasm":
-                    logger.log("toolFinished", currentTool + " has finished");
                     File.applicationStorageDirectory.resolvePath("gcfw-0").copyTo(File.applicationStorageDirectory.resolvePath("gcfw-0-clean"));
                     dispatchEvent(new Event(LatticeEvent.DISASSEMBLY_DONE));
                     break;
                 case "rabcasm":
-                    logger.log("toolFinished", currentTool + " has finished");
                     callTool("abcreplace", ["gcfw-modded.swf", "0", "gcfw-0/gcfw-0.main.abc"]);
                     break;
                 case "abcreplace":
-                    logger.log("toolFinished", currentTool + " has finished");
                     dispatchEvent(new Event(LatticeEvent.REBUILD_DONE));
                     break;
             }
+        }
+
+        private function onToolError(e:Event): void
+        {
+            this.processError += this.process.standardError.readUTFBytes(process.standardError.bytesAvailable);
         }
 
         public function init(bezel:Bezel): void
