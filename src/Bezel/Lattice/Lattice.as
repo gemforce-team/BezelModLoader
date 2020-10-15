@@ -125,17 +125,15 @@ package Bezel.Lattice
                 logger.log("init", "Loading previous coremod info");
                 var stream:FileStream = new FileStream();
                 stream.open(file, FileMode.READ);
-                var bytes:ByteArray = new ByteArray();
-                stream.readBytes(bytes);
-                stream.close();
-
-                bytes.position = 0;
-
-                while (bytes.bytesAvailable != 0)
+                while (stream.bytesAvailable != 0)
                 {
-                    expectedPatches.push(new LatticePatch(bytes.readUTF(), bytes.readUnsignedInt(), bytes.readUnsignedInt(), bytes.readUTF()));
+                    var filename:String = stream.readUTF();
+                    var offset:uint = stream.readUnsignedInt();
+                    var contents:String = stream.readUTF();
+                    var overwrite:uint = stream.readUnsignedInt();
+                    expectedPatches.push(new LatticePatch(filename, offset, overwrite, contents));
                 }
-
+                stream.close();
                 dispatchEvent(new Event(LatticeEvent.DISASSEMBLY_DONE));
             }
             else
@@ -182,7 +180,6 @@ package Bezel.Lattice
             }
             else
             {
-                
                 for (var i:uint = 0; i < expectedPatches.length; ++i)
                 {
                     if (expectedPatches[i].filename != patches[i].filename ||
@@ -198,17 +195,15 @@ package Bezel.Lattice
 
             if (!unchangedPatches)
             {
-                var bytes:ByteArray = new ByteArray();
-                for each (var patch:LatticePatch in patches)
-                {
-                    bytes.writeUTF(patch.filename);
-                    bytes.writeUnsignedInt(patch.offset);
-                    bytes.writeUnsignedInt(patch.overwritten);
-                    bytes.writeUTF(patch.contents);
-                }
                 var stream:FileStream = new FileStream();
                 stream.open(File.applicationStorageDirectory.resolvePath("coremods.lttc"), FileMode.WRITE);
-                stream.writeBytes(bytes);
+                for each (var patch:LatticePatch in patches)
+                {
+                    stream.writeUTF(patch.filename);
+                    stream.writeUnsignedInt(patch.offset);
+                    stream.writeUTF(patch.contents);
+                    stream.writeUnsignedInt(patch.overwritten);
+                }
                 stream.close();
 
                 File.applicationStorageDirectory.resolvePath("gcfw-0").deleteDirectory(true);

@@ -15,9 +15,6 @@ package Bezel
                 "\".*an error has occured.*\"",
                 "\".*Could you please copy this message.*\"",
                 "trait.*method.*com.giab.games.gcfw.*frame3",
-                "findproperty.*steamworks",
-                "steamworks",
-                "trait slot.*steamworks",
                 "constructsuper",
                 "trait.*_cm"
             ],
@@ -34,7 +31,7 @@ package Bezel
             ["monsterEggHunt"]
         ];
         private static const replaceNums:Array = [
-            [ 1, 1, 0, 4, 19, 1, 0, 0 ],
+            [ 1, 1, 0, 0, 0 ],
             [ 0 ],
             [ 0, 0, 0, 1 ],
             [ 0 ],
@@ -43,7 +40,7 @@ package Bezel
             [ 0 ]
         ];
         private static const offsetFromMatches:Array = [
-            [ 0, 0, 22, -1, -2, -1, 0, 0 ],
+            [ 0, 0, 22, 0, 0 ],
             [ -17 ],
             [ -5, 39, -5, 17 ],
             [ 7 ],
@@ -56,9 +53,6 @@ package Bezel
                 "pushstring \"Unfortunately, an error has occured in the game:\\n(game version stamp: \"",
                 "pushstring \"\\n\\nTHE GAME IS MODDED!\\n\\nPlease check the log in \\\"%AppData%/Roaming/com.giab.games.gcfw.steam/Local Store/Bezel Mod Loader\\\" for additional info!\\n\\nYou can ask for help in GemCraft's discord #modding channel.\\n\\nThank you for your help and sorry for the inconvenience!\"",
                 "trait slot QName(PackageNamespace(\"\"), \"bezel\") type QName(PackageNamespace(\"\"), \"Object\") end",
-                "",
-                "",
-                "trait slot QName(PackageNamespace(\"\"), \"steamworks\") slotid 1 type QName(PackageNamespace(\"\"), \"Object\") end",
                 ' \n \
                 returnvoid \n \
                 end \n \

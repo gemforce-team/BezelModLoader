@@ -25,9 +25,6 @@ package Bezel
 		public const VERSION:String = "0.2.1";
 		public const GAME_VERSION:String = "1.1.2b";
 		
-		private static var steam:Object;
-		private static var steamInited:Boolean;
-		
 		// Game objects
 		public var gameObjects:Object;
 		public var lattice:Lattice;
@@ -56,10 +53,7 @@ package Bezel
 		{
 			super();
 			prepareFolders();
-			
-			steam = new (getDefinitionByName("com.amanitadesign.steam.FRESteamWorks"))();
-			steamInited = steam.init();
-			steam.addOverlayWorkaround(this, false);
+
 			NativeApplication.nativeApplication.addEventListener(Event.EXITING,this.onExit);
 
 			Logger.init();
@@ -99,10 +93,6 @@ package Bezel
 		
 		private function onExit(e:Event): void
 		{
-			if (steamInited)
-			{
-				steam.dispose();
-			}
 		}
 
 		private function onLatticeReady(e:Event): void
@@ -122,9 +112,6 @@ package Bezel
 		{
 			this.main = game.instance;
 			game.instance.bezel = this;
-			var gameMainClass:Class = getDefinitionByName(getQualifiedClassName(game.instance)) as Class;
-			gameMainClass.steamworks = steam;
-			gameMainClass.isSteamworksInitiated = steamInited;
 			this.addChild(DisplayObject(game.instance));
 			main.initFromBezel();
 			bind();
