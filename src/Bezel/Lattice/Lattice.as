@@ -110,11 +110,11 @@ package Bezel.Lattice
 
                 if (!File.applicationStorageDirectory.resolvePath("gcfw.swf").exists)
                 {
-                    File.applicationDirectory.resolvePath("gcfw.swf").copyTo(File.applicationStorageDirectory.resolvePath("gcfw.swf"));
+                    File.applicationDirectory.resolvePath("GemCraft Frostborn Wrath Backup.swf").copyTo(File.applicationStorageDirectory.resolvePath("gcfw.swf"));
                 }
                 if (!File.applicationStorageDirectory.resolvePath("gcfw-modded.swf").exists)
                 {
-                    File.applicationDirectory.resolvePath("gcfw.swf").copyTo(File.applicationStorageDirectory.resolvePath("gcfw-modded.swf"));
+                    File.applicationStorageDirectory.resolvePath("gcfw.swf").copyTo(File.applicationStorageDirectory.resolvePath("gcfw-modded.swf"));
                 }
 
                 callTool("abcexport", ["gcfw.swf"]);
