@@ -131,7 +131,7 @@ package Bezel.Lattice
                     var offset:uint = stream.readUnsignedInt();
                     var contents:String = stream.readUTF();
                     var overwrite:uint = stream.readUnsignedInt();
-                    expectedPatches.push(new LatticePatch(filename, offset, overwrite, contents));
+                    this.expectedPatches[this.expectedPatches.length] = new LatticePatch(filename, offset, overwrite, contents);
                 }
                 stream.close();
                 dispatchEvent(new Event(LatticeEvent.DISASSEMBLY_DONE));
@@ -213,11 +213,11 @@ package Bezel.Lattice
             }
             else
             {
-                dispatchEvent(new Event(LatticeEvent.DISASSEMBLY_DONE));
+                dispatchEvent(new Event(LatticeEvent.REBUILD_DONE));
             }
         }
 
-        public function doPatch(): void
+        private function doPatch(): void
         {
             for each (var patch:LatticePatch in patches)
             {
@@ -247,7 +247,7 @@ package Bezel.Lattice
             {
                 throw new IOError("'" + filename + "'" + " does not exist");
             }
-            patches.push(new LatticePatch(filename, offset, replaceLines, contents));
+            this.patches[this.patches.length] = new LatticePatch(filename, offset, replaceLines, contents);
         }
 
         public function findPattern(filename:String, searchFrom:int, pattern:RegExp): int
