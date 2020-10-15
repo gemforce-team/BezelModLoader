@@ -128,5 +128,17 @@
         "file": "saveSave.abc"
       }
     ]
+  },
+  {
+    "script": "IngameInitializer.class",
+    "file": "com/giab/games/gcfw/ingame/IngameInitializer.class.asasm",
+    "actions": [
+      {
+        "type": "insert",
+        "identifier": "monsterEggHunt",
+        "offset": "-2",
+        "file": "newScene.abc"
+      }
+    ]
   }
 ]

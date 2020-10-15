@@ -13,22 +13,30 @@ package Bezel
 	import Bezel.Logger;
 	import Bezel.BezelEvent;
 	import Bezel.Events.*;
+	import flash.desktop.NativeApplication;
+	import Bezel.Lattice.Lattice;
+	import Bezel.Lattice.LatticeEvent;
+	import flash.events.Event;
 
 	// We extend MovieClip so that flash.display.Loader accepts our class
 	// The loader also requires a parameterless constructor (AFAIK), so we also have a .bind method to bind our class to the game
 	public class Bezel extends MovieClip
 	{
 		public const VERSION:String = "0.2.1";
-		public const GAME_VERSION:String = "1.1.1";
+		public const GAME_VERSION:String = "1.1.2b";
+		
+		private static var steam:Object;
+		private static var steamInited:Boolean;
 		
 		// Game objects
 		public var gameObjects:Object;
+		public var lattice:Lattice;
 		
 		// Shortcuts to gameObjects
 		private var main:Object;/*Main*/
 		private var core:Object;/*IngameCore*/
-		private var GV:Object;/*GV*/
-		private var SB:Object;/*SB*/
+		private var GV:Class;/*GV*/
+		private var SB:Class;/*SB*/
 		private var prefs:Object;/*Prefs*/
 
 		private var updateAvailable:Boolean;
@@ -36,37 +44,160 @@ package Bezel
 		private var logger:Logger;
 		private var mods:Object;
 		private var appStorage:File;
+
+		private var waitingMods:uint;
 		
 		private var modsReloadedTimestamp:int;
+
+		private var game:SWFFile;
 		
 		// Parameterless constructor for flash.display.Loader
 		public function Bezel()
 		{
 			super();
 			prepareFolders();
+			
+			steam = new (getDefinitionByName("com.amanitadesign.steam.FRESteamWorks"))();
+			steamInited = steam.init();
+			steam.addOverlayWorkaround(this, false);
+			NativeApplication.nativeApplication.addEventListener(Event.EXITING,this.onExit);
 
 			Logger.init();
 			this.logger = Logger.getLogger("Bezel");
 			this.mods = new Object();
 			
 			this.logger.log("Bezel", "Bezel Mod Loader " + prettyVersion());
+			this.logger.log("Bezel", "Current application storage directory: " + File.applicationStorageDirectory.nativePath);
+			
+            var swfFile:File = File.applicationDirectory.resolvePath("gcfw.swf");
+			if (!swfFile.exists)
+			{
+				this.logger.log("Bezel", "Game file not found. Try reinstalling the game, then Bezel.");
+				NativeApplication.nativeApplication.exit(-1);
+			}
+			var tools:File = File.applicationDirectory.resolvePath("BezelTools");
+			if (!tools.exists || !tools.isDirectory)
+			{
+				this.logger.log("Bezel", "Tools directory not found. Try reinstalling Bezel.");
+				NativeApplication.nativeApplication.exit(-1);
+			}
+			for each (var tool:String in ["abcexport", "rabcdasm", "rabcasm", "abcreplace"])
+			{
+				if (!File.applicationDirectory.resolvePath("BezelTools/" + tool + ".exe").exists)
+				{
+					this.logger.log("Bezel", tool + " not found. Try reinstalling Bezel.");
+					NativeApplication.nativeApplication.exit(-1);
+				}
+			}
+
+			this.lattice = new Lattice(this);
+
+			this.lattice.addEventListener(LatticeEvent.DISASSEMBLY_DONE, onLatticeReady);
+			this.lattice.addEventListener(LatticeEvent.REBUILD_DONE, onGameBuilt);
+			this.lattice.init(this);
+		}
+		
+		private function onExit(e:Event): void
+		{
+			if (steamInited)
+			{
+				steam.dispose();
+			}
+		}
+
+		private function onLatticeReady(e:Event): void
+		{
+			BezelCoreMod.installHooks(this);
+
+			loadMods();
+		}
+
+		private function onGameBuilt(e:Event): void
+		{
+			this.game = new SWFFile(File.applicationStorageDirectory.resolvePath("gcfw-modded.swf"));
+			this.game.load(gameLoadSuccess, gameLoadFail);
+		}
+
+		private function gameLoadSuccess(game:SWFFile): void
+		{
+			this.main = game.instance;
+			game.instance.bezel = this;
+			var gameMainClass:Class = getDefinitionByName(getQualifiedClassName(game.instance)) as Class;
+			gameMainClass.steamworks = steam;
+			gameMainClass.isSteamworksInitiated = steamInited;
+			this.addChild(DisplayObject(game.instance));
+			main.initFromBezel();
+			bind();
+		}
+
+		private function gameLoadFail(e:Event): void
+		{
+			this.logger.log("gameLoadFail", "Loading game failed");
 		}
 		
 		// This method binds the class to the game's objects
-		public function bind(gameObjects:Object) : Bezel
+		public function bind() : Bezel
 		{
-			this.gameObjects = gameObjects;
-			this.main = gameObjects.main;
-			this.core = gameObjects.GV.ingameCore;
-			this.SB = gameObjects.SB;
-			this.GV = gameObjects.GV;
-			this.prefs = gameObjects.prefs;
+			this.GV = getDefinitionByName("com.giab.games.gcfw.GV") as Class;
+			this.SB = getDefinitionByName("com.giab.games.gcfw.SB") as Class;
+			this.prefs = getDefinitionByName("com.giab.games.gcfw.Prefs") as Class;
+			this.gameObjects = new Object();
+			this.gameObjects.main = this.main;
+			this.gameObjects.core = this.GV.ingameCore;
+			this.gameObjects.GV = this.GV;
+			this.gameObjects.SB = this.SB;
+			this.gameObjects.prefs = this.prefs;
+
+			this.gameObjects.mods = getDefinitionByName("com.giab.games.gcfw.Mods");
+			this.gameObjects.constants = new Object();
+			this.gameObjects.constants.achievementIngameStatus = getDefinitionByName("com.giab.games.gcfw.constants.AchievementIngameStatus");
+			this.gameObjects.constants.actionStatus = getDefinitionByName("com.giab.games.gcfw.constants.ActionStatus");
+			this.gameObjects.constants.battleMode = getDefinitionByName("com.giab.games.gcfw.constants.BattleMode");
+			this.gameObjects.constants.battleOutcome = getDefinitionByName("com.giab.games.gcfw.constants.BattleOutcome");
+			this.gameObjects.constants.battleTraitId = getDefinitionByName("com.giab.games.gcfw.constants.BattleTraitId");
+			this.gameObjects.constants.beaconType = getDefinitionByName("com.giab.games.gcfw.constants.BeaconType");
+			this.gameObjects.constants.buildingType = getDefinitionByName("com.giab.games.gcfw.constants.BuildingType");
+			this.gameObjects.constants.dropType = getDefinitionByName("com.giab.games.gcfw.constants.DropType");
+			this.gameObjects.constants.epicCreatureType = getDefinitionByName("com.giab.games.gcfw.constants.EpicCreatureType");
+			this.gameObjects.constants.gameMode = getDefinitionByName("com.giab.games.gcfw.constants.GameMode");
+			this.gameObjects.constants.gemComponentType = getDefinitionByName("com.giab.games.gcfw.constants.GemComponentType");
+			this.gameObjects.constants.gemEnhancementId = getDefinitionByName("com.giab.games.gcfw.constants.GemEnhancementId");
+			this.gameObjects.constants.ingameStatus = getDefinitionByName("com.giab.games.gcfw.constants.IngameStatus");
+			this.gameObjects.constants.monsterBodyPartType = getDefinitionByName("com.giab.games.gcfw.constants.MonsterBodyPartType");
+			this.gameObjects.constants.monsterBuffId = getDefinitionByName("com.giab.games.gcfw.constants.MonsterBuffId");
+			this.gameObjects.constants.monsterType = getDefinitionByName("com.giab.games.gcfw.constants.MonsterType");
+			this.gameObjects.constants.pauseType = getDefinitionByName("com.giab.games.gcfw.constants.PauseType");
+			this.gameObjects.constants.screenId = getDefinitionByName("com.giab.games.gcfw.constants.ScreenId");
+			this.gameObjects.constants.selectorScreenStatus = getDefinitionByName("com.giab.games.gcfw.constants.SelectorScreenStatus");
+			this.gameObjects.constants.skillId = getDefinitionByName("com.giab.games.gcfw.constants.SkillId");
+			this.gameObjects.constants.skillType = getDefinitionByName("com.giab.games.gcfw.constants.SkillType");
+			this.gameObjects.constants.stageType = getDefinitionByName("com.giab.games.gcfw.constants.StageType");
+			this.gameObjects.constants.statId = getDefinitionByName("com.giab.games.gcfw.constants.StatId");
+			this.gameObjects.constants.strikeSpellId = getDefinitionByName("com.giab.games.gcfw.constants.StrikeSpellId");
+			this.gameObjects.constants.talismanFragmentType = getDefinitionByName("com.giab.games.gcfw.constants.TalismanFragmentType");
+			this.gameObjects.constants.talismanPropertyId = getDefinitionByName("com.giab.games.gcfw.constants.TalismanPropertyId");
+			this.gameObjects.constants.targetPriorityId = getDefinitionByName("com.giab.games.gcfw.constants.TargetPriorityId");
+			this.gameObjects.constants.tutorialId = getDefinitionByName("com.giab.games.gcfw.constants.TutorialId");
+			this.gameObjects.constants.url = getDefinitionByName("com.giab.games.gcfw.constants.Url");
+			this.gameObjects.constants.waveFormation = getDefinitionByName("com.giab.games.gcfw.constants.WaveFormation");
+			this.gameObjects.constants.wizLockType = getDefinitionByName("com.giab.games.gcfw.constants.WizLockType");
+			this.gameObjects.constants.wizStashStatus = getDefinitionByName("com.giab.games.gcfw.constants.WizStashStatus");
+			
 			this.updateAvailable = false;
 			main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text = "Bezel " + prettyVersion();
 			//checkForUpdates();
 			this.logger.log("Bezel", "Bezel bound to game's objects!");
-			this.loadMods();
+			this.bindMods();
 			return this;
+		}
+
+		private function bindMods() : void
+		{
+			for each (var mod:Object in mods)
+			{
+				mod.instance.bind(this, this.gameObjects);
+				this.logger.log("bindMods", "Bound mod: " + mod.instance.MOD_NAME);
+			}
 		}
 
 		private function prepareFolders(): void
@@ -82,25 +213,32 @@ package Bezel
 			var modsFolder:File = File.applicationDirectory.resolvePath("Mods/");
 			
 			var fileList: Array = modsFolder.getDirectoryListing();
+			var modFiles:Array = new Array();
 			for(var f:int = 0; f < fileList.length; f++)
 			{
 				var fileName:String = fileList[f].name;
 				//logger.log("loadMods", "Looking at " + fileName);
 				if (fileName.substring(fileName.length - 4, fileName.length) == ".swf" && fileName != "BezelModLoader.swf")
 				{
-					var newMod:BezelMod = new BezelMod(fileName);
-					newMod.load(successfulLoad, failedLoad);
+					modFiles.push(fileName);
 				}
+			}
+
+			waitingMods = modFiles.length;
+			for each (var file:String in modFiles)
+			{
+				logger.log("loadMods", "Loading " + file + " @ " + File.applicationDirectory.resolvePath("Mods/" + file).nativePath);
+				var newMod:SWFFile = new SWFFile(File.applicationDirectory.resolvePath("Mods/" + file));
+				newMod.load(successfulModLoad, failedModLoad);
 			}
 			this.modsReloadedTimestamp = getTimer();
 		}
 		
-		public function successfulLoad(mod: Object): void
+		public function successfulModLoad(mod:SWFFile): void
 		{
-			logger.log("successfulLoad", "Loaded mod: " + mod.instance.MOD_NAME + " v" + mod.instance.VERSION);
+			logger.log("successfulModLoad", "Loaded mod: " + mod.instance.MOD_NAME + " v" + mod.instance.VERSION);
 			mods[mod.instance.MOD_NAME] = mod;
-			this.addChild(mod.instance);
-			mod.instance.bind(this, this.gameObjects);
+			this.addChild(DisplayObject(mod.instance));
 			if (!this.bezelVersionCompatible(mod.instance.BEZEL_VERSION))
 			{
 				logger.log("Compatibility", "Bezel version is incompatible! Required: " + mod.instance.BEZEL_VERSION);
@@ -108,7 +246,18 @@ package Bezel
 				mod.unload();
 				throw new Error("Bezel version is incompatible! Bezel: " + VERSION + " while " + mod.instance.MOD_NAME+ " requires " + mod.instance.BEZEL_VERSION);
 			}
-			logger.log("successfulLoad", "Bound mod: " + mod.instance.MOD_NAME);
+
+			if ("loadCoreMod" in mod.instance)
+			{
+				mod.instance.loadCoreMod(this.lattice);
+			}
+
+			waitingMods--;
+
+			if (waitingMods == 0)
+			{
+				this.lattice.apply();
+			}
 		}
 		
 		public function bezelVersionCompatible(requiredVersion:String): Boolean
@@ -130,9 +279,15 @@ package Bezel
 			return false;
 		}
 		
-		public function failedLoad(e:Event): void
+		public function failedModLoad(e:Event): void
 		{
 			logger.log("failedLoad", "Failed to load mod: " + e.currentTarget.url);
+
+			waitingMods--;
+			if (waitingMods == 0)
+			{
+				this.lattice.apply();
+			}
 		}
 		
 		public function getLogger(id:String): Logger
@@ -212,7 +367,7 @@ package Bezel
 		{
 			logger.log("eh_keyboardKeyDown", "Reloading all mods!");
 			this.modsReloadedTimestamp = getTimer();
-			for each(var mod:BezelMod in mods)
+			for each(var mod:SWFFile in mods)
 			{
 				mod.unload();
 			}
@@ -228,6 +383,10 @@ package Bezel
 		public function saveSave(): void
 		{
 			dispatchEvent(new SaveSaveEvent(GV.ppd, BezelEvent.SAVE_SAVE));
+		}
+		public function ingameNewScene(): void
+		{
+			dispatchEvent(new IngameNewSceneEvent(BezelEvent.INGAME_NEW_SCENE));
 		}
 	}
 }

@@ -26,6 +26,7 @@ package Bezel
 			if(logFile.exists)
 				logFile.deleteFile();
 			logStream = new FileStream();
+			logStream.open(logFile, FileMode.APPEND);
 			loggers = new Dictionary();
 		}
 		
@@ -34,14 +35,12 @@ package Bezel
 		// TODO probably just add a hook to Main uncaughtErrorHandler to gracefully shut down?
 		private static function writeLog(id:String, source:String, message:String): void
 		{
-			logStream.open(logFile, FileMode.APPEND);
 			var df:DateTimeFormatter = new DateTimeFormatter("");
 			df.setDateTimePattern("yyyy-MM-dd HH:mm:ss");
 			var formattedId:String = id.substring(0, 20);
 			formattedId += "               ".substr(0, 20-formattedId.length);
 			//logStream.writeUTFBytes(df.format(new Date()) + "\t[" + formattedId + "][" + source + "]:\t" + message + "\r\n");
 			logStream.writeUTFBytes(df.format(new Date()) + "\t[" + formattedId + "]: " + message + "\r\n");
-			logStream.close();
 		}
 		
 		public function Logger(identifier:String)
