@@ -17,6 +17,8 @@ package Bezel
 	import Bezel.Lattice.Lattice;
 	import Bezel.Lattice.LatticeEvent;
 	import flash.events.Event;
+	import flash.filesystem.FileStream;
+	import flash.filesystem.FileMode;
 
 	// We extend MovieClip so that flash.display.Loader accepts our class
 	// The loader also requires a parameterless constructor (AFAIK), so we also have a .bind method to bind our class to the game
@@ -47,6 +49,13 @@ package Bezel
 		private var modsReloadedTimestamp:int;
 
 		private var game:SWFFile;
+
+
+        [Embed(source = "../../assets/rabcdasm/rabcdasm.exe", mimeType = "application/octet-stream")] private var rabcdasm:Class;
+        [Embed(source = "../../assets/rabcdasm/rabcasm.exe", mimeType = "application/octet-stream")] private var rabcasm:Class;
+        [Embed(source = "../../assets/rabcdasm/abcexport.exe", mimeType = "application/octet-stream")] private var abcexport:Class;
+        [Embed(source = "../../assets/rabcdasm/abcreplace.exe", mimeType = "application/octet-stream")] private var abcreplace:Class;
+		[Embed(source = "../../assets/rabcdasm/COPYING", mimeType = "application/octet-stream")] private var LICENSE:Class;
 		
 		// Parameterless constructor for flash.display.Loader
 		public function Bezel()
@@ -69,18 +78,22 @@ package Bezel
 				this.logger.log("Bezel", "Game file not found. Try reinstalling the game, then Bezel.");
 				NativeApplication.nativeApplication.exit(-1);
 			}
-			var tools:File = File.applicationDirectory.resolvePath("BezelTools");
-			if (!tools.exists || !tools.isDirectory)
+			var tools:File = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/tools/");
+			if (!tools.exists)
 			{
-				this.logger.log("Bezel", "Tools directory not found. Try reinstalling Bezel.");
-				NativeApplication.nativeApplication.exit(-1);
+				tools.createDirectory();
 			}
-			for each (var tool:String in ["abcexport", "rabcdasm", "rabcasm", "abcreplace"])
+			for each (var tool:String in ["abcexport", "rabcdasm", "rabcasm", "abcreplace", "LICENSE"])
 			{
-				if (!File.applicationDirectory.resolvePath("BezelTools/" + tool + ".exe").exists)
+				var file:File = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/tools/" + tool + ".exe");
+				if (!file.exists)
 				{
-					this.logger.log("Bezel", tool + " not found. Try reinstalling Bezel.");
-					NativeApplication.nativeApplication.exit(-1);
+					this.logger.log("Bezel", "Exporting tool " + tool);
+					var toolData:ByteArray = new this[tool] as ByteArray;
+					var stream:FileStream = new FileStream();
+					stream.open(file, FileMode.WRITE);
+					stream.writeBytes(toolData);
+					stream.close();
 				}
 			}
 

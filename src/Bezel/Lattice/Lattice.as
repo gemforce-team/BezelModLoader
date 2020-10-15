@@ -12,6 +12,7 @@ package Bezel.Lattice
     import flash.filesystem.FileMode;
     import flash.errors.IOError;
     import flash.events.Event;
+    import flash.utils.Dictionary;
 
     public class Lattice extends EventDispatcher
     {
@@ -40,10 +41,10 @@ package Bezel.Lattice
             this.process = new NativeProcess();
             this.processInfo = new NativeProcessStartupInfo();
             this.currentTool = tool;
-            processInfo.executable = File.applicationDirectory.resolvePath("BezelTools/" + tool + ".exe");
+            processInfo.executable = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/tools/" + tool + ".exe");
             if (!processInfo.executable.exists)
             {
-                processInfo.executable = File.applicationDirectory.resolvePath("BezelTools/" + tool);
+                processInfo.executable = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/tools/" + tool);
             }
             for each (var arg:String in argument)
             {
