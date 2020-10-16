@@ -30,6 +30,11 @@ package Bezel
 			loggers = new Dictionary();
 		}
 		
+		internal static function exit(): void
+		{
+			logStream.close();
+		}
+		
 		// UglyLog is ugly because I open, write, close the stream every time this method is called
 		// This is to guarantee that the messages arrive at the log in case of an uncaught exception
 		// TODO probably just add a hook to Main uncaughtErrorHandler to gracefully shut down?

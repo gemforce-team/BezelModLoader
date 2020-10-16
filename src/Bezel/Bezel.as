@@ -106,6 +106,7 @@ package Bezel
 		
 		private function onExit(e:Event): void
 		{
+			Logger.exit();
 		}
 
 		private function onLatticeReady(e:Event): void
