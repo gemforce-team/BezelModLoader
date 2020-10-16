@@ -24,13 +24,13 @@ package Bezel.Lattice
         private var processInfo:NativeProcessStartupInfo;
         private var processError:String;
 
-        private var logger:Logger;
+        internal static var logger:Logger;
 
         private var doneDisassembling:Boolean = false;
 
         public function Lattice(bezel:Bezel)
         {
-            this.logger = bezel.getLogger("Lattice");
+            logger = bezel.getLogger("Lattice");
 
             this.patches = new Vector.<LatticePatch>();
             this.expectedPatches = new Vector.<LatticePatch>();
@@ -314,6 +314,22 @@ package Bezel.Lattice
             }
 
             return ret;
+        }
+
+        public static function getClass(name:String): LatticeClass
+        {
+            var file:File = File.applicationStorageDirectory.resolvePath("gcfw-0-clean/" + name.replace(/\./g, '/') + ".class.asasm");
+            if (!file.exists)
+            {
+                throw new IOError("Lattice: Class '" + name + "' does not exist");
+            }
+            
+            var stream:FileStream = new FileStream();
+            stream.open(file, FileMode.READ);
+            var contents:String = stream.readUTFBytes(stream.bytesAvailable);
+            stream.close();
+
+            return new LatticeClass(contents);
         }
     }
 }
