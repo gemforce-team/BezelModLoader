@@ -42,7 +42,7 @@ package Bezel
         private static const offsetFromMatches:Array = [
             [ 0, 0, 22, 0, 0 ],
             [ -17 ],
-            [ -5, 39, -5, 17 ],
+            [ -5, 39, -5, 16 ],
             [ 7 ],
             [ 1 ],
             [ 3 ],
@@ -113,7 +113,8 @@ package Bezel
                 ' \n \
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel")                                                                                                                  getlocal1 \n \
+                    getproperty         QName(PackageNamespace(""), "bezel") \n \
+                    getlocal1 \n \
                     getlocal            2 \n \
                     getlocal            3 \n \
                     getlocal            4 \n \
