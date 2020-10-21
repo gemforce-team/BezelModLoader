@@ -51,10 +51,8 @@ package Bezel
 		private var game:SWFFile;
 
 
-        [Embed(source = "../../assets/rabcdasm/rabcdasm.exe", mimeType = "application/octet-stream")] private var rabcdasm:Class;
-        [Embed(source = "../../assets/rabcdasm/rabcasm.exe", mimeType = "application/octet-stream")] private var rabcasm:Class;
-        [Embed(source = "../../assets/rabcdasm/abcexport.exe", mimeType = "application/octet-stream")] private var abcexport:Class;
-        [Embed(source = "../../assets/rabcdasm/abcreplace.exe", mimeType = "application/octet-stream")] private var abcreplace:Class;
+        [Embed(source = "../../assets/rabcdasm/rabcdasm.exe", mimeType = "application/octet-stream")] private var disassemble:Class;
+        [Embed(source = "../../assets/rabcdasm/rabcasm.exe", mimeType = "application/octet-stream")] private var reassemble:Class;
 		[Embed(source = "../../assets/rabcdasm/COPYING", mimeType = "application/octet-stream")] private var LICENSE:Class;
 		
 		// Parameterless constructor for flash.display.Loader
@@ -70,7 +68,6 @@ package Bezel
 			this.mods = new Object();
 			
 			this.logger.log("Bezel", "Bezel Mod Loader " + prettyVersion());
-			this.logger.log("Bezel", "Current application storage directory: " + File.applicationStorageDirectory.nativePath);
 			
             var swfFile:File = File.applicationDirectory.resolvePath("GemCraft Frostborn Wrath Backup.swf");
 			if (!swfFile.exists)
@@ -83,7 +80,7 @@ package Bezel
 			{
 				tools.createDirectory();
 			}
-			for each (var tool:String in ["abcexport", "rabcdasm", "rabcasm", "abcreplace", "LICENSE"])
+			for each (var tool:String in ["disassemble", "reassemble", "LICENSE"])
 			{
 				var file:File = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/tools/" + tool + ".exe");
 				if (!file.exists)
@@ -118,7 +115,7 @@ package Bezel
 
 		private function onGameBuilt(e:Event): void
 		{
-			this.game = new SWFFile(File.applicationStorageDirectory.resolvePath("gcfw-modded.swf"));
+			this.game = new SWFFile(Lattice.moddedSwf);
 			this.game.load(gameLoadSuccess, gameLoadFail);
 		}
 

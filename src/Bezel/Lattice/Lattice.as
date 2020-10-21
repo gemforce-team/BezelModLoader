@@ -20,6 +20,30 @@ package Bezel.Lattice
         private var patches:Vector.<LatticePatch>;
         private var expectedPatches:Vector.<LatticePatch>;
 
+        private var _asasmFiles:Object;
+
+        private function get asasmFiles(): Object
+        {
+            if (this._asasmFiles == null)
+            {
+                this._asasmFiles = new Object();
+
+                var asmStream:FileStream = new FileStream();
+                asmStream.open(cleanAsm, FileMode.READ);
+                var bytes:ByteArray = new ByteArray();
+                asmStream.readBytes(bytes);
+                asmStream.close();
+
+                while (bytes.bytesAvailable != 0)
+                {
+                    var name:String = readNTString(bytes);
+                    this.asasmFiles[name] = readNTString(bytes);
+                }
+            }
+
+        	return _asasmFiles;
+        }
+
         private var process:NativeProcess;
         private var processInfo:NativeProcessStartupInfo;
         private var processError:String;
@@ -27,6 +51,12 @@ package Bezel.Lattice
         internal static var logger:Logger;
 
         private var doneDisassembling:Boolean = false;
+
+        public static var gameSwf:File = File.applicationDirectory.resolvePath("GemCraft Frostborn Wrath Backup.swf");
+        public static var moddedSwf:File = File.applicationDirectory.resolvePath("gcfw-modded.swf");
+        public static var asm:File = File.applicationStorageDirectory.resolvePath("gcfw.basasm");
+        public static var cleanAsm:File = File.applicationStorageDirectory.resolvePath("gcfw-clean.basasm");
+        public static var coremods:File = File.applicationStorageDirectory.resolvePath("coremods.lttc");
 
         public function Lattice(bezel:Bezel)
         {
@@ -36,7 +66,7 @@ package Bezel.Lattice
             this.expectedPatches = new Vector.<LatticePatch>();
         }
 
-        private function callTool(tool:String, argument:Array): void
+        private function callTool(tool:String, argument:Vector.<String>): void
         {
             logger.log("callTool", "Starting " + tool);
             this.process = new NativeProcess();
@@ -47,10 +77,7 @@ package Bezel.Lattice
             {
                 processInfo.executable = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/tools/" + tool);
             }
-            for each (var arg:String in argument)
-            {
-                processInfo.arguments.push(arg);
-            }
+            processInfo.arguments = argument;
             processInfo.workingDirectory = File.applicationStorageDirectory;
             process.addEventListener(NativeProcessExitEvent.EXIT, this.toolFinished);
             process.addEventListener("standardErrorData", this.onToolError);
@@ -68,17 +95,11 @@ package Bezel.Lattice
             logger.log("toolFinished", currentTool + " has finished");
             switch (currentTool)
             {
-                case "abcexport":
-                    callTool("rabcdasm", ["gcfw-0.abc"]);
-                    break;
-                case "rabcdasm":
-                    File.applicationStorageDirectory.resolvePath("gcfw-0").copyTo(File.applicationStorageDirectory.resolvePath("gcfw-0-clean"));
+                case "disassemble":
+                    cleanAsm.copyTo(asm);
                     dispatchEvent(new Event(LatticeEvent.DISASSEMBLY_DONE));
                     break;
-                case "rabcasm":
-                    callTool("abcreplace", ["gcfw-modded.swf", "0", "gcfw-0/gcfw-0.main.abc"]);
-                    break;
-                case "abcreplace":
+                case "reassemble":
                     dispatchEvent(new Event(LatticeEvent.REBUILD_DONE));
                     break;
             }
@@ -91,47 +112,29 @@ package Bezel.Lattice
 
         public function init(bezel:Bezel): void
         {
-            if (!File.applicationStorageDirectory.resolvePath("gcfw-0.abc").exists ||
-                !File.applicationStorageDirectory.resolvePath("gcfw-0-clean").exists ||
-                !File.applicationStorageDirectory.resolvePath("gcfw-0").exists ||
-                !File.applicationStorageDirectory.resolvePath("coremods.lttc").exists ||
-                !File.applicationStorageDirectory.resolvePath("gcfw-modded.swf").exists)
+            if (!asm.exists || !cleanAsm.exists || !coremods.exists || !moddedSwf.exists)
             {
-                if (File.applicationStorageDirectory.resolvePath("gcfw-0-clean").exists)
+                if (asm.exists)
                 {
-                    File.applicationStorageDirectory.resolvePath("gcfw-0-clean").deleteDirectory(true);
+                    asm.deleteFile();
                 }
-                if (File.applicationStorageDirectory.resolvePath("gcfw-0").exists)
+                if (cleanAsm.exists)
                 {
-                    File.applicationStorageDirectory.resolvePath("gcfw-0").deleteDirectory(true);
+                    cleanAsm.deleteFile();
                 }
-                if (File.applicationStorageDirectory.resolvePath("coremods.lttc").exists)
+                if (coremods.exists)
                 {
-                    File.applicationStorageDirectory.resolvePath("coremods.lttc").deleteFile();
-                }
-                if (File.applicationStorageDirectory.resolvePath("gcfw-modded.swf").exists)
-                {
-                    File.applicationStorageDirectory.resolvePath("gcfw-modded.swf").deleteFile();
+                    coremods.deleteFile();
                 }
 
-                if (!File.applicationStorageDirectory.resolvePath("gcfw.swf").exists)
-                {
-                    File.applicationDirectory.resolvePath("GemCraft Frostborn Wrath Backup.swf").copyTo(File.applicationStorageDirectory.resolvePath("gcfw.swf"));
-                }
-                if (!File.applicationStorageDirectory.resolvePath("gcfw-modded.swf").exists)
-                {
-                    File.applicationStorageDirectory.resolvePath("gcfw.swf").copyTo(File.applicationStorageDirectory.resolvePath("gcfw-modded.swf"));
-                }
-
-                callTool("abcexport", ["gcfw.swf"]);
+                callTool("disassemble", new <String>[gameSwf.nativePath, cleanAsm.nativePath]);
             }
 
-            var file:File = File.applicationStorageDirectory.resolvePath("coremods.lttc");
-            if (file.exists)
+            if (coremods.exists)
             {
                 logger.log("init", "Loading previous coremod info");
                 var stream:FileStream = new FileStream();
-                stream.open(file, FileMode.READ);
+                stream.open(coremods, FileMode.READ);
                 while (stream.bytesAvailable != 0)
                 {
                     var filename:String = stream.readUTF();
@@ -213,11 +216,9 @@ package Bezel.Lattice
                 }
                 stream.close();
 
-                File.applicationStorageDirectory.resolvePath("gcfw-0").deleteDirectory(true);
-                File.applicationStorageDirectory.resolvePath("gcfw-0-clean").copyTo(File.applicationStorageDirectory.resolvePath("gcfw-0"));
                 checkConflicts();
                 doPatch();
-                callTool("rabcasm", ["gcfw-0/gcfw-0.main.asasm"]);
+                callTool("reassemble", new <String>[gameSwf.nativePath, asm.nativePath, moddedSwf.nativePath]);
             }
             else
             {
@@ -258,11 +259,7 @@ package Bezel.Lattice
             {
                 logger.log("doPatch", "Patching line " + patch.offset + " of " + patch.filename);
 
-                var file:File = File.applicationStorageDirectory.resolvePath("gcfw-0/" + patch.filename);
-                var stream:FileStream = new FileStream();
-                stream.open(file, FileMode.READ);
-                var dataAsStrings:Array = stream.readUTFBytes(stream.bytesAvailable).split('\n');
-                stream.close();
+                var dataAsStrings:Array = this.asasmFiles[patch.filename].split('\n');
 
                 for (var i:uint = 0; i < patch.overwritten; ++i)
                 {
@@ -270,33 +267,36 @@ package Bezel.Lattice
                 }
                 dataAsStrings.insertAt(patch.offset, patch.contents);
 
-                stream.open(file, FileMode.WRITE);
-                stream.writeUTFBytes(dataAsStrings.join('\n'));
-                stream.close();
+                this.asasmFiles[patch.filename] = dataAsStrings.join('\n');
             }
+
+            var stream:FileStream = new FileStream();
+            stream.open(asm, FileMode.WRITE);
+            for (var file:String in this.asasmFiles)
+            {
+                writeNTString(stream, file);
+                writeNTString(stream, this.asasmFiles[file]);
+            }
+            stream.close();
         }
 
         public function patchFile(filename:String, offset:int, replaceLines:int, contents:String): void
         {
-            if (!File.applicationStorageDirectory.resolvePath("gcfw-0/" + filename).exists)
+            if (!(filename in this.asasmFiles))
             {
-                throw new IOError("'" + filename + "'" + " does not exist");
+                throw new Error("File '" + filename + "' not in disassembly");
             }
             this.patches[this.patches.length] = new LatticePatch(filename, offset, replaceLines, contents);
         }
 
         public function findPattern(filename:String, searchFrom:int, pattern:RegExp): int
         {
-            var file:File = File.applicationStorageDirectory.resolvePath("gcfw-0-clean/" + filename);
-            if (!file.exists)
+            if (!(filename in this.asasmFiles))
             {
-                throw new IOError("'" + filename + "'" + " does not exist");
+                throw new Error("File '" + filename + "' not in disassembly");
             }
 
-            var stream:FileStream = new FileStream();
-            stream.open(file, FileMode.READ);
-            var searchString:String = stream.readUTFBytes(stream.bytesAvailable).split('\n').slice(searchFrom).join('\n');
-            stream.close();
+            var searchString:String = this.asasmFiles[filename].split('\n').slice(searchFrom).join('\n');
 
             var ret:int = searchString.search(pattern);
             if (ret != -1)
@@ -316,20 +316,23 @@ package Bezel.Lattice
             return ret;
         }
 
-        public static function getClass(name:String): LatticeClass
+        private static function readNTString(data:ByteArray): String
         {
-            var file:File = File.applicationStorageDirectory.resolvePath("gcfw-0-clean/" + name.replace(/\./g, '/') + ".class.asasm");
-            if (!file.exists)
+            var num:uint = 0;
+            while (num + data.position < data.length && data[num + data.position] != 0)
             {
-                throw new IOError("Lattice: Class '" + name + "' does not exist");
+                ++num;
             }
-            
-            var stream:FileStream = new FileStream();
-            stream.open(file, FileMode.READ);
-            var contents:String = stream.readUTFBytes(stream.bytesAvailable);
-            stream.close();
 
-            return new LatticeClass(contents);
+            var ret:String = data.readUTFBytes(num);
+            data.position++; // Consume the null terminator
+            return ret;
+        }
+
+        private static function writeNTString(stream:FileStream, data:String): void
+        {
+            stream.writeUTFBytes(data);
+            stream.writeByte(0);
         }
     }
 }
