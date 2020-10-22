@@ -70,7 +70,6 @@ package Bezel
 				//writeLog("Logger", "getLogger", "Created a new logger: " + identifier);
 				return loggers[identifier];
 			}
-			
 		}
 		
 		public function log(source:String, message:String): void

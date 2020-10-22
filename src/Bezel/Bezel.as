@@ -104,8 +104,9 @@ package Bezel
 
 			this.lattice = new Lattice(this);
 
-			this.lattice.addEventListener(LatticeEvent.DISASSEMBLY_DONE, onLatticeReady);
-			this.lattice.addEventListener(LatticeEvent.REBUILD_DONE, onGameBuilt);
+			this.lattice.addEventListener(LatticeEvent.DISASSEMBLY_DONE, this.onLatticeReady);
+			this.lattice.addEventListener(LatticeEvent.REBUILD_DONE, this.onGameBuilt);
+			this.addEventListener(LatticeEvent.REBUILD_DONE, this.onGameBuilt);
 			
 			this.coremods = new Array();
 			this.prevCoremods = new Array();
@@ -143,7 +144,7 @@ package Bezel
 		private function onGameBuilt(e:Event): void
 		{
 			this.game = new SWFFile(Lattice.moddedSwf);
-			this.game.load(gameLoadSuccess, gameLoadFail);
+			this.game.load(this.gameLoadSuccess, this.gameLoadFail, false);
 		}
 
 		private function gameLoadSuccess(game:SWFFile): void
@@ -253,7 +254,6 @@ package Bezel
 			waitingMods = modFiles.length;
 			for each (var file:String in modFiles)
 			{
-				logger.log("loadMods", "Loading " + file + " @ " + File.applicationDirectory.resolvePath("Mods/" + file).nativePath);
 				var newMod:SWFFile = new SWFFile(File.applicationDirectory.resolvePath("Mods/" + file));
 				newMod.load(successfulModLoad, failedModLoad);
 			}
@@ -464,7 +464,7 @@ package Bezel
 			}
 			else
 			{
-				this.onGameBuilt(new Event(""));
+				dispatchEvent(new Event(LatticeEvent.REBUILD_DONE));
 			}
 		}
 

@@ -40,7 +40,7 @@ package Bezel
 			this.loader = new Loader();
 		}
 		
-		public function load(successCallback:Function, failureCallback:Function): void
+		public function load(successCallback:Function, failureCallback:Function, doHash:Boolean = true): void
 		{
 			this.successfulLoadCallback = successCallback;
 			this.failedLoadCallback = failureCallback;
@@ -51,7 +51,10 @@ package Bezel
 			stream.open(file, FileMode.READ);
 			stream.readBytes(bytes);
 			stream.close();
-			this._hash = CCITT16.computeDigest(bytes);
+			if (doHash)
+			{
+				this._hash = CCITT16.computeDigest(bytes);
+			}
 			var context:LoaderContext = new LoaderContext(true, ApplicationDomain.currentDomain);
 			context.checkPolicyFile = false;
 			context.allowCodeImport = true;

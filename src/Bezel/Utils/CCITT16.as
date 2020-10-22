@@ -12,10 +12,10 @@ package Bezel.Utils
 		public static function computeDigest(data:ByteArray): uint
 		{
 			var chk:uint = 0xFFFF;
-			for each (var byte:uint in data)
+			for (var i:uint = 0; i < data.length; i++)
 			{
-				chk ^= byte << 8;
-				for (var i:uint = 0; i < 8; i++)
+				chk ^= data[i] << 8;
+				for (var j:uint = 0; j < 8; j++)
 				{
 					if ((chk & 0x8000) != 0)
 					{
