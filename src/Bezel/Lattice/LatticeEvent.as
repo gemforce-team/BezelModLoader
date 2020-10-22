@@ -1,6 +1,5 @@
 package Bezel.Lattice
 {
-    import flash.events.Event;
     import flash.errors.IllegalOperationError;
 
     public class LatticeEvent

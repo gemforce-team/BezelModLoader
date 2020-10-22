@@ -7,7 +7,6 @@ package Bezel
 	
 	import flash.display.*;
 	import flash.events.*;
-	import flash.system.*;
 	import flash.filesystem.*;
 	import flash.utils.*;
 	import Bezel.Logger;
@@ -19,6 +18,8 @@ package Bezel
 	import flash.events.Event;
 	import flash.filesystem.FileStream;
 	import flash.filesystem.FileMode;
+	import flash.filesystem.File;
+	import Bezel.Utils.CCITT16;
 
 	// We extend MovieClip so that flash.display.Loader accepts our class
 	// The loader also requires a parameterless constructor (AFAIK), so we also have a .bind method to bind our class to the game
@@ -49,6 +50,9 @@ package Bezel
 		private var modsReloadedTimestamp:int;
 
 		private var game:SWFFile;
+		private var initialLoad:Boolean;
+		private var coremods:Array;
+		private var prevCoremods:Array;
 
 
         [Embed(source = "../../assets/rabcdasm/rabcdasm.exe", mimeType = "application/octet-stream")] private var disassemble:Class;
@@ -60,6 +64,10 @@ package Bezel
 		{
 			super();
 			prepareFolders();
+
+			this.initialLoad = true;
+			this.addEventListener(BezelEvent.BEZEL_DONE_MOD_RELOAD, this.doneModReload);
+			this.addEventListener(BezelEvent.BEZEL_DONE_MOD_LOAD, this.doneModLoad);
 
 			NativeApplication.nativeApplication.addEventListener(Event.EXITING,this.onExit);
 
@@ -98,7 +106,23 @@ package Bezel
 
 			this.lattice.addEventListener(LatticeEvent.DISASSEMBLY_DONE, onLatticeReady);
 			this.lattice.addEventListener(LatticeEvent.REBUILD_DONE, onGameBuilt);
-			this.lattice.init(this);
+			
+			this.coremods = new Array();
+			this.prevCoremods = new Array();
+			if (!this.lattice.init())
+			{
+				var coremodFile:File = File.applicationStorageDirectory.resolvePath("coremods.bzl");
+				if (coremodFile.exists)
+				{
+					var coremodStream:FileStream = new FileStream();
+					coremodStream.open(coremodFile, FileMode.READ);
+					while (coremodStream.bytesAvailable != 0)
+					{
+						this.prevCoremods[this.prevCoremods.length] = {"name": coremodStream.readUTF(), "hash": coremodStream.readUnsignedShort()};
+					}
+					coremodStream.close();
+				}
+			}
 		}
 		
 		private function onExit(e:Event): void
@@ -109,6 +133,9 @@ package Bezel
 		private function onLatticeReady(e:Event): void
 		{
 			BezelCoreMod.installHooks(this);
+			var versionBytes:ByteArray = new ByteArray();
+			versionBytes.writeUTF(VERSION);
+			this.coremods[this.coremods.length] = {"name": "BEZEL_MOD_LOADER", "hash": CCITT16.computeDigest(versionBytes)};
 
 			loadMods();
 		}
@@ -126,6 +153,7 @@ package Bezel
 			this.addChild(DisplayObject(game.instance));
 			main.initFromBezel();
 			bind();
+			this.initialLoad = false;
 		}
 
 		private function gameLoadFail(e:Event): void
@@ -210,7 +238,7 @@ package Bezel
 		{
 			var modsFolder:File = File.applicationDirectory.resolvePath("Mods/");
 			
-			var fileList: Array = modsFolder.getDirectoryListing();
+			var fileList:Array = modsFolder.getDirectoryListing();
 			var modFiles:Array = new Array();
 			for(var f:int = 0; f < fileList.length; f++)
 			{
@@ -236,7 +264,6 @@ package Bezel
 		{
 			logger.log("successfulModLoad", "Loaded mod: " + mod.instance.MOD_NAME + " v" + mod.instance.VERSION);
 			mods[mod.instance.MOD_NAME] = mod;
-			this.addChild(DisplayObject(mod.instance));
 			if (!this.bezelVersionCompatible(mod.instance.BEZEL_VERSION))
 			{
 				logger.log("Compatibility", "Bezel version is incompatible! Required: " + mod.instance.BEZEL_VERSION);
@@ -244,17 +271,33 @@ package Bezel
 				mod.unload();
 				throw new Error("Bezel version is incompatible! Bezel: " + VERSION + " while " + mod.instance.MOD_NAME+ " requires " + mod.instance.BEZEL_VERSION);
 			}
-
-			if ("loadCoreMod" in mod.instance)
-			{
-				mod.instance.loadCoreMod(this.lattice);
-			}
+			this.addChild(DisplayObject(mod.instance));
 
 			waitingMods--;
 
-			if (waitingMods == 0)
+			if (this.initialLoad)
 			{
-				this.lattice.apply();
+				if ("loadCoreMod" in mod.instance)
+				{
+					this.coremods[this.coremods.length] = {"name": mod.instance.MOD_NAME, "hash": mod.hash};
+				}
+
+				if (waitingMods == 0)
+				{
+					this.dispatchEvent(new Event(BezelEvent.BEZEL_DONE_MOD_LOAD));
+				}
+			}
+			else 
+			{
+				if ("loadCoreMod" in mod.instance)
+				{
+					logger.log("Mod Reload", "The coremod contained in " + mod.instance.MOD_NAME + " was not reloaded. This may cause issues!");
+				}
+
+				if (waitingMods == 0)
+				{
+					dispatchEvent(new Event(BezelEvent.BEZEL_DONE_MOD_RELOAD));
+				}
 			}
 		}
 		
@@ -284,7 +327,14 @@ package Bezel
 			waitingMods--;
 			if (waitingMods == 0)
 			{
-				this.lattice.apply();
+				if (this.initialLoad)
+				{
+					dispatchEvent(new Event(BezelEvent.BEZEL_DONE_MOD_LOAD));
+				}
+				else
+				{
+					dispatchEvent(new Event(BezelEvent.BEZEL_DONE_MOD_RELOAD));
+				}
 			}
 		}
 		
@@ -365,13 +415,55 @@ package Bezel
 		{
 			logger.log("eh_keyboardKeyDown", "Reloading all mods!");
 			this.modsReloadedTimestamp = getTimer();
-			for each(var mod:SWFFile in mods)
+			for each (var mod:SWFFile in mods)
 			{
 				mod.unload();
 			}
 			this.removeChildren();
 			mods = new Array();
 			loadMods();
+		}
+
+		private function doneModReload(e:Event): void
+		{
+			bindMods();
+		}
+
+		private function doneModLoad(e:Event): void
+		{
+			var differentCoremods:Boolean = this.coremods.length != this.prevCoremods.length;
+			if (!differentCoremods)
+			{
+				this.coremods.sortOn("name");
+				this.prevCoremods.sortOn("name");
+				for (var i:int = 0; i < this.coremods.length; i++)
+				{
+					if (this.coremods[i].name != this.prevCoremods[i].name ||
+						this.coremods[i].hash != this.prevCoremods[i].hash)
+					{
+						differentCoremods = true;
+						break;
+					}
+				}
+			}
+
+			if (differentCoremods)
+			{
+				var file:File = File.applicationStorageDirectory.resolvePath("coremods.bzl");
+				var stream:FileStream = new FileStream();
+				stream.open(file, FileMode.WRITE);
+				for each (var coremod:Object in this.coremods)
+				{
+					stream.writeUTF(coremod.name);
+					stream.writeShort(coremod.hash);
+				}
+				stream.close();
+				this.lattice.apply();
+			}
+			else
+			{
+				this.onGameBuilt(new Event(""));
+			}
 		}
 
 		public function loadSave(): void

@@ -15,6 +15,9 @@ package Bezel
 		public static const LOAD_SAVE:String = "loadSave";
 		public static const SAVE_SAVE:String = "saveSave";
 		public static const INGAME_NEW_SCENE:String = "ingameNewScene";
+
+		internal static const BEZEL_DONE_MOD_RELOAD:String = "bezelDoneReload";
+		internal static const BEZEL_DONE_MOD_LOAD:String = "bezelDoneModLoad";
 		
 		public function BezelEvent() 
 		{

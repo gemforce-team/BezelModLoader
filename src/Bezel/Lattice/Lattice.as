@@ -10,7 +10,6 @@ package Bezel.Lattice
     import Bezel.Bezel;
     import Bezel.Logger;
     import flash.filesystem.FileMode;
-    import flash.errors.IOError;
     import flash.events.Event;
     import flash.utils.Dictionary;
 
@@ -110,8 +109,11 @@ package Bezel.Lattice
             this.processError += this.process.standardError.readUTFBytes(process.standardError.bytesAvailable);
         }
 
-        public function init(bezel:Bezel): void
+        // Returns whether coremods should be reloaded, regardless of if they've changed or not
+        public function init(): Boolean
         {
+            var ret:Boolean = false;
+
             if (!asm.exists || !cleanAsm.exists || !coremods.exists || !moddedSwf.exists)
             {
                 if (asm.exists)
@@ -128,6 +130,7 @@ package Bezel.Lattice
                 }
 
                 callTool("disassemble", new <String>[gameSwf.nativePath, cleanAsm.nativePath]);
+                ret = true;
             }
 
             if (coremods.exists)
@@ -150,6 +153,8 @@ package Bezel.Lattice
             {
                 logger.log("init", "Previous coremod info not found");
             }
+
+            return ret;
         }
 
         public function apply(): void
