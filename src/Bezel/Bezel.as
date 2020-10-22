@@ -280,6 +280,8 @@ package Bezel
 				if ("loadCoreMod" in mod.instance)
 				{
 					this.coremods[this.coremods.length] = {"name": mod.instance.MOD_NAME, "hash": mod.hash};
+					logger.log("LoadCoreMod", "Loading coremods for " + mod.instance.MOD_NAME);
+					mod.instance.loadCoreMod(this.lattice);
 				}
 
 				if (waitingMods == 0)
