@@ -19,7 +19,6 @@ package Bezel
 	import flash.filesystem.FileStream;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.File;
-	import Bezel.Utils.CCITT16;
 
 	// We extend MovieClip so that flash.display.Loader accepts our class
 	// The loader also requires a parameterless constructor (AFAIK), so we also have a .bind method to bind our class to the game
@@ -119,7 +118,7 @@ package Bezel
 					coremodStream.open(coremodFile, FileMode.READ);
 					while (coremodStream.bytesAvailable != 0)
 					{
-						this.prevCoremods[this.prevCoremods.length] = {"name": coremodStream.readUTF(), "hash": coremodStream.readUnsignedShort()};
+						this.prevCoremods[this.prevCoremods.length] = {"name": coremodStream.readUTF(), "version": coremodStream.readUTF()};
 					}
 					coremodStream.close();
 				}
@@ -133,10 +132,7 @@ package Bezel
 
 		private function onLatticeReady(e:Event): void
 		{
-			BezelCoreMod.installHooks(this);
-			var versionBytes:ByteArray = new ByteArray();
-			versionBytes.writeUTF(VERSION);
-			this.coremods[this.coremods.length] = {"name": "BEZEL_MOD_LOADER", "hash": CCITT16.computeDigest(versionBytes)};
+			this.coremods[this.coremods.length] = {"name": "BEZEL_MOD_LOADER", "version": BezelCoreMod.VERSION, "load": BezelCoreMod.installHooks};
 
 			loadMods();
 		}
@@ -144,7 +140,7 @@ package Bezel
 		private function onGameBuilt(e:Event): void
 		{
 			this.game = new SWFFile(Lattice.moddedSwf);
-			this.game.load(this.gameLoadSuccess, this.gameLoadFail, false);
+			this.game.load(this.gameLoadSuccess, this.gameLoadFail);
 		}
 
 		private function gameLoadSuccess(game:SWFFile): void
@@ -279,9 +275,14 @@ package Bezel
 			{
 				if ("loadCoreMod" in mod.instance)
 				{
-					this.coremods[this.coremods.length] = {"name": mod.instance.MOD_NAME, "hash": mod.hash};
-					logger.log("LoadCoreMod", "Loading coremods for " + mod.instance.MOD_NAME);
-					mod.instance.loadCoreMod(this.lattice);
+					if ("COREMOD_VERSION" in mod.instance)
+					{
+						this.coremods[this.coremods.length] = {"name": mod.instance.MOD_NAME, "version": mod.instance.COREMOD_VERSION, "load": mod.instance.loadCoreMod};
+					}
+					else
+					{
+						this.coremods[this.coremods.length] = {"name": mod.instance.MOD_NAME, "version": mod.instance.VERSION, "load": mod.instance.loadCoreMod};
+					}
 				}
 
 				if (waitingMods == 0)
@@ -441,7 +442,7 @@ package Bezel
 				for (var i:int = 0; i < this.coremods.length; i++)
 				{
 					if (this.coremods[i].name != this.prevCoremods[i].name ||
-						this.coremods[i].hash != this.prevCoremods[i].hash)
+						this.coremods[i].version != this.prevCoremods[i].version)
 					{
 						differentCoremods = true;
 						break;
@@ -457,7 +458,10 @@ package Bezel
 				for each (var coremod:Object in this.coremods)
 				{
 					stream.writeUTF(coremod.name);
-					stream.writeShort(coremod.hash);
+					stream.writeUTF(coremod.version);
+
+					logger.log("doneModLoad", "Loading coremods for " + coremod.name);
+					coremod.load(this.lattice);
 				}
 				stream.close();
 				this.lattice.apply();

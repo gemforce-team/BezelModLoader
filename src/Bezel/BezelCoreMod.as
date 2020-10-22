@@ -1,7 +1,11 @@
 package Bezel
 {
+    import Bezel.Lattice.Lattice;
+
     internal class BezelCoreMod
     {
+        public static const VERSION:String = "1";
+
         private static const files:Array = [
             "com/giab/games/gcfw/Main.class.asasm",
             "com/giab/games/gcfw/ingame/IngameInfoPanelRenderer2.class.asasm",
@@ -183,16 +187,15 @@ package Bezel
             ]
         ];
 
-        internal static function installHooks(bezel:Bezel): void
+        internal static function installHooks(lattice:Lattice): void
         {
             // for in loops loop the indices for some godforsaken reason. Oh well, at least it works
             for (var index:uint in files)
             {
                 for (var filepatch:uint in matches[index])
                 {
-                    var offset:int = bezel.lattice.findPattern(files[index], 0, new RegExp(matches[index][filepatch]));
-                    bezel.getLogger("Bezel").log("installHooks", "Offset within " + files[index] + " is " + offset);
-                    bezel.lattice.patchFile(files[index], offset + offsetFromMatches[index][filepatch], replaceNums[index][filepatch], contents[index][filepatch]);
+                    var offset:int = lattice.findPattern(files[index], 0, new RegExp(matches[index][filepatch]));
+                    lattice.patchFile(files[index], offset + offsetFromMatches[index][filepatch], replaceNums[index][filepatch], contents[index][filepatch]);
                 }
             }
         }

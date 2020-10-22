@@ -14,7 +14,6 @@ package Bezel
 	import flash.utils.ByteArray;
 	import flash.filesystem.FileStream;
 	import flash.filesystem.FileMode;
-	import Bezel.Utils.CCITT16;
 	 
 	internal class SWFFile 
 	{
@@ -22,13 +21,6 @@ package Bezel
 		private var file:File;
 		public var instance:Object;
 
-		private var _hash:uint;
-
-		public function get hash():uint
-		{
-			return _hash;
-		}
-		
 		private var successfulLoadCallback:Function;
 		private var failedLoadCallback:Function;
 		
@@ -40,7 +32,7 @@ package Bezel
 			this.loader = new Loader();
 		}
 		
-		public function load(successCallback:Function, failureCallback:Function, doHash:Boolean = true): void
+		public function load(successCallback:Function, failureCallback:Function): void
 		{
 			this.successfulLoadCallback = successCallback;
 			this.failedLoadCallback = failureCallback;
@@ -51,10 +43,6 @@ package Bezel
 			stream.open(file, FileMode.READ);
 			stream.readBytes(bytes);
 			stream.close();
-			if (doHash)
-			{
-				this._hash = CCITT16.computeDigest(bytes);
-			}
 			var context:LoaderContext = new LoaderContext(true, ApplicationDomain.currentDomain);
 			context.checkPolicyFile = false;
 			context.allowCodeImport = true;
