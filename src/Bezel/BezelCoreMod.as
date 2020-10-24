@@ -4,7 +4,7 @@ package Bezel
 
     internal class BezelCoreMod
     {
-        public static const VERSION:String = "1";
+        public static const VERSION:String = "2";
 
         private static const files:Array = [
             "com/giab/games/gcfw/Main.class.asasm",
@@ -182,7 +182,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
-                    callpropvoid        QName(PackageNamespace(""), "saveSave"), 0 \n \
+                    callpropvoid        QName(PackageNamespace(""), "ingameNewScene"), 0 \n \
                 '
             ]
         ];
