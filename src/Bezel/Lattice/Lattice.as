@@ -321,6 +321,30 @@ package Bezel.Lattice
             return ret;
         }
 
+        // Grabs a region of code and returns it
+        public function retrieveCode(filename:String, offset:int, lines:int): String
+        {
+            if (!(filename in this.asasmFiles))
+            {
+                throw new Error("File '" + filename + "' not in disassembly");
+            }
+
+            return this.asasmFiles[filename].split('\n').slice(offset, offset + lines).join('\n');
+        }
+
+        // Grabs a region of code and returns it, erasing it from where it was
+        public function extractCode(filename:String, offset:int, lines:int): String
+        {
+            if (!(filename in this.asasmFiles))
+            {
+                throw new Error("File '" + filename + "' not in disassembly");
+            }
+
+            this.patchFile(filename, offset, lines, "");
+
+            return retrieveCode(filename, offset, lines);
+        }
+
         private static function readNTString(data:ByteArray): String
         {
             var num:uint = 0;
