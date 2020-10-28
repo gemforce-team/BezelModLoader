@@ -1,5 +1,10 @@
 package Bezel.Lattice
 {
+	/**
+	 * "Coremod" handling system: accepts and applies changes to GCFW assembly
+	 * @author piepie62
+	 */
+
     import flash.filesystem.File;
     import flash.desktop.NativeProcess;
     import flash.desktop.NativeProcessStartupInfo;
@@ -285,6 +290,15 @@ package Bezel.Lattice
             stream.close();
         }
 
+        /**
+         * Inserts and optionally removes assembly at a given line offset within a passed-in GCFW assembly filename.
+         * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
+         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         * @param offset Offset at which to insert the contents. Note that this is zero-indexed: value 1 will be inserted AFTER line 1
+         * @param replaceLines Number of lines to remove at the specified offset. Note that this will delete with respect to zero-indexing:
+         *                     if this is 1 and offset is 1, the second line will be removed
+         * @param contents New lines of assembly to insert. Can be empty if only removal is necessary
+         */
         public function patchFile(filename:String, offset:int, replaceLines:int, contents:String): void
         {
             if (!(filename in this.asasmFiles))
@@ -294,6 +308,14 @@ package Bezel.Lattice
             this.patches[this.patches.length] = new LatticePatch(filename, offset, replaceLines, contents);
         }
 
+        /**
+         * Finds a regex within a passed-in GCFW assembly filename
+         * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
+         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
+         * @param pattern Pattern to search for. Can be a multiline regex
+         * @return The line index where the pattern matched. Zero-indexed, so can be passed directly into another findPattern or into patchFile
+         */
         public function findPattern(filename:String, searchFrom:int, pattern:RegExp): int
         {
             if (!(filename in this.asasmFiles))
@@ -321,7 +343,14 @@ package Bezel.Lattice
             return ret;
         }
 
-        // Grabs a region of code and returns it
+        /**
+         * Copies out code from the passed-in GCFW assembly filename
+         * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
+         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         * @param offset Offset from which to pull the contents. Note that this is zero-indexed: value 1 will retrieve lines 2-offset+lines
+         * @param lines Number of lines to retrieve
+         * @return A string containing the specified region of code
+         */
         public function retrieveCode(filename:String, offset:int, lines:int): String
         {
             if (!(filename in this.asasmFiles))
@@ -332,7 +361,14 @@ package Bezel.Lattice
             return this.asasmFiles[filename].split('\n').slice(offset, offset + lines).join('\n');
         }
 
-        // Grabs a region of code and returns it, erasing it from where it was
+        /**
+         * Copies out code from the passed-in GCFW assembly filename, removing it from its original position.
+         * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
+         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         * @param offset Offset from which to pull the contents. Note that this is zero-indexed: value 1 will retrieve lines 2-offset+lines
+         * @param lines Number of lines to retrieve
+         * @return A string containing the specified region of code
+         */
         public function extractCode(filename:String, offset:int, lines:int): String
         {
             if (!(filename in this.asasmFiles))

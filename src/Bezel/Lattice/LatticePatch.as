@@ -1,5 +1,10 @@
 package Bezel.Lattice
 {
+	/**
+	 * ...
+	 * @author piepie62
+	 */
+
     internal class LatticePatch
     {
         internal var filename:String;
