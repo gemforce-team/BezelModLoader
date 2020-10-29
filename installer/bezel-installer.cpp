@@ -9,6 +9,10 @@ extern int swfSize asm("swfSize");
 void waitExit(const char *exitMessage, int exitCode)
 {
     printf(exitMessage);
+    if (exitCode != 0)
+    {
+        printf("%i", exitCode);
+    }
     char trash[2];
     std::cin.read(trash, 1);
     exit(exitCode);
