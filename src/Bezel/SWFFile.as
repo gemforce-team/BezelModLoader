@@ -5,28 +5,30 @@ package Bezel
 	 * @author Hellrage
 	 */
 	
-	import flash.display.*;
-	import flash.filesystem.*;
-	import Bezel.Logger;
+	import flash.display.Loader;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
-	import flash.net.*;
-	import flash.system.*;
+	import flash.system.LoaderContext;
+	import flash.system.ApplicationDomain;
+	import flash.filesystem.File;
+	import flash.utils.ByteArray;
+	import flash.filesystem.FileStream;
+	import flash.filesystem.FileMode;
 	 
-	internal class BezelMod 
+	internal class SWFFile 
 	{
 		private var loader:Loader;
-		private var fileName:String;
-		public var instance: Object;
-		
+		private var file:File;
+		public var instance:Object;
+
 		private var successfulLoadCallback:Function;
 		private var failedLoadCallback:Function;
 		
-		public function BezelMod(fileName:String) 
+		public function SWFFile(file:File) 
 		{
-			if (fileName == null || fileName == "")
+			if (file == null || !file.exists)
 				throw new ArgumentError("Tried to create a mod with no mod file!");
-			this.fileName = fileName;
+			this.file = file;
 			this.loader = new Loader();
 		}
 		
@@ -36,7 +38,15 @@ package Bezel
 			this.failedLoadCallback = failureCallback;
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loadedSuccessfully);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, failedLoadCallback);
-			loader.load(new URLRequest(this.fileName));// , new LoaderContext(false, ApplicationDomain.currentDomain));
+			var bytes:ByteArray = new ByteArray();
+			var stream:FileStream = new FileStream();
+			stream.open(file, FileMode.READ);
+			stream.readBytes(bytes);
+			stream.close();
+			var context:LoaderContext = new LoaderContext(true, ApplicationDomain.currentDomain);
+			context.checkPolicyFile = false;
+			context.allowCodeImport = true;
+			loader.loadBytes(bytes, context);
 		}
 		
 		public function unload(): void
@@ -46,7 +56,6 @@ package Bezel
 			this.loader.unloadAndStop(false);
 			this.instance.unload();
 			this.instance = null;
-			this.loader = null;
 		}
 		
 		private function loadedSuccessfully(e:Event): void
