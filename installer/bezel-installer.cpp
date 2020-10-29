@@ -56,7 +56,7 @@ int main()
         }
         else
         {
-            waitExit("Bezel appears to already be installed. If this is not correct, please ")
+            waitExit("Bezel appears to already be installed. If this is not correct, please file a bug report.", -2);
         }
     }
     catch (std::filesystem::filesystem_error &e)
