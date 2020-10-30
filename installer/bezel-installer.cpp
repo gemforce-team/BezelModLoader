@@ -52,10 +52,14 @@ int main()
             fwrite(swfData, 1, swfSize, out);
             fclose(out);
 
+            std::filesystem::create_directory("Mods", trashError);
+
             waitExit("Installation succeeded. Press enter to exit.", 0);
         }
         else
         {
+            std::filesystem::create_directory("Mods", trashError);
+
             waitExit("Bezel appears to already be installed. If this is not correct, please file a bug report.", -2);
         }
     }
