@@ -34,8 +34,8 @@ package Bezel
 		// Shortcuts to gameObjects
 		private var main:Object;/*Main*/
 		private var core:Object;/*IngameCore*/
-		private var GV:Class;/*GV*/
-		private var SB:Class;/*SB*/
+		private var GV:Object;/*GV*/
+		private var SB:Object;/*SB*/
 		private var prefs:Object;/*Prefs*/
 
 		private var updateAvailable:Boolean;

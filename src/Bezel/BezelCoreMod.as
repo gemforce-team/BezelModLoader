@@ -286,9 +286,9 @@ package Bezel
         internal static function installHooks(lattice:Lattice): void
         {
             // for in loops loop the indices for some godforsaken reason. Oh well, at least it works
-            for (var index:uint in files)
+            for (var index:uint = 0; index < files.length; index++)
             {
-                for (var filepatch:uint in matches[index])
+                for (var filepatch:uint = 0; filepatch < matches[index].length; filepatch++)
                 {
                     var offset:int = 0;
                     if (matches[index][filepatch] is Array)
