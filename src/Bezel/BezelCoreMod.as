@@ -4,14 +4,13 @@ package Bezel
 
     internal class BezelCoreMod
     {
-        public static const VERSION:String = "2";
+        public static const VERSION:String = "3";
 
         private static const files:Array = [
             "com/giab/games/gcfw/Main.class.asasm",
             "com/giab/games/gcfw/ingame/IngameInfoPanelRenderer2.class.asasm",
             "com/giab/games/gcfw/ingame/IngameInputHandler2.class.asasm",
             "com/giab/games/gcfw/ingame/IngameInfoPanelRenderer.class.asasm",
-            "com/giab/games/gcfw/Mods.class.asasm",
             "com/giab/games/gcfw/utils/LoaderSaver.class.asasm",
             "com/giab/games/gcfw/ingame/IngameInitializer.class.asasm"];
         private static const matches:Array = [
@@ -30,17 +29,61 @@ package Bezel
                 "trait.*method.*rightClickOnScene"
             ],
             ["CHANGE_TARGET_TYPE_DRAGGING"],
-            ["setproperty.*deepLearningGems"],
-            ["callpropvoid.*addFloaterPanel"],
-            ["monsterEggHunt"]
+            [
+                [
+                    "method.*saveGameData",
+                    "callpropvoid.*close"
+                ],
+                [
+                    "method.*ehContinueSlotL1Clicked",
+                    "returnvoid"
+                ],
+                [
+                    "method.*ehContinueSlotL2Clicked",
+                    "returnvoid"
+                ],
+                [
+                    "method.*ehContinueSlotL3Clicked",
+                    "returnvoid"
+                ],
+                [
+                    "method.*ehContinueSlotL4Clicked",
+                    "returnvoid"
+                ],
+                [
+                    "method.*ehContinueSlotL5Clicked",
+                    "returnvoid"
+                ],
+                [
+                    "method.*ehContinueSlotL6Clicked",
+                    "returnvoid"
+                ],
+                [
+                    "method.*ehContinueSlotL7Clicked",
+                    "returnvoid"
+                ],
+                [
+                    "method.*ehContinueSlotL8Clicked",
+                    "returnvoid"
+                ],
+                [
+                    "method.*startNewGame2",
+                    "returnvoid"
+                ]
+            ],
+            [
+                [
+                    "method.*setScene3Initiate",
+                    "returnvoid"
+                ]
+            ]
         ];
         private static const replaceNums:Array = [
             [ 1, 1, 0, 0, 0 ],
             [ 0 ],
             [ 0, 0, 0, 1 ],
             [ 0 ],
-            [ 0 ],
-            [ 0 ],
+            [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
             [ 0 ]
         ];
         private static const offsetFromMatches:Array = [
@@ -48,9 +91,8 @@ package Bezel
             [ -17 ],
             [ -5, 39, -5, 16 ],
             [ 7 ],
-            [ 1 ],
-            [ 3 ],
-            [ -2 ]
+            [ 0, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
+            [ -1 ]
         ];
         private static const contents:Array = [
             [
@@ -159,21 +201,75 @@ package Bezel
                 '
             ],
             [
-                // loadSave
-                ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
-                '
-            ],
-            [
                 // saveSave
                 ' \n \
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
                     callpropvoid        QName(PackageNamespace(""), "saveSave"), 0 \n \
+                ',
+                // loadSave
+                ' \n \
+                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
+                    getproperty         QName(PackageNamespace(""), "main") \n \
+                    getproperty         QName(PackageNamespace(""), "bezel") \n \
+                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                ',
+                // loadSave
+                ' \n \
+                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
+                    getproperty         QName(PackageNamespace(""), "main") \n \
+                    getproperty         QName(PackageNamespace(""), "bezel") \n \
+                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                ',
+                // loadSave
+                ' \n \
+                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
+                    getproperty         QName(PackageNamespace(""), "main") \n \
+                    getproperty         QName(PackageNamespace(""), "bezel") \n \
+                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                ',
+                // loadSave
+                ' \n \
+                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
+                    getproperty         QName(PackageNamespace(""), "main") \n \
+                    getproperty         QName(PackageNamespace(""), "bezel") \n \
+                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                ',
+                // loadSave
+                ' \n \
+                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
+                    getproperty         QName(PackageNamespace(""), "main") \n \
+                    getproperty         QName(PackageNamespace(""), "bezel") \n \
+                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                ',
+                // loadSave
+                ' \n \
+                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
+                    getproperty         QName(PackageNamespace(""), "main") \n \
+                    getproperty         QName(PackageNamespace(""), "bezel") \n \
+                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                ',
+                // loadSave
+                ' \n \
+                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
+                    getproperty         QName(PackageNamespace(""), "main") \n \
+                    getproperty         QName(PackageNamespace(""), "bezel") \n \
+                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                ',
+                // loadSave
+                ' \n \
+                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
+                    getproperty         QName(PackageNamespace(""), "main") \n \
+                    getproperty         QName(PackageNamespace(""), "bezel") \n \
+                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                ',
+                // loadSave
+                ' \n \
+                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
+                    getproperty         QName(PackageNamespace(""), "main") \n \
+                    getproperty         QName(PackageNamespace(""), "bezel") \n \
+                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
                 '
             ],
             [
@@ -194,8 +290,20 @@ package Bezel
             {
                 for (var filepatch:uint in matches[index])
                 {
-                    var offset:int = lattice.findPattern(files[index], 0, new RegExp(matches[index][filepatch]));
-                    lattice.patchFile(files[index], offset + offsetFromMatches[index][filepatch], replaceNums[index][filepatch], contents[index][filepatch]);
+                    var offset:int = 0;
+                    if (matches[index][filepatch] is Array)
+                    {
+                        for each (var regex:String in matches[index][filepatch])
+                        {
+                            offset = lattice.findPattern(files[index], offset, new RegExp(regex));
+                        }
+                        lattice.patchFile(files[index], offset + offsetFromMatches[index][filepatch], replaceNums[index][filepatch], contents[index][filepatch]);
+                    }
+                    else
+                    {
+                        offset = lattice.findPattern(files[index], 0, new RegExp(matches[index][filepatch]));
+                        lattice.patchFile(files[index], offset + offsetFromMatches[index][filepatch], replaceNums[index][filepatch], contents[index][filepatch]);
+                    }
                 }
             }
         }
