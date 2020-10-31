@@ -1,5 +1,9 @@
 package Bezel
 {
+	/**
+	 * ...
+	 * @author piepie62
+	 */
     import Bezel.Lattice.Lattice;
 
     internal class BezelCoreMod

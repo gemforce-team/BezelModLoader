@@ -17,3 +17,7 @@
 		Updated for the latest game version.
 29.04.2020 v0.2.1 for 1.1.1
 		Updated for the latest game version.
+19.05.20 v0.2.1 for 1.1.2b
+		Updated for the latest gme version.
+31.10.20 v0.2.2 for 1.1.2b
+		Merged piepie62's Lattice branch. Coremods can now be automatically applied, there's no need for courgette or diff patching.

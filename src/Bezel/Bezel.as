@@ -24,7 +24,7 @@ package Bezel
 	// The loader also requires a parameterless constructor (AFAIK), so we also have a .bind method to bind our class to the game
 	public class Bezel extends MovieClip
 	{
-		public const VERSION:String = "0.2.1";
+		public const VERSION:String = "0.3.0";
 		public const GAME_VERSION:String = "1.1.2b";
 		
 		// Game objects
@@ -476,10 +476,12 @@ package Bezel
 		{
 			dispatchEvent(new LoadSaveEvent(GV.ppd, BezelEvent.LOAD_SAVE));
 		}
+		
 		public function saveSave(): void
 		{
 			dispatchEvent(new SaveSaveEvent(GV.ppd, BezelEvent.SAVE_SAVE));
 		}
+		
 		public function ingameNewScene(): void
 		{
 			dispatchEvent(new IngameNewSceneEvent(BezelEvent.INGAME_NEW_SCENE));

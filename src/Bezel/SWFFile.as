@@ -2,7 +2,7 @@ package Bezel
 {
 	/**
 	 * ...
-	 * @author Hellrage
+	 * @author piepie62
 	 */
 	
 	import flash.display.Loader;
