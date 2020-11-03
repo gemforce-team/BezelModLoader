@@ -344,6 +344,26 @@ package Bezel.Lattice
         }
 
         /**
+         * Copies out code found via a regex within a passed-in GCFW assembly filename
+         * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
+         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
+         * @param pattern Pattern to search for. Can be a multiline regex
+         * @return The result of pattern.exec
+         */
+        public function retrievePattern(filename:String, searchFrom:int, pattern:RegExp): Object
+        {
+            if (!(filename in this.asasmFiles))
+            {
+                throw new Error("File '" + filename + "' not in disassembly");
+            }
+
+            var searchString:String = this.asasmFiles[filename].split('\n').slice(searchFrom).join('\n');
+
+            return pattern.exec(searchString);
+        }
+
+        /**
          * Copies out code from the passed-in GCFW assembly filename
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
          *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
