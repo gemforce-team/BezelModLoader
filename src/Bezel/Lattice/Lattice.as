@@ -93,6 +93,10 @@ package Bezel.Lattice
             if (e.exitCode != 0)
             {
                 logger.log("toolFinished", currentTool + " failed: " + this.processError);
+				if (coremods.exists)
+				{
+					coremods.deleteFile();
+				}
                 throw new Error("Lattice patch tool " + currentTool + " failed. Check the log file for details");
             }
 
