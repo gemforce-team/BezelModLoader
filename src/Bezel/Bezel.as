@@ -452,8 +452,6 @@ package Bezel
 
 			if (differentCoremods)
 			{
-				this.lattice.apply();
-
 				var file:File = File.applicationStorageDirectory.resolvePath("coremods.bzl");
 				var stream:FileStream = new FileStream();
 				stream.open(file, FileMode.WRITE);
@@ -466,6 +464,18 @@ package Bezel
 					coremod.load(this.lattice);
 				}
 				stream.close();
+
+				try {
+					this.lattice.apply();
+				}
+				catch (e:Error)
+				{
+					if (Lattice.moddedSwf.exists)
+					{
+						Lattice.moddedSwf.deleteFile();
+					}
+					throw e;
+				}
 			}
 			else
 			{
