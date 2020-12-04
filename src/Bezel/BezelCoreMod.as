@@ -296,12 +296,20 @@ package Bezel
                         for each (var regex:String in matches[index][filepatch])
                         {
                             offset = lattice.findPattern(files[index], offset, new RegExp(regex));
+                            if (offset == -1)
+                            {
+                                throw new Error("Could not apply Bezel coremods");
+                            }
                         }
                         lattice.patchFile(files[index], offset + offsetFromMatches[index][filepatch], replaceNums[index][filepatch], contents[index][filepatch]);
                     }
                     else
                     {
                         offset = lattice.findPattern(files[index], 0, new RegExp(matches[index][filepatch]));
+                        if (offset == -1)
+                        {
+                            throw new Error("Could not apply Bezel coremods");
+                        }
                         lattice.patchFile(files[index], offset + offsetFromMatches[index][filepatch], replaceNums[index][filepatch], contents[index][filepatch]);
                     }
                 }
