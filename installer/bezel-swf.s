@@ -3,7 +3,7 @@
 .align 4
 
 swfData:
-.incbin "../obj/GemCraft Frostborn Wrath.swf"
+.incbin "../obj/BezelModLoader.swf"
 
 .global swfSize
 .align 4

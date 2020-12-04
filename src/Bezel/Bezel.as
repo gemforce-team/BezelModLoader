@@ -76,10 +76,10 @@ package Bezel
 			
 			this.logger.log("Bezel", "Bezel Mod Loader " + prettyVersion());
 			
-            var swfFile:File = File.applicationDirectory.resolvePath("GemCraft Frostborn Wrath Backup.swf");
+            var swfFile:File = File.applicationDirectory.resolvePath("GemCraft Frostborn Wrath.swf");
 			if (!swfFile.exists)
 			{
-				this.logger.log("Bezel", "Game file not found. Try reinstalling the game, then Bezel.");
+				this.logger.log("Bezel", "Game file not found. Try reinstalling the game.");
 				NativeApplication.nativeApplication.exit(-1);
 			}
 			var tools:File = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/tools/");

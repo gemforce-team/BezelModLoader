@@ -56,7 +56,7 @@ package Bezel.Lattice
 
         private var doneDisassembling:Boolean = false;
 
-        public static var gameSwf:File = File.applicationDirectory.resolvePath("GemCraft Frostborn Wrath Backup.swf");
+        public static var gameSwf:File = File.applicationDirectory.resolvePath("GemCraft Frostborn Wrath.swf");
         public static var moddedSwf:File = File.applicationDirectory.resolvePath("gcfw-modded.swf");
         public static var asm:File = File.applicationStorageDirectory.resolvePath("gcfw.basasm");
         public static var cleanAsm:File = File.applicationStorageDirectory.resolvePath("gcfw-clean.basasm");
