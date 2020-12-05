@@ -26,6 +26,12 @@ int main()
 
     const std::filesystem::path metadataFile{"META-INF/AIR/application.xml"};
     const std::filesystem::path metadataBkpFile{"META-INF/AIR/application.xml.bkp"};
+    const std::filesystem::path gcfwBkpFile{"GemCraft Frostborn Wrath Backup.swf"};
+
+    if (std::filesystem::exists(gcfwBkpFile))
+    {
+        std::filesystem::rename(gcfwBkpFile, "GemCraft Frostborn Wrath.swf");
+    }
 
     if (!std::filesystem::exists(metadataFile))
     {

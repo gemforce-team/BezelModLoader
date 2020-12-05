@@ -264,8 +264,10 @@ package Bezel
 			{
 				logger.log("Compatibility", "Bezel version is incompatible! Required: " + mod.instance.BEZEL_VERSION);
 				delete mods[mod.instance.MOD_NAME];
+				var name:String = mod.instance.MOD_NAME;
+				var requiredVersion:String = mod.instance.BEZEL_VERSION;
 				mod.unload();
-				throw new Error("Bezel version is incompatible! Bezel: " + VERSION + " while " + mod.instance.MOD_NAME+ " requires " + mod.instance.BEZEL_VERSION);
+				throw new Error("Bezel version is incompatible! Bezel: " + VERSION + " while " + name + " requires " + requiredVersion);
 			}
 			this.addChild(DisplayObject(mod.instance));
 
