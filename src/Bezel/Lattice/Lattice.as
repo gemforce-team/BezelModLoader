@@ -56,7 +56,7 @@ package Bezel.Lattice
 
         private var doneDisassembling:Boolean = false;
 
-        public static var gameSwf:File = File.applicationDirectory.resolvePath("GemCraft Frostborn Wrath Backup.swf");
+        public static var gameSwf:File = File.applicationDirectory.resolvePath("GemCraft Frostborn Wrath.swf");
         public static var moddedSwf:File = File.applicationDirectory.resolvePath("gcfw-modded.swf");
         public static var asm:File = File.applicationStorageDirectory.resolvePath("gcfw.basasm");
         public static var cleanAsm:File = File.applicationStorageDirectory.resolvePath("gcfw-clean.basasm");
@@ -93,6 +93,10 @@ package Bezel.Lattice
             if (e.exitCode != 0)
             {
                 logger.log("toolFinished", currentTool + " failed: " + this.processError);
+				if (coremods.exists)
+				{
+					coremods.deleteFile();
+				}
                 throw new Error("Lattice patch tool " + currentTool + " failed. Check the log file for details");
             }
 
@@ -341,6 +345,62 @@ package Bezel.Lattice
             }
 
             return ret;
+        }
+
+        /**
+         * Finds and replaces a regex within a passed-in GCFW assembly filename. Note that $ replacement codes can be used in the replacement string.
+         * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
+         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
+         * @param pattern Pattern to search for. Can be a multiline regex
+         * @param replacement Object to use for replacement string. Passed into the second argument of String.replace
+         * @return Whether the find and replacement succeeded
+         */
+        public function replacePattern(filename:String, searchFrom:int, pattern:RegExp, replacement:*): Boolean
+        {
+            if (!(filename in this.asasmFiles))
+            {
+                throw new Error("File '" + filename + "' not in disassembly");
+            }
+
+            var searchString:String = this.asasmFiles[filename].split('\n').slice(searchFrom).join('\n');
+
+            var line:int = findPattern(filename, searchFrom, pattern);
+            if (line != -1)
+            {
+                var result:Object = pattern.exec(searchString);
+
+                var lines:Array = result[0].split('\n');
+                searchString = searchString.split('\n').slice(0, lines.length).join('\n');
+
+                var replaced:String = searchString.replace(pattern, replacement);
+                
+                this.patchFile(filename, line, lines.length, replaced);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        /**
+         * Copies out code found via a regex within a passed-in GCFW assembly filename
+         * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
+         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
+         * @param pattern Pattern to search for. Can be a multiline regex
+         * @return The result of pattern.exec
+         */
+        public function retrievePattern(filename:String, searchFrom:int, pattern:RegExp): Object
+        {
+            if (!(filename in this.asasmFiles))
+            {
+                throw new Error("File '" + filename + "' not in disassembly");
+            }
+
+            var searchString:String = this.asasmFiles[filename].split('\n').slice(searchFrom).join('\n');
+
+            return pattern.exec(searchString);
         }
 
         /**

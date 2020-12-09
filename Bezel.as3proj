@@ -4,7 +4,7 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="C:\Program Files (x86)\Steam\steamapps\common\GemCraft Frostborn Wrath\GemCraft Frostborn Wrath.swf" />
+    <movie path="D:\Games\Steam\steamapps\common\GemCraft Frostborn Wrath\Mods\BezelModLoader.swf" />
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />

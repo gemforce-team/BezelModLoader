@@ -289,7 +289,6 @@ package Bezel
 
         internal static function installHooks(lattice:Lattice): void
         {
-            // for in loops loop the indices for some godforsaken reason. Oh well, at least it works
             for (var index:uint = 0; index < files.length; index++)
             {
                 for (var filepatch:uint = 0; filepatch < matches[index].length; filepatch++)
@@ -300,12 +299,20 @@ package Bezel
                         for each (var regex:String in matches[index][filepatch])
                         {
                             offset = lattice.findPattern(files[index], offset, new RegExp(regex));
+                            if (offset == -1)
+                            {
+                                throw new Error("Could not apply Bezel coremod for " + files[index] + ", patch number " + filepatch);
+                            }
                         }
                         lattice.patchFile(files[index], offset + offsetFromMatches[index][filepatch], replaceNums[index][filepatch], contents[index][filepatch]);
                     }
                     else
                     {
                         offset = lattice.findPattern(files[index], 0, new RegExp(matches[index][filepatch]));
+                        if (offset == -1)
+                        {
+                            throw new Error("Could not apply Bezel coremod for " + files[index] + ", patch number " + filepatch);
+                        }
                         lattice.patchFile(files[index], offset + offsetFromMatches[index][filepatch], replaceNums[index][filepatch], contents[index][filepatch]);
                     }
                 }
