@@ -19,5 +19,5 @@
 		Updated for the latest game version.
 19.05.2020 v0.2.1 for 1.1.2b
 		Updated for the latest game version.
-19.05.2020 v0.3.0 for 1.1.2b
+05.03.2021 v0.3.0 for 1.1.2b
 		Merged piepie62's Lattice branch into master. This update adds dynamic hook injection and a different file structure for the main swf. Also a new installer.
