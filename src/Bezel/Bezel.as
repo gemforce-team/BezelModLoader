@@ -4,7 +4,7 @@ package Bezel
 	 * ...
 	 * @author Hellrage
 	 */
-	
+
 	import flash.display.*;
 	import flash.events.*;
 	import flash.filesystem.*;
@@ -26,11 +26,11 @@ package Bezel
 	{
 		public const VERSION:String = "0.3.0";
 		public const GAME_VERSION:String = "1.1.2b";
-		
+
 		// Game objects
 		public var gameObjects:Object;
 		public var lattice:Lattice;
-		
+
 		// Shortcuts to gameObjects
 		private var main:Object;/*Main*/
 		private var core:Object;/*IngameCore*/
@@ -39,13 +39,13 @@ package Bezel
 		private var prefs:Object;/*Prefs*/
 
 		private var updateAvailable:Boolean;
-		
+
 		private var logger:Logger;
 		private var mods:Object;
 		private var appStorage:File;
 
 		private var waitingMods:uint;
-		
+
 		private var modsReloadedTimestamp:int;
 
 		private var game:SWFFile;
@@ -57,7 +57,7 @@ package Bezel
         [Embed(source = "../../assets/rabcdasm/rabcdasm.exe", mimeType = "application/octet-stream")] private var disassemble:Class;
         [Embed(source = "../../assets/rabcdasm/rabcasm.exe", mimeType = "application/octet-stream")] private var reassemble:Class;
 		[Embed(source = "../../assets/rabcdasm/COPYING", mimeType = "application/octet-stream")] private var LICENSE:Class;
-		
+
 		// Parameterless constructor for flash.display.Loader
 		public function Bezel()
 		{
@@ -73,9 +73,9 @@ package Bezel
 			Logger.init();
 			this.logger = Logger.getLogger("Bezel");
 			this.mods = new Object();
-			
+
 			this.logger.log("Bezel", "Bezel Mod Loader " + prettyVersion());
-			
+
             var swfFile:File = File.applicationDirectory.resolvePath("GemCraft Frostborn Wrath.swf");
 			if (!swfFile.exists)
 			{
@@ -106,7 +106,7 @@ package Bezel
 			this.lattice.addEventListener(LatticeEvent.DISASSEMBLY_DONE, this.onLatticeReady);
 			this.lattice.addEventListener(LatticeEvent.REBUILD_DONE, this.onGameBuilt);
 			this.addEventListener(LatticeEvent.REBUILD_DONE, this.onGameBuilt);
-			
+
 			this.coremods = new Array();
 			this.prevCoremods = new Array();
 			if (!this.lattice.init())
@@ -124,7 +124,7 @@ package Bezel
 				}
 			}
 		}
-		
+
 		private function onExit(e:Event): void
 		{
 			Logger.exit();
@@ -157,7 +157,7 @@ package Bezel
 		{
 			this.logger.log("gameLoadFail", "Loading game failed");
 		}
-		
+
 		// This method binds the class to the game's objects
 		public function bind() : Bezel
 		{
@@ -205,7 +205,7 @@ package Bezel
 			this.gameObjects.constants.waveFormation = getDefinitionByName("com.giab.games.gcfw.constants.WaveFormation");
 			this.gameObjects.constants.wizLockType = getDefinitionByName("com.giab.games.gcfw.constants.WizLockType");
 			this.gameObjects.constants.wizStashStatus = getDefinitionByName("com.giab.games.gcfw.constants.WizStashStatus");
-			
+
 			this.updateAvailable = false;
 			main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text = "Bezel " + prettyVersion();
 			//checkForUpdates();
@@ -230,11 +230,11 @@ package Bezel
 			if(!storageFolder.isDirectory)
 				storageFolder.createDirectory();
 		}
-		
+
 		private function loadMods(): void
 		{
 			var modsFolder:File = File.applicationDirectory.resolvePath("Mods/");
-			
+
 			var fileList:Array = modsFolder.getDirectoryListing();
 			var modFiles:Array = new Array();
 			for(var f:int = 0; f < fileList.length; f++)
@@ -255,7 +255,7 @@ package Bezel
 			}
 			this.modsReloadedTimestamp = getTimer();
 		}
-		
+
 		public function successfulModLoad(mod:SWFFile): void
 		{
 			logger.log("successfulModLoad", "Loaded mod: " + mod.instance.MOD_NAME + " v" + mod.instance.VERSION);
@@ -292,7 +292,7 @@ package Bezel
 					this.dispatchEvent(new Event(BezelEvent.BEZEL_DONE_MOD_LOAD));
 				}
 			}
-			else 
+			else
 			{
 				if ("loadCoreMod" in mod.instance)
 				{
@@ -305,7 +305,7 @@ package Bezel
 				}
 			}
 		}
-		
+
 		public function bezelVersionCompatible(requiredVersion:String): Boolean
 		{
 			var bezelVer:Array = this.VERSION.split(".");
@@ -321,10 +321,10 @@ package Bezel
 					return bezelVer[2] >= thisVer[2];
 				}
 			}
-			
+
 			return false;
 		}
-		
+
 		public function failedModLoad(e:Event): void
 		{
 			logger.log("failedLoad", "Failed to load mod: " + e.currentTarget.url);
@@ -342,30 +342,30 @@ package Bezel
 				}
 			}
 		}
-		
+
 		public function getLogger(id:String): Logger
 		{
 			return Logger.getLogger(id);
 		}
-		
+
 		public function getModByName(modName:String): Object
 		{
 			if (this.mods[modName])
 				return this.mods[modName].instance;
 			return null;
 		}
-		
+
 		public function prettyVersion(): String
 		{
 			return 'v' + VERSION + ' for ' + GAME_VERSION;
 		}
-		
+
 		// Called after the gem's info panel has been formed but before it's returned to the game for rendering
 		public function ingameGemInfoPanelFormed(infoPanel:Object, gem:Object, numberFormatter:Object): void
 		{
 			dispatchEvent(new IngameGemInfoPanelFormedEvent(BezelEvent.INGAME_GEM_INFO_PANEL_FORMED, {"infoPanel": infoPanel, "gem": gem, "numberFormatter": numberFormatter}));
 		}
-		
+
 		// Called before any of the game's logic runs when starting to form an infopanel
 		// This method is called before infoPanelFormed (which should be renamed to ingameGemInfoPanelFormed)
 		public function ingamePreRenderInfoPanel(): Boolean
@@ -375,7 +375,7 @@ package Bezel
 			//logger.log("ingamePreRenderInfoPanel", "Dispatched event!");
 			return eventArgs.continueDefault;
 		}
-		
+
 		// Called immediately as a click event is fired by the base game
 		// set continueDefault to false to prevent the base game's handler from running
 		public function ingameClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
@@ -384,7 +384,7 @@ package Bezel
 			dispatchEvent(new IngameClickOnSceneEvent(BezelEvent.INGAME_CLICK_ON_SCENE, eventArgs));
 			return eventArgs.continueDefault;
 		}
-		
+
 		// Called immediately as a right click event is fired by the base game
 		// set continueDefault to false to prevent the base game's handler from running
 		public function ingameRightClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
@@ -393,7 +393,7 @@ package Bezel
 			dispatchEvent(new IngameClickOnSceneEvent(BezelEvent.INGAME_RIGHT_CLICK_ON_SCENE, eventArgs));
 			return eventArgs.continueDefault;
 		}
-		
+
 		// TODO rename to ingameKeyDown
 		// Called after the game checks that a key should be handled, but before any of the actual handling logic
 		// Set continueDefault to false to prevent the base game's handler from running
@@ -415,7 +415,7 @@ package Bezel
 			dispatchEvent(new IngameKeyDownEvent(BezelEvent.INGAME_KEY_DOWN, kbKDEventArgs));
 			return kbKDEventArgs.continueDefault;
 		}
-		
+
 		private function reloadAllMods(): void
 		{
 			logger.log("eh_keyboardKeyDown", "Reloading all mods!");
@@ -489,12 +489,12 @@ package Bezel
 		{
 			dispatchEvent(new LoadSaveEvent(GV.ppd, BezelEvent.LOAD_SAVE));
 		}
-		
+
 		public function saveSave(): void
 		{
 			dispatchEvent(new SaveSaveEvent(GV.ppd, BezelEvent.SAVE_SAVE));
 		}
-		
+
 		public function ingameNewScene(): void
 		{
 			dispatchEvent(new IngameNewSceneEvent(BezelEvent.INGAME_NEW_SCENE));
