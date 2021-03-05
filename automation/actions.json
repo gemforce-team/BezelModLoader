@@ -104,5 +104,41 @@
         "file": "renderInfoPanel.abc"
       }
     ]
+  },
+  {
+    "script": "Mods.class",
+    "file": "com/giab/games/gcfw/Mods.class.asasm",
+    "actions": [
+      {
+        "type": "insert",
+        "identifier": "setproperty.*deepLearningGems",
+        "offset": "1",
+        "file": "loadSave.abc"
+      }
+    ]
+  },
+  {
+    "script": "LoaderSaver.class",
+    "file": "com/giab/games/gcfw/utils/LoaderSaver.class.asasm",
+    "actions": [
+      {
+        "type": "insert",
+        "identifier": "callpropvoid.*addFloaterPanel",
+        "offset": "3",
+        "file": "saveSave.abc"
+      }
+    ]
+  },
+  {
+    "script": "IngameInitializer.class",
+    "file": "com/giab/games/gcfw/ingame/IngameInitializer.class.asasm",
+    "actions": [
+      {
+        "type": "insert",
+        "identifier": "monsterEggHunt",
+        "offset": "-2",
+        "file": "newScene.abc"
+      }
+    ]
   }
 ]
