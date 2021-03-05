@@ -28,26 +28,26 @@ Mods are kept in the game's folder, in a `Mods` subfolder. Any `.swf`s placed th
 
 * There are a couple events provided by Bezel that mods can subscribe to. You can also subscribe to game objects' events directly.
 
+* Coremods allow you to inject any changes into the game (such as new hooks or changing hardcoded values), take a look at [BezelCoreMod](https://github.com/gemforce-team/BezelModLoader/blob/master/src/Bezel/BezelCoreMod.as)
+
 
 # Installation
-**To install Bezel** grab a release archive (links below) for your game version. Copy
-```
-applyDiff.bat
-courgette64.exe
-BezelModLoader-x.x.x-for-y.y.y.diff
-"Mods" folder
-```
-from the archive into the game's folder (To navigate to the game's folder: rightclick the game in steam -> Manage -> Browse local files).
+**To install Bezel** grab an installer (links below) for your game version.
 
-After that launch `applyDiff.bat`, your game will be patched and all unnecessary files deleted. Then launch the game normally through steam.
+## If you had Bezel 0.2.x installed (via patching), you need to restore the original game's swf.
+There are two ways to restore your original .swf
+1) Delete "GemCraft Frostborn Wrath.swf" and rename "GemCraft Frostborn Wrath Backup.swf" to "GemCraft Frostborn Wrath.swf"
+2) Run steam's "Verify integrity of game files" and it'll be redownloaded.
+This will not remove any files, only restore the game's swf to baseline.
 
-[More about Courgette](https://blog.chromium.org/2009/07/smaller-is-faster-and-safer-too.html)
+## After performing the above (or if you have the unmodded game)
+Simply put the installer into your game's folder and launch it. You'll see a message that the installation was successful, then launch the game normally through steam. You'll see Bezel in the bottom right corner of the main menu:
 
-[Courgette repo](https://chromium.googlesource.com/chromium/src/courgette/+/master)
+![image](https://user-images.githubusercontent.com/5305748/110174231-e1ee4f00-7e10-11eb-875e-b2745214a07d.png)
 
 
-## Installing mods
-#Refer to individual mods' readme for instructions first!
+# Installing mods
+## Refer to individual mods' readme for instructions first!
 
 
 At the moment you install mods by dropping their .swf into the `Mods` folder. Make sure there are no duplicates there (like two versions of the same mod), they will overwrite each other in alphabetical order (will be fixed later).
@@ -56,12 +56,10 @@ At the moment you install mods by dropping their .swf into the `Mods` folder. Ma
 You can even do it on the fly, just press `Ctrl+Alt+Shift+Home` to reload all mods. **This is a development feature, it shouldn't crash but to be sure just restart the game if you add new mods.**
 
 
-## Uninstalling Bezel
-There are two ways to restore your original .swf
-1) Delete "GemCraft Frostborn Wrath.swf" and rename "GemCraft Frostborn Wrath Backup.swf" to "GemCraft Frostborn Wrath.swf"
-2) Run steam's "Verify integrity of game files" and it'll be redownloaded.
+# Uninstalling Bezel
+Run steam's "Verify integrity of game files".
 
-This will not remove any files, only restore the game's swf to baseline.
+This will not remove any files, only restore the game's .exe to baseline.
 
 
 # Releases
@@ -94,3 +92,5 @@ GemCraft - Frostborn Wrath is developed and owned by [gameinabottle](http://game
 Bezel Mod Loader is developed by Hellrage
 
 Special thanks to LA for automating swf patching and .diff generation!
+
+Thanks to piepie62 for developing Lattice!
