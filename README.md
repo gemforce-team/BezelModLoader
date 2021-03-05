@@ -32,7 +32,7 @@ Mods are kept in the game's folder, in a `Mods` subfolder. Any `.swf`s placed th
 
 
 # Installation
-**To install Bezel** grab an installer (links below) for your game version.
+**To install Bezel** grab an [installer](https://github.com/gemforce-team/BezelModLoader/releases/latest) (links for other releases below) for your game version.
 
 ## If you had Bezel 0.2.x installed (via patching), you need to restore the original game's swf.
 There are two ways to restore your original .swf
