@@ -65,10 +65,12 @@ package Bezel
 			prepareFolders();
 
 			this.initialLoad = true;
+			
+			// Application flow is controlled using events. There's a page on the wiki that outlines it
 			this.addEventListener(BezelEvent.BEZEL_DONE_MOD_RELOAD, this.doneModReload);
 			this.addEventListener(BezelEvent.BEZEL_DONE_MOD_LOAD, this.doneModLoad);
 
-			NativeApplication.nativeApplication.addEventListener(Event.EXITING,this.onExit);
+			NativeApplication.nativeApplication.addEventListener(Event.EXITING, this.onExit);
 
 			Logger.init();
 			this.logger = Logger.getLogger("Bezel");
@@ -82,14 +84,16 @@ package Bezel
 				this.logger.log("Bezel", "Game file not found. Try reinstalling the game.");
 				NativeApplication.nativeApplication.exit(-1);
 			}
-			var tools:File = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/tools/");
+			
+			var toolsPath: String = "Bezel Mod Loader/tools/";
+			var tools:File = File.applicationStorageDirectory.resolvePath(toolsPath);
 			if (!tools.exists)
 			{
 				tools.createDirectory();
 			}
 			for each (var tool:String in ["disassemble", "reassemble", "LICENSE"])
 			{
-				var file:File = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/tools/" + tool + ".exe");
+				var file:File = File.applicationStorageDirectory.resolvePath(toolsPath + tool + ".exe");
 				if (!file.exists)
 				{
 					this.logger.log("Bezel", "Exporting tool " + tool);
@@ -109,7 +113,11 @@ package Bezel
 
 			this.coremods = new Array();
 			this.prevCoremods = new Array();
-			if (!this.lattice.init())
+			
+			// Initializes Lattice. This method raises DISASSEMBLY_DONE
+			var reloadCoremods: Boolean = this.lattice.init();
+			
+			if (!reloadCoremods)
 			{
 				var coremodFile:File = File.applicationStorageDirectory.resolvePath("coremods.bzl");
 				if (coremodFile.exists)
@@ -129,7 +137,8 @@ package Bezel
 		{
 			Logger.exit();
 		}
-
+		
+		// After we have the dissassembled game, add BezelCoreMod and load mods
 		private function onLatticeReady(e:Event): void
 		{
 			this.coremods[this.coremods.length] = {"name": "BEZEL_MOD_LOADER", "version": BezelCoreMod.VERSION, "load": BezelCoreMod.installHooks};
@@ -137,17 +146,20 @@ package Bezel
 			loadMods();
 		}
 
+		// After we've loaded all mods and applied coremods & rebuilt the modded swf, we're ready to start the game
 		private function onGameBuilt(e:Event): void
 		{
 			this.game = new SWFFile(Lattice.moddedSwf);
 			this.game.load(this.gameLoadSuccess, this.gameLoadFail);
 		}
 
+		// Bind the game and Bezel to each other
 		private function gameLoadSuccess(game:SWFFile): void
 		{
 			this.main = game.instance;
 			game.instance.bezel = this;
 			this.addChild(DisplayObject(game.instance));
+			// Base game's init (main.initFromBezel())
 			main.initFromBezel();
 			bind();
 			this.initialLoad = false;
@@ -230,7 +242,8 @@ package Bezel
 			if(!storageFolder.isDirectory)
 				storageFolder.createDirectory();
 		}
-
+		
+		// Tries to load every .swf except itself in /Mods/ directory as a mod
 		private function loadMods(): void
 		{
 			var modsFolder:File = File.applicationDirectory.resolvePath("Mods/");
@@ -256,15 +269,16 @@ package Bezel
 			this.modsReloadedTimestamp = getTimer();
 		}
 
+		// Assuming the file loaded, add the mod to tracked mods. Check compatibility. Check if the mod has a coremod and add the patches if so.
 		public function successfulModLoad(mod:SWFFile): void
 		{
-			logger.log("successfulModLoad", "Loaded mod: " + mod.instance.MOD_NAME + " v" + mod.instance.VERSION);
-			mods[mod.instance.MOD_NAME] = mod;
+			var name: String = mod.instance.MOD_NAME;
+			logger.log("successfulModLoad", "Loaded mod: " + name + " v" + mod.instance.VERSION);
+			mods[name] = mod;
 			if (!this.bezelVersionCompatible(mod.instance.BEZEL_VERSION))
 			{
 				logger.log("Compatibility", "Bezel version is incompatible! Required: " + mod.instance.BEZEL_VERSION);
-				delete mods[mod.instance.MOD_NAME];
-				var name:String = mod.instance.MOD_NAME;
+				delete mods[name];
 				var requiredVersion:String = mod.instance.BEZEL_VERSION;
 				mod.unload();
 				throw new Error("Bezel version is incompatible! Bezel: " + VERSION + " while " + name + " requires " + requiredVersion);
@@ -279,11 +293,11 @@ package Bezel
 				{
 					if ("COREMOD_VERSION" in mod.instance)
 					{
-						this.coremods[this.coremods.length] = {"name": mod.instance.MOD_NAME, "version": mod.instance.COREMOD_VERSION, "load": mod.instance.loadCoreMod};
+						this.coremods[this.coremods.length] = {"name": name, "version": mod.instance.COREMOD_VERSION, "load": mod.instance.loadCoreMod};
 					}
 					else
 					{
-						this.coremods[this.coremods.length] = {"name": mod.instance.MOD_NAME, "version": mod.instance.VERSION, "load": mod.instance.loadCoreMod};
+						this.coremods[this.coremods.length] = {"name": name, "version": mod.instance.VERSION, "load": mod.instance.loadCoreMod};
 					}
 				}
 
@@ -296,7 +310,7 @@ package Bezel
 			{
 				if ("loadCoreMod" in mod.instance)
 				{
-					logger.log("Mod Reload", "The coremod contained in " + mod.instance.MOD_NAME + " was not reloaded. This may cause issues!");
+					logger.log("Mod Reload", "The coremod contained in " + name + " was not reloaded. This may cause issues!");
 				}
 
 				if (waitingMods == 0)
@@ -347,7 +361,8 @@ package Bezel
 		{
 			return Logger.getLogger(id);
 		}
-
+		
+		// Returns a mod's instance, if such a mod is loaded. Used for cross-mod interactions
 		public function getModByName(modName:String): Object
 		{
 			if (this.mods[modName])
@@ -434,6 +449,10 @@ package Bezel
 			bindMods();
 		}
 
+		// After bezel loads mods from /Mods/ and aggregates all coremods, check if we need to reapply the coremods.
+		// If we do, load them into Lattice, apply them, rebuild the modded swf.
+		// Either Bezel sees that the coremods are all the same and skips calling Lattice (raises REBUILD_DONE)
+		// Or They are different and we call Lattice, which then raises REBUILD_DONE
 		private function doneModLoad(e:Event): void
 		{
 			var differentCoremods:Boolean = this.coremods.length != this.prevCoremods.length;
@@ -451,7 +470,7 @@ package Bezel
 					}
 				}
 			}
-
+			
 			if (differentCoremods)
 			{
 				var file:File = File.applicationStorageDirectory.resolvePath("coremods.bzl");

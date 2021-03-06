@@ -118,6 +118,7 @@ package Bezel.Lattice
             this.processError += this.process.standardError.readUTFBytes(process.standardError.bytesAvailable);
         }
 
+		// Disassembles the game into a clean asm. Prepares Lattice patches.
         // Returns whether coremods should be reloaded, regardless of if they've changed or not
         public function init(): Boolean
         {
