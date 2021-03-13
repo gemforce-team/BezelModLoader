@@ -30,6 +30,7 @@ int main()
 
     if (std::filesystem::exists(gcfwBkpFile))
     {
+        std::filesystem::remove("GemCraft Frostborn Wrath.swf");
         std::filesystem::rename(gcfwBkpFile, "GemCraft Frostborn Wrath.swf");
     }
 
