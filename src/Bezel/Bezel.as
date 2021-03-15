@@ -53,6 +53,14 @@ package Bezel
 		private var coremods:Array;
 		private var prevCoremods:Array;
 
+		public static const bezelFolder:File = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/");
+		public static const toolsFolder:File = bezelFolder.resolvePath("tools/");
+		public static const latticeFolder:File = bezelFolder.resolvePath("Lattice/");
+		public static const coremodFile:File = bezelFolder.resolvePath("coremods.bzl");
+
+		public static const modsFolder:File = File.applicationDirectory.resolvePath("Mods/");
+        public static const gameSwf:File = File.applicationDirectory.resolvePath("GemCraft Frostborn Wrath.swf");
+		public static const moddedSwf:File = File.applicationDirectory.resolvePath("gcfw-modded.swf");
 
         [Embed(source = "../../assets/rabcdasm/rabcdasm.exe", mimeType = "application/octet-stream")] private var disassemble:Class;
         [Embed(source = "../../assets/rabcdasm/rabcasm.exe", mimeType = "application/octet-stream")] private var reassemble:Class;
@@ -78,22 +86,19 @@ package Bezel
 
 			this.logger.log("Bezel", "Bezel Mod Loader " + prettyVersion());
 
-            var swfFile:File = File.applicationDirectory.resolvePath("GemCraft Frostborn Wrath.swf");
-			if (!swfFile.exists)
+			if (!gameSwf.exists)
 			{
 				this.logger.log("Bezel", "Game file not found. Try reinstalling the game.");
 				NativeApplication.nativeApplication.exit(-1);
 			}
 			
-			var toolsPath: String = "Bezel Mod Loader/tools/";
-			var tools:File = File.applicationStorageDirectory.resolvePath(toolsPath);
-			if (!tools.exists)
+			if (!toolsFolder.exists)
 			{
-				tools.createDirectory();
+				toolsFolder.createDirectory();
 			}
 			for each (var tool:String in ["disassemble", "reassemble", "LICENSE"])
 			{
-				var file:File = File.applicationStorageDirectory.resolvePath(toolsPath + tool + ".exe");
+				var file:File = toolsFolder.resolvePath(tool);
 				if (!file.exists)
 				{
 					this.logger.log("Bezel", "Exporting tool " + tool);
@@ -119,7 +124,6 @@ package Bezel
 			
 			if (!reloadCoremods)
 			{
-				var coremodFile:File = File.applicationStorageDirectory.resolvePath("coremods.bzl");
 				if (coremodFile.exists)
 				{
 					var coremodStream:FileStream = new FileStream();
@@ -149,7 +153,7 @@ package Bezel
 		// After we've loaded all mods and applied coremods & rebuilt the modded swf, we're ready to start the game
 		private function onGameBuilt(e:Event): void
 		{
-			this.game = new SWFFile(Lattice.moddedSwf);
+			this.game = new SWFFile(moddedSwf);
 			this.game.load(this.gameLoadSuccess, this.gameLoadFail);
 		}
 
@@ -238,16 +242,15 @@ package Bezel
 		private function prepareFolders(): void
 		{
 			this.appStorage = File.applicationStorageDirectory;
-			var storageFolder:File = this.appStorage.resolvePath("Bezel Mod Loader");
-			if(!storageFolder.isDirectory)
-				storageFolder.createDirectory();
+			if(!bezelFolder.isDirectory)
+				bezelFolder.createDirectory();
+			if (!latticeFolder.isDirectory)
+				latticeFolder.createDirectory();
 		}
 		
 		// Tries to load every .swf except itself in /Mods/ directory as a mod
 		private function loadMods(): void
 		{
-			var modsFolder:File = File.applicationDirectory.resolvePath("Mods/");
-
 			var fileList:Array = modsFolder.getDirectoryListing();
 			var modFiles:Array = new Array();
 			for(var f:int = 0; f < fileList.length; f++)
@@ -263,7 +266,7 @@ package Bezel
 			waitingMods = modFiles.length;
 			for each (var file:String in modFiles)
 			{
-				var newMod:SWFFile = new SWFFile(File.applicationDirectory.resolvePath("Mods/" + file));
+				var newMod:SWFFile = new SWFFile(modsFolder.resolvePath(file));
 				newMod.load(successfulModLoad, failedModLoad);
 			}
 			this.modsReloadedTimestamp = getTimer();
@@ -372,7 +375,7 @@ package Bezel
 
 		public function prettyVersion(): String
 		{
-			return 'v' + VERSION + ' for ' + GAME_VERSION;
+			return 'Bezel v' + VERSION;
 		}
 
 		// Called after the gem's info panel has been formed but before it's returned to the game for rendering
@@ -473,9 +476,8 @@ package Bezel
 			
 			if (differentCoremods)
 			{
-				var file:File = File.applicationStorageDirectory.resolvePath("coremods.bzl");
 				var stream:FileStream = new FileStream();
-				stream.open(file, FileMode.WRITE);
+				stream.open(coremodFile, FileMode.WRITE);
 				for each (var coremod:Object in this.coremods)
 				{
 					stream.writeUTF(coremod.name);
@@ -491,9 +493,9 @@ package Bezel
 				}
 				catch (e:Error)
 				{
-					if (Lattice.moddedSwf.exists)
+					if (moddedSwf.exists)
 					{
-						Lattice.moddedSwf.deleteFile();
+						moddedSwf.deleteFile();
 					}
 					throw e;
 				}
