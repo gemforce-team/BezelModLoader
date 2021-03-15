@@ -25,7 +25,6 @@ package Bezel
 	public class Bezel extends MovieClip
 	{
 		public const VERSION:String = "0.3.0";
-		public const GAME_VERSION:String = "1.1.2b";
 
 		// Game objects
 		public var gameObjects:Object;
@@ -223,7 +222,10 @@ package Bezel
 			this.gameObjects.constants.wizStashStatus = getDefinitionByName("com.giab.games.gcfw.constants.WizStashStatus");
 
 			this.updateAvailable = false;
-			main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text = "Bezel " + prettyVersion();
+
+			var version:String = main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text;
+			version = version.slice(0, version.search(' ') + 1) + prettyVersion();
+			main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text = version;
 			//checkForUpdates();
 			this.logger.log("Bezel", "Bezel bound to game's objects!");
 			this.bindMods();
