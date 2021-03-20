@@ -76,10 +76,19 @@ int main()
             // Intentionally ignore these errors; if they don't exist there's no issue
             try
             {
-                std::filesystem::remove(gcfwData / "coremods.bzl");
-                std::filesystem::remove(gcfwData / "coremods.lttc");
-                std::filesystem::remove(gcfwData / "gcfw.basasm");
-                std::filesystem::remove(gcfwData / "gcfw-clean.basasm");
+                // Before files were moved to subfolder
+                std::filesystem::remove(gcfwData / "coremods.bzl", ec);
+                std::filesystem::remove(gcfwData / "coremods.lttc", ec);
+                std::filesystem::remove(gcfwData / "gcfw.basasm", ec);
+                std::filesystem::remove(gcfwData / "gcfw-clean.basasm", ec);
+
+                std::filesystem::remove(gcfwData / "Bezel Mod Loader" / "coremods.bzl", ec);
+                std::filesystem::remove(gcfwData / "Bezel Mod Loader" / "Lattice" / "coremods.lttc", ec);
+                std::filesystem::remove(gcfwData / "Bezel Mod Loader" / "Lattice" / "gcfw.basasm", ec);
+                std::filesystem::remove(gcfwData / "Bezel Mod Loader" / "Lattice" / "gcfw-clean.basasm", ec);
+
+                // In case tools are updated
+                std::filesystem::remove(gcfwData / "Bezel Mod Loader" / "tools", ec);
             }
             catch (std::filesystem::filesystem_error &e)
             {

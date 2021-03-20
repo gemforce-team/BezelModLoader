@@ -56,11 +56,9 @@ package Bezel.Lattice
 
         private var doneDisassembling:Boolean = false;
 
-        public static var gameSwf:File = File.applicationDirectory.resolvePath("GemCraft Frostborn Wrath.swf");
-        public static var moddedSwf:File = File.applicationDirectory.resolvePath("gcfw-modded.swf");
-        public static var asm:File = File.applicationStorageDirectory.resolvePath("gcfw.basasm");
-        public static var cleanAsm:File = File.applicationStorageDirectory.resolvePath("gcfw-clean.basasm");
-        public static var coremods:File = File.applicationStorageDirectory.resolvePath("coremods.lttc");
+        public static const asm:File = Bezel.Bezel.latticeFolder.resolvePath("gcfw.basasm");
+        public static const cleanAsm:File = Bezel.Bezel.latticeFolder.resolvePath("gcfw-clean.basasm");
+        public static const coremods:File = Bezel.Bezel.latticeFolder.resolvePath("coremods.lttc");
 
         public function Lattice(bezel:Bezel)
         {
@@ -76,10 +74,10 @@ package Bezel.Lattice
             this.process = new NativeProcess();
             this.processInfo = new NativeProcessStartupInfo();
             this.currentTool = tool;
-            processInfo.executable = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/tools/" + tool + ".exe");
+            processInfo.executable = Bezel.Bezel.toolsFolder.resolvePath(tool + ".exe");
             if (!processInfo.executable.exists)
             {
-                processInfo.executable = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/tools/" + tool);
+                processInfo.executable = Bezel.Bezel.toolsFolder.resolvePath(tool);
             }
             processInfo.arguments = argument;
             processInfo.workingDirectory = File.applicationStorageDirectory;
@@ -124,7 +122,7 @@ package Bezel.Lattice
         {
             var ret:Boolean = false;
 
-            if (!asm.exists || !cleanAsm.exists || !coremods.exists || !moddedSwf.exists)
+            if (!asm.exists || !cleanAsm.exists || !coremods.exists || !Bezel.Bezel.moddedSwf.exists || Bezel.Bezel.moddedSwf.modificationDate.getTime() < Bezel.Bezel.gameSwf.modificationDate.getTime())
             {
                 if (asm.exists)
                 {
@@ -139,7 +137,7 @@ package Bezel.Lattice
                     coremods.deleteFile();
                 }
 
-                callTool("disassemble", new <String>[gameSwf.nativePath, cleanAsm.nativePath]);
+                callTool("disassemble", new <String>[Bezel.Bezel.gameSwf.nativePath, cleanAsm.nativePath]);
                 ret = true;
             }
 
@@ -221,7 +219,7 @@ package Bezel.Lattice
             if (!unchangedPatches)
             {
                 var stream:FileStream = new FileStream();
-                stream.open(File.applicationStorageDirectory.resolvePath("coremods.lttc"), FileMode.WRITE);
+                stream.open(coremods, FileMode.WRITE);
                 for each (var patch:LatticePatch in patches)
                 {
                     stream.writeUTF(patch.filename);
@@ -233,7 +231,7 @@ package Bezel.Lattice
 
                 checkConflicts();
                 doPatch();
-                callTool("reassemble", new <String>[gameSwf.nativePath, asm.nativePath, moddedSwf.nativePath]);
+                callTool("reassemble", new <String>[Bezel.Bezel.gameSwf.nativePath, asm.nativePath, Bezel.Bezel.moddedSwf.nativePath]);
             }
             else
             {
