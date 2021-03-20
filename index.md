@@ -17,9 +17,12 @@ Installation is covered in the [readme of Bezel's repo.](https://github.com/gemf
 
 Follows a (possibly incomplete) list of mods that can be installed on Bezel.
 
-* [Autocast](https://github.com/gemforce-team/Autocast): Autocasting mod 
-* [Gemsmith](https://github.com/gemforce-team/gemsmith): Automatically performs complex gem combinations
-* [ManaMason](https://github.com/gemforce-team/ManaMason): Quickly place arbitrary groups of structures
+* [Autocast](https://github.com/gemforce-team/Autocast): Autocasting mod .
+* [Gemsmith](https://github.com/gemforce-team/gemsmith): Automatically performs complex gem combinations.
+* [ManaMason](https://github.com/gemforce-team/ManaMason): Quickly build arbitrary groups of structures (using blueprints).
+* [Foresight](https://github.com/piepie62/Foresight): Place ghosts of buildings to plan your layout.
+* [MichaelsMagic](https://github.com/gemforce-team/MichaelsMagic): Adds automation. You can specify which gems to automatically upgrade, spending mana accordingly.
+* [Talismania](https://github.com/gemforce-team/Talismania): Allows you to reroll you talisman fragments or pay a large sum of SC to force a fragment with desired properties.
 
 Contact Bezel authors to get your mods added to the list!
 
