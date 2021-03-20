@@ -8,7 +8,7 @@ package Bezel
 
     internal class BezelCoreMod
     {
-        public static const VERSION:String = "3";
+        public static const VERSION:String = "4";
 
         private static const files:Array = [
             "com/giab/games/gcfw/Main.class.asasm",
@@ -182,7 +182,7 @@ package Bezel
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
                     getlocal1 \n \
-                    callproperty        QName(PackageNamespace(""), "eh_ingameKeyDown"), 1 \n \
+                    callproperty        QName(PackageNamespace(""), "ingameKeyDown"), 1 \n \
                     not \n \
                     iffalse             L55 \n \
                         returnvoid \n \

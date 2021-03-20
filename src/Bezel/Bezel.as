@@ -24,7 +24,7 @@ package Bezel
 	// The loader also requires a parameterless constructor (AFAIK), so we also have a .bind method to bind our class to the game
 	public class Bezel extends MovieClip
 	{
-		public const VERSION:String = "0.3.0";
+		public const VERSION:String = "0.3.1";
 		public const GAME_VERSION:String = "1.1.2b";
 
 		// Game objects
@@ -109,6 +109,7 @@ package Bezel
 
 			this.lattice.addEventListener(LatticeEvent.DISASSEMBLY_DONE, this.onLatticeReady);
 			this.lattice.addEventListener(LatticeEvent.REBUILD_DONE, this.onGameBuilt);
+			
 			this.addEventListener(LatticeEvent.REBUILD_DONE, this.onGameBuilt);
 
 			this.coremods = new Array();
@@ -221,6 +222,9 @@ package Bezel
 			this.updateAvailable = false;
 			main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text = "Bezel " + prettyVersion();
 			//checkForUpdates();
+			
+			GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
+			
 			this.logger.log("Bezel", "Bezel bound to game's objects!");
 			this.bindMods();
 			return this;
@@ -409,28 +413,30 @@ package Bezel
 			return eventArgs.continueDefault;
 		}
 
-		// TODO rename to ingameKeyDown
 		// Called after the game checks that a key should be handled, but before any of the actual handling logic
 		// Set continueDefault to false to prevent the base game's handler from running
-		public function eh_ingameKeyDown(e:KeyboardEvent): Boolean
+		public function ingameKeyDown(e:KeyboardEvent): Boolean
+		{
+			var kbKDEventArgs:Object = {"event": e, "continueDefault": true};
+			dispatchEvent(new IngameKeyDownEvent(BezelEvent.INGAME_KEY_DOWN, kbKDEventArgs));
+			return kbKDEventArgs.continueDefault;
+		}
+
+		// 
+		public function stageKeyDown(e: KeyboardEvent): void
 		{
 			if (e.controlKey && e.altKey && e.shiftKey && e.keyCode == 36)
 			{
 				if (this.modsReloadedTimestamp + 10*1000 > getTimer())
 				{
 					GV.vfxEngine.createFloatingText4(GV.main.mouseX,GV.main.mouseY < 60?Number(GV.main.mouseY + 30):Number(GV.main.mouseY - 20),"Please wait 10 secods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
-					return false;
+					return;
 				}
 				SB.playSound("sndalert");
 				GV.vfxEngine.createFloatingText4(GV.main.mouseX,GV.main.mouseY < 60?Number(GV.main.mouseY + 30):Number(GV.main.mouseY - 20),"Reloading mods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
 				reloadAllMods();
-				return false;
 			}
-			var kbKDEventArgs:Object = {"event": e, "continueDefault": true};
-			dispatchEvent(new IngameKeyDownEvent(BezelEvent.INGAME_KEY_DOWN, kbKDEventArgs));
-			return kbKDEventArgs.continueDefault;
 		}
-
 		private function reloadAllMods(): void
 		{
 			logger.log("eh_keyboardKeyDown", "Reloading all mods!");
@@ -440,6 +446,7 @@ package Bezel
 				mod.unload();
 			}
 			this.removeChildren();
+			this.addChild(DisplayObject(game.instance));
 			mods = new Array();
 			loadMods();
 		}
