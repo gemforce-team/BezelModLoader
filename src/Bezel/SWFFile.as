@@ -32,7 +32,7 @@ package Bezel
 			this.loader = new Loader();
 		}
 		
-		public function load(successCallback:Function, failureCallback:Function): void
+		public function load(successCallback:Function, failureCallback:Function, currentDomain: Boolean = false): void
 		{
 			this.successfulLoadCallback = successCallback;
 			this.failedLoadCallback = failureCallback;
@@ -43,7 +43,13 @@ package Bezel
 			stream.open(file, FileMode.READ);
 			stream.readBytes(bytes);
 			stream.close();
-			var context:LoaderContext = new LoaderContext(true, ApplicationDomain.currentDomain);
+			var context:LoaderContext;
+			// The domain matters, if you load mods into the same domain as the game, they will stay loaded until you restart the entire flash application
+			// This way by default (ApplicationDomain = null) they are loaded into a domain under their Loader, which lets us reload the mods without restarting the game
+			if(!currentDomain)
+				context = new LoaderContext(true);
+			else
+				context = new LoaderContext(true, ApplicationDomain.currentDomain);
 			context.checkPolicyFile = false;
 			context.allowCodeImport = true;
 			loader.loadBytes(bytes, context);
@@ -53,9 +59,12 @@ package Bezel
 		{
 			this.loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, loadedSuccessfully);
 			this.loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, failedLoadCallback);
+			// Make sure the mod cleans up its event subscribers and resources
 			this.instance.unload();
+			// Stop all execution and unsibscribe events, let garbage collection occur
 			this.loader.unloadAndStop(true);
 			this.instance = null;
+			this.loader = null;
 		}
 		
 		private function loadedSuccessfully(e:Event): void

@@ -154,7 +154,9 @@ package Bezel
 		private function onGameBuilt(e:Event): void
 		{
 			this.game = new SWFFile(moddedSwf);
-			this.game.load(this.gameLoadSuccess, this.gameLoadFail);
+			// Last argument tells the flash Loader to load the game into the same ApplicationDomain as Bezel is running in.
+			// This gives Bezel direct access to the game's classes (using getDefinitionByName).
+			this.game.load(this.gameLoadSuccess, this.gameLoadFail, true);
 		}
 
 		// Bind the game and Bezel to each other
@@ -448,7 +450,9 @@ package Bezel
 			this.modsReloadedTimestamp = getTimer();
 			for each (var mod:SWFFile in mods)
 			{
+				var name: String = mod.instance.MOD_NAME;
 				mod.unload();
+				delete mods[name];
 			}
 			this.removeChildren();
 			this.addChild(DisplayObject(game.instance));
