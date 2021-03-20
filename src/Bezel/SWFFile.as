@@ -53,8 +53,8 @@ package Bezel
 		{
 			this.loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, loadedSuccessfully);
 			this.loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, failedLoadCallback);
-			this.loader.unloadAndStop(false);
 			this.instance.unload();
+			this.loader.unloadAndStop(true);
 			this.instance = null;
 		}
 		
