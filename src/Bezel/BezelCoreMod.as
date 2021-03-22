@@ -8,7 +8,7 @@ package Bezel
 
     internal class BezelCoreMod
     {
-        public static const VERSION:String = "4";
+        public static const VERSION:String = "5";
 
         private static const files:Array = [
             "com/giab/games/gcfw/Main.class.asasm",
