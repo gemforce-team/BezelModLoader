@@ -90,11 +90,11 @@ package Bezel
             [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
             [ 0 ]
         ];
-        private static const offsetFromMatches:Array = [
-            [ 0, 0, 22, 0, 0 ],
-            [ -17 ],
-            [ -5, 39, -5, 16 ],
-            [ 7 ],
+		private static const offsetFromMatches:Array = [
+            [ 0, 0, 20, 0, 0 ],
+            [ -15 ],
+            [ -4, 37, -5, 16 ],
+            [ 5 ],
             [ 0, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
             [ -1 ]
         ];
@@ -298,7 +298,7 @@ package Bezel
                     {
                         for each (var regex:String in matches[index][filepatch])
                         {
-                            offset = lattice.findPattern(files[index], offset, new RegExp(regex));
+                            offset = lattice.findPattern(files[index], new RegExp(regex), offset);
                             if (offset == -1)
                             {
                                 throw new Error("Could not apply Bezel coremod for " + files[index] + ", patch number " + filepatch);
@@ -308,7 +308,7 @@ package Bezel
                     }
                     else
                     {
-                        offset = lattice.findPattern(files[index], 0, new RegExp(matches[index][filepatch]));
+                        offset = lattice.findPattern(files[index], new RegExp(matches[index][filepatch]));
                         if (offset == -1)
                         {
                             throw new Error("Could not apply Bezel coremod for " + files[index] + ", patch number " + filepatch);
