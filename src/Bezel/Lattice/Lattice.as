@@ -315,18 +315,18 @@ package Bezel.Lattice
          * Finds a regex within a passed-in GCFW assembly filename
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
          *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
-         * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
          * @param pattern Pattern to search for. Can be a multiline regex
+		 * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
          * @return The line index where the pattern matched. Zero-indexed, so can be passed directly into another findPattern or into patchFile
          */
-        public function findPattern(filename:String, searchFrom:int, pattern:RegExp): int
+        public function findPattern(filename:String, pattern:RegExp, searchFrom:int = 0): int
         {
             if (!(filename in this.asasmFiles))
             {
                 throw new Error("File '" + filename + "' not in disassembly");
             }
 
-            var searchString:String = this.asasmFiles[filename].split('\n').slice(searchFrom).join('\n');
+            var searchString:String = searchFrom > 0 ? this.asasmFiles[filename].split('\n').slice(searchFrom).join('\n') : this.asasmFiles[filename];
 
             var ret:int = searchString.search(pattern);
             if (ret != -1)
@@ -350,21 +350,21 @@ package Bezel.Lattice
          * Finds and replaces a regex within a passed-in GCFW assembly filename. Note that $ replacement codes can be used in the replacement string.
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
          *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
-         * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
          * @param pattern Pattern to search for. Can be a multiline regex
          * @param replacement Object to use for replacement string. Passed into the second argument of String.replace
+		 * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
          * @return Whether the find and replacement succeeded
          */
-        public function replacePattern(filename:String, searchFrom:int, pattern:RegExp, replacement:*): Boolean
+        public function replacePattern(filename:String, pattern:RegExp, replacement:*, searchFrom:int = 0): Boolean
         {
             if (!(filename in this.asasmFiles))
             {
                 throw new Error("File '" + filename + "' not in disassembly");
             }
 
-            var searchString:String = this.asasmFiles[filename].split('\n').slice(searchFrom).join('\n');
+            var searchString:String = searchFrom > 0 ? this.asasmFiles[filename].split('\n').slice(searchFrom).join('\n') : this.asasmFiles[filename];
 
-            var line:int = findPattern(filename, searchFrom, pattern);
+            var line:int = findPattern(filename, pattern, searchFrom);
             if (line != -1)
             {
                 var result:Object = pattern.exec(searchString);
@@ -386,18 +386,18 @@ package Bezel.Lattice
          * Copies out code found via a regex within a passed-in GCFW assembly filename
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
          *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
-         * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
          * @param pattern Pattern to search for. Can be a multiline regex
+		 * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
          * @return The result of pattern.exec
          */
-        public function retrievePattern(filename:String, searchFrom:int, pattern:RegExp): Object
+        public function retrievePattern(filename:String, pattern:RegExp, searchFrom:int = 0): Object
         {
             if (!(filename in this.asasmFiles))
             {
                 throw new Error("File '" + filename + "' not in disassembly");
             }
 
-            var searchString:String = this.asasmFiles[filename].split('\n').slice(searchFrom).join('\n');
+            var searchString:String = searchFrom > 0 ? this.asasmFiles[filename].split('\n').slice(searchFrom).join('\n') : this.asasmFiles[filename];
 
             return pattern.exec(searchString);
         }
