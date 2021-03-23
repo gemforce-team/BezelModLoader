@@ -88,7 +88,7 @@ int main()
                 std::filesystem::remove(gcfwData / "Bezel Mod Loader" / "Lattice" / "gcfw-clean.basasm", ec);
 
                 // In case tools are updated
-                std::filesystem::remove(gcfwData / "Bezel Mod Loader" / "tools", ec);
+                std::filesystem::remove_all(gcfwData / "Bezel Mod Loader" / "tools", ec);
             }
             catch (std::filesystem::filesystem_error &e)
             {
