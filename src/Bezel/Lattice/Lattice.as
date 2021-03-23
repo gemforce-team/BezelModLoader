@@ -312,6 +312,20 @@ package Bezel.Lattice
         }
 
         /**
+         * Retrieves the contents of the passed-in GCFW assembly filename.
+         * @param filename File to retrieve. If retrieving a class, this will be the fully qualified name of the class with periods replaced by /,
+         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         */
+        public function retrieveFile(filename:String): String
+        {
+            if (!(filename in this.asasmFiles))
+            {
+                throw new Error("File '" + filename + "' not in disassembly");
+            }
+            return asasmFiles[filename];
+        }
+
+        /**
          * Finds a regex within a passed-in GCFW assembly filename
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
          *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
