@@ -61,9 +61,13 @@ package Bezel
         public static const gameSwf:File = File.applicationDirectory.resolvePath("GemCraft Frostborn Wrath.swf");
 		public static const moddedSwf:File = File.applicationDirectory.resolvePath("gcfw-modded.swf");
 
-        [Embed(source = "../../assets/rabcdasm/rabcdasm.exe", mimeType = "application/octet-stream")] private var disassemble:Class;
-        [Embed(source = "../../assets/rabcdasm/rabcasm.exe", mimeType = "application/octet-stream")] private var reassemble:Class;
-		[Embed(source = "../../assets/rabcdasm/COPYING", mimeType = "application/octet-stream")] private var LICENSE:Class;
+        [Embed(source = "../../assets/rabcdasm/rabcdasm.exe", mimeType = "application/octet-stream")] private static const disassemble_data:Class;
+        [Embed(source = "../../assets/rabcdasm/rabcasm.exe", mimeType = "application/octet-stream")] private static const reassemble_data:Class;
+		[Embed(source = "../../assets/rabcdasm/COPYING", mimeType = "application/octet-stream")] private static const LICENSE_data:Class;
+		
+		private static const disassemble:Object = {"name": "disassemble.exe", "data":disassemble_data};
+		private static const reassemble:Object = {"name": "reassemble.exe", "data":reassemble_data};
+		private static const LICENSE:Object = {"name": "LICENSE", "data":LICENSE_data};
 
 		// Parameterless constructor for flash.display.Loader
 		public function Bezel()
@@ -95,13 +99,14 @@ package Bezel
 			{
 				toolsFolder.createDirectory();
 			}
-			for each (var tool:String in ["disassemble", "reassemble", "LICENSE"])
+			
+			for each (var tool:Object in [disassemble, reassemble, LICENSE])
 			{
-				var file:File = toolsFolder.resolvePath(tool);
+				var file:File = toolsFolder.resolvePath(tool.name);
 				if (!file.exists)
 				{
 					this.logger.log("Bezel", "Exporting tool " + tool);
-					var toolData:ByteArray = new this[tool] as ByteArray;
+					var toolData:ByteArray = new tool.data as ByteArray;
 					var stream:FileStream = new FileStream();
 					stream.open(file, FileMode.WRITE);
 					stream.writeBytes(toolData);
