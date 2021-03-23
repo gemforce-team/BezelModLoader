@@ -93,7 +93,7 @@ package Bezel
 		private static const offsetFromMatches:Array = [
             [ 0, 0, 20, 0, 0 ],
             [ -15 ],
-            [ -4, 37, -5, 16 ],
+            [ -5, 37, -5, 16 ],
             [ 5 ],
             [ 0, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
             [ -1 ]
