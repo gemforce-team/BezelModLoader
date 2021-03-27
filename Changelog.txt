@@ -21,7 +21,9 @@
 		Updated for the latest game version.
 05.03.2021 v0.3.0 for 1.1.2b
 		Merged piepie62's Lattice branch into master. This update adds dynamic hook injection and a different file structure for the main swf. Also a new installer.
-20.03.2021 v0.3.1
+27.03.2021 v0.3.1
 		Fixed "Reload all mods" keybinding and moved it so it works anywhere in the game.
 		Renamed "eh_ingameKeyDown" to "ingameKeyDown" and adjusted the coremod to match.
 		Merged piepie62's Lattice improvements.
+		Merged ZS-NVB's changes to Lattice.
+		Moved Lattice's files to their own folder.
