@@ -125,7 +125,7 @@ package Bezel
 			this.prevCoremods = new Array();
 
 			// Initializes Lattice. This method raises DISASSEMBLY_DONE
-			var reloadCoremods: Boolean = this.lattice.init();
+			var reloadCoremods:Boolean = this.lattice.init();
 
 			if (!reloadCoremods)
 			{
@@ -282,6 +282,12 @@ package Bezel
 				var newMod:SWFFile = new SWFFile(modsFolder.resolvePath(file));
 				newMod.load(successfulModLoad, failedModLoad);
 			}
+			
+			if (modFiles.length == 0)
+			{
+				this.dispatchEvent(new Event(BezelEvent.BEZEL_DONE_MOD_LOAD));
+			}
+			
 			this.modsReloadedTimestamp = getTimer();
 		}
 
