@@ -285,7 +285,14 @@ package Bezel
 			
 			if (modFiles.length == 0)
 			{
-				this.dispatchEvent(new Event(BezelEvent.BEZEL_DONE_MOD_LOAD));
+				if (this.initialLoad)
+				{
+					this.dispatchEvent(new Event(BezelEvent.BEZEL_DONE_MOD_LOAD));
+				}
+				else
+				{
+					this.dispatchEvent(new Event(BezelEvent.BEZEL_DONE_MOD_RELOAD));
+				}
 			}
 			
 			this.modsReloadedTimestamp = getTimer();
