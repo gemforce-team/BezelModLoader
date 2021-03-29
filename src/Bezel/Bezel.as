@@ -19,6 +19,7 @@ package Bezel
 	import flash.filesystem.FileStream;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.File;
+	import flash.text.TextField;
 
 	// We extend MovieClip so that flash.display.Loader accepts our class
 	// The loader also requires a parameterless constructor (AFAIK), so we also have a .bind method to bind our class to the game
@@ -51,6 +52,9 @@ package Bezel
 		private var initialLoad:Boolean;
 		private var coremods:Array;
 		private var prevCoremods:Array;
+		
+		private var loadingTextField:TextField;
+		private static const loadingText:String = "Loading Mods...";
 
 		public static const bezelFolder:File = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/");
 		public static const toolsFolder:File = bezelFolder.resolvePath("tools/");
@@ -74,6 +78,11 @@ package Bezel
 		{
 			super();
 			prepareFolders();
+			
+			loadingTextField = new TextField();
+			loadingTextField.text = loadingText;
+			loadingTextField.textColor = 0xFFFFFF;
+			this.addChild(loadingTextField);
 
 			this.initialLoad = true;
 
@@ -169,6 +178,7 @@ package Bezel
 		{
 			this.main = game.instance;
 			game.instance.bezel = this;
+			this.removeChild(this.loadingTextField);
 			this.addChild(DisplayObject(game.instance));
 			// Base game's init (main.initFromBezel())
 			main.initFromBezel();
