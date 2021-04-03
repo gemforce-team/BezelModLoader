@@ -47,8 +47,14 @@ Simply put the installer into your game's folder and launch it. You'll see a mes
 ![image](https://user-images.githubusercontent.com/5305748/110174231-e1ee4f00-7e10-11eb-875e-b2745214a07d.png)
 
 ## Linux
-Using Proton you need to install it like this:
-`andreas@trelitri:~/.steam/steam/steamapps/common/GemCraft Frostborn Wrath$ WINEPREFIX=~/.steam/steam/steamapps/compatdata/1106530/pfx ../Proton\ 5.13/dist/bin/wine bezel-installer-vx.y.z.exe`
+UPut the installer in the game folder, then check the exact Proton version used to run the game, say it is `Proton A.BB.`
+
+Then open a terminal and run:
+
+```
+cd ~/.steam/steam/steamapps/common/GemCraft\ Frostborn\ Wrath # go to the installation dir
+WINEPREFIX=~/.steam/steam/steamapps/compatdata/1106530/pfx ../Proton\ A.BB/dist/bin/wine bezel-installer-vx.y.z.exe
+```
 
 # Installing mods
 ## Refer to individual mods' readme for instructions first!
