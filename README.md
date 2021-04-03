@@ -47,7 +47,7 @@ Simply put the installer into your game's folder and launch it. You'll see a mes
 ![image](https://user-images.githubusercontent.com/5305748/110174231-e1ee4f00-7e10-11eb-875e-b2745214a07d.png)
 
 ## Linux
-UPut the installer in the game folder, then check the exact Proton version used to run the game, say it is `Proton A.BB.`
+Put the installer in the game folder, then check the exact Proton version used to run the game, say it is `Proton A.BB.`
 
 Then open a terminal and run:
 
