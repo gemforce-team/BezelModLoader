@@ -32,6 +32,7 @@ Mods are kept in the game's folder, in a `Mods` subfolder. Any `.swf`s placed th
 
 
 # Installation
+## Windows
 **To install Bezel** grab an [installer](https://github.com/gemforce-team/BezelModLoader/releases/latest) (links for other releases below) for your game version.
 
 ## If you had Bezel 0.2.x installed (via patching), you need to restore the original game's swf.
@@ -45,6 +46,9 @@ Simply put the installer into your game's folder and launch it. You'll see a mes
 
 ![image](https://user-images.githubusercontent.com/5305748/110174231-e1ee4f00-7e10-11eb-875e-b2745214a07d.png)
 
+## Linux
+Using Proton you need to install it like this:
+`andreas@trelitri:~/.steam/steam/steamapps/common/GemCraft Frostborn Wrath$ WINEPREFIX=~/.steam/steam/steamapps/compatdata/1106530/pfx ../Proton\ 5.13/dist/bin/wine bezel-installer-vx.y.z.exe`
 
 # Installing mods
 ## Refer to individual mods' readme for instructions first!
@@ -72,7 +76,7 @@ Release history: [Releases](https://github.com/gemforce-team/BezelModLoader/rele
 ## Hotkeys
 At the moment there is only one key combination:
 ```
-Ctrl+Alt+Shift+Home - reload all mods. Works only when in a field (playing a level). This is used for debugging.
+Ctrl+Alt+Shift+Home - reload all mods. This is used for debugging \ development. Does not reapply coremods, but will load additional mods were added to the `Mods` folder after starting the game.
 ```
 
 
@@ -89,8 +93,12 @@ GemCraft - Frostborn Wrath is developed and owned by [gameinabottle](http://game
 
 
 # Credits
-Bezel Mod Loader is developed by Hellrage
+Hellrage - original developer.
 
-Special thanks to LA for automating swf patching and .diff generation!
+Special thanks to:
 
-Thanks to piepie62 for developing Lattice!
+LA for automating swf patching and .diff generation!
+
+piepie62 for developing Lattice!
+
+12345ieee for figuring out the installation process on Linux!

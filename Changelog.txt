@@ -27,3 +27,6 @@
 		Merged piepie62's Lattice improvements.
 		Merged ZS-NVB's changes to Lattice.
 		Moved Lattice's files to their own folder.
+03.04.2021 v0.3.2
+		Fixed freezing when no mods are present.
+		Added a message to bezel's swf to show that it's loading.
