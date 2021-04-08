@@ -23,6 +23,7 @@ Follows a (possibly incomplete) list of mods that can be installed on Bezel.
 * [Foresight](https://github.com/piepie62/Foresight): Place ghosts of buildings to plan your layout.
 * [MichaelsMagic](https://github.com/gemforce-team/MichaelsMagic): Adds automation. You can specify which gems to automatically upgrade, spending mana accordingly.
 * [Talismania](https://github.com/gemforce-team/Talismania): Allows you to reroll you talisman fragments or pay a large sum of SC to force a fragment with desired properties.
+* [CoreModCollection](https://github.com/ZS-NVB/CoreModCollection): A variety of coremods bundled in a single package. Includes rotatable talisman fragments, tweaks to color stat scaling, lantern muter and various fixes among other things. You can choose which individual coremods to enable with a config file. 
 
 Contact Bezel authors to get your mods added to the list!
 
