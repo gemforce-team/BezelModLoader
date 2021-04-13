@@ -1,4 +1,4 @@
-package Bezel.Events
+package Bezel.GCFW.Events
 {
     /**
 	 * ...
@@ -7,12 +7,12 @@ package Bezel.Events
 	
 	import flash.events.Event;
 	import Bezel.BezelEvent;
-	public class LoadSaveEvent extends Event
+	public class SaveSaveEvent extends Event
 	{
 
         public var save:Object;
 
-		public function LoadSaveEvent(save:Object, type:String, bubbles:Boolean=false, cancelable:Boolean=false) 
+		public function SaveSaveEvent(save:Object, type:String, bubbles:Boolean=false, cancelable:Boolean=false) 
 		{
 			super(type, bubbles, cancelable);
 

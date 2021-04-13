@@ -1,4 +1,4 @@
-package Bezel.Events 
+package Bezel.GCFW.Events 
 {
 	/**
 	 * ...
@@ -7,7 +7,7 @@ package Bezel.Events
 	
 	import flash.events.Event;
 	import Bezel.BezelEvent;
-	public class IngameKeyDownEvent extends Event
+	public class IngamePreRenderInfoPanelEvent extends Event
 	{
 		private var _eventArgs:Object;
 		
@@ -16,7 +16,7 @@ package Bezel.Events
 			return _eventArgs;
 		}
 	
-		public function IngameKeyDownEvent(type:String, eventArgs:Object, bubbles:Boolean=false, cancelable:Boolean=false) 
+		public function IngamePreRenderInfoPanelEvent(type:String, eventArgs:Object, bubbles:Boolean=false, cancelable:Boolean=false) 
 		{
 			super(type, bubbles, cancelable);
 			this._eventArgs = eventArgs;

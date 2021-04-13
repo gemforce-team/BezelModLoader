@@ -53,16 +53,18 @@ package Bezel.Lattice
         private var processError:String;
 
         internal static var logger:Logger;
+		internal var bezel:Bezel;
 
         private var doneDisassembling:Boolean = false;
 
-        public static const asm:File = Bezel.Bezel.latticeFolder.resolvePath("gcfw.basasm");
-        public static const cleanAsm:File = Bezel.Bezel.latticeFolder.resolvePath("gcfw-clean.basasm");
+        public static const asm:File = Bezel.Bezel.latticeFolder.resolvePath("game.basasm");
+        public static const cleanAsm:File = Bezel.Bezel.latticeFolder.resolvePath("game-clean.basasm");
         public static const coremods:File = Bezel.Bezel.latticeFolder.resolvePath("coremods.lttc");
 
         public function Lattice(bezel:Bezel)
         {
             logger = bezel.getLogger("Lattice");
+			this.bezel = bezel;
 
             this.patches = new Vector.<LatticePatch>();
             this.expectedPatches = new Vector.<LatticePatch>();
@@ -122,7 +124,7 @@ package Bezel.Lattice
         {
             var ret:Boolean = false;
 
-            if (!asm.exists || !cleanAsm.exists || !coremods.exists || !Bezel.Bezel.moddedSwf.exists || Bezel.Bezel.moddedSwf.modificationDate.getTime() < Bezel.Bezel.gameSwf.modificationDate.getTime())
+            if (!asm.exists || !cleanAsm.exists || !coremods.exists || !bezel.moddedSwf.exists || bezel.moddedSwf.modificationDate.getTime() < bezel.gameSwf.modificationDate.getTime())
             {
                 if (asm.exists)
                 {
@@ -137,7 +139,7 @@ package Bezel.Lattice
                     coremods.deleteFile();
                 }
 
-                callTool("disassemble", new <String>[Bezel.Bezel.gameSwf.nativePath, cleanAsm.nativePath]);
+                callTool("disassemble", new <String>[bezel.gameSwf.nativePath, cleanAsm.nativePath]);
                 ret = true;
             }
 
@@ -231,7 +233,7 @@ package Bezel.Lattice
 
                 checkConflicts();
                 doPatch();
-                callTool("reassemble", new <String>[Bezel.Bezel.gameSwf.nativePath, asm.nativePath, Bezel.Bezel.moddedSwf.nativePath]);
+                callTool("reassemble", new <String>[bezel.gameSwf.nativePath, asm.nativePath, bezel.moddedSwf.nativePath]);
             }
             else
             {
@@ -274,11 +276,9 @@ package Bezel.Lattice
 
                 var dataAsStrings:Array = this.asasmFiles[patch.filename].split('\n');
 
-                for (var i:uint = 0; i < patch.overwritten; ++i)
-                {
-                    dataAsStrings.removeAt(patch.offset);
-                }
-                dataAsStrings.insertAt(patch.offset, patch.contents);
+                dataAsStrings.splice(patch.offset, patch.overwritten, patch.contents);
+
+                // dataAsStrings.insertAt(patch.offset, patch.contents);
 
                 this.asasmFiles[patch.filename] = dataAsStrings.join('\n');
             }
@@ -292,6 +292,16 @@ package Bezel.Lattice
             }
             stream.close();
         }
+		
+		/**
+		 * Returns whether a file exists in the disassembly.
+		 * @param filename File to search for
+		 * @return Whether or not it exists
+		 */
+		public function doesFileExist(filename:String): Boolean
+		{
+			return filename in this.asasmFiles;
+		}
 
         /**
          * Inserts and optionally removes assembly at a given line offset within a passed-in GCFW assembly filename.

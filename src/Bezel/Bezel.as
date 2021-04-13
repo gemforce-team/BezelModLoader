@@ -5,48 +5,48 @@ package Bezel
 	 * @author Hellrage
 	 */
 
-	import flash.display.*;
-	import flash.events.*;
-	import flash.filesystem.*;
-	import flash.utils.*;
-	import Bezel.Logger;
 	import Bezel.BezelEvent;
-	import Bezel.Events.*;
-	import flash.desktop.NativeApplication;
+	import Bezel.GCCS.GCCSBezel;
+	import Bezel.GCFW.GCFWBezel;
 	import Bezel.Lattice.Lattice;
 	import Bezel.Lattice.LatticeEvent;
+	import Bezel.Logger;
+	import flash.desktop.NativeApplication;
+	import flash.display.*;
+	import flash.events.*;
 	import flash.events.Event;
-	import flash.filesystem.FileStream;
-	import flash.filesystem.FileMode;
+	import flash.filesystem.*;
 	import flash.filesystem.File;
+	import flash.filesystem.FileMode;
+	import flash.filesystem.FileStream;
 	import flash.text.TextField;
+	import flash.utils.ByteArray;
+	import flash.utils.getTimer;
 
 	// We extend MovieClip so that flash.display.Loader accepts our class
 	// The loader also requires a parameterless constructor (AFAIK), so we also have a .bind method to bind our class to the game
 	public class Bezel extends MovieClip
 	{
-		public const VERSION:String = "0.3.2";
+		public static const VERSION:String = "0.3.2";
 
 		// Game objects
 		public var gameObjects:Object;
 		public var lattice:Lattice;
-
-		// Shortcuts to gameObjects
-		private var main:Object;/*Main*/
-		private var core:Object;/*IngameCore*/
-		private var GV:Object;/*GV*/
-		private var SB:Object;/*SB*/
-		private var prefs:Object;/*Prefs*/
+		public var mainLoader:MainLoader;
 
 		private var updateAvailable:Boolean;
 
 		private var logger:Logger;
 		private var mods:Object;
-		private var appStorage:File;
 
 		private var waitingMods:uint;
 
-		private var modsReloadedTimestamp:int;
+		private var _modsReloadedTimestamp:int;
+		
+		public function get modsReloadedTimestamp():int
+		{
+			return _modsReloadedTimestamp;
+		}
 
 		private var game:SWFFile;
 		private var initialLoad:Boolean;
@@ -62,8 +62,30 @@ package Bezel
 		public static const coremodFile:File = bezelFolder.resolvePath("coremods.bzl");
 
 		public static const modsFolder:File = File.applicationDirectory.resolvePath("Mods/");
-        public static const gameSwf:File = File.applicationDirectory.resolvePath("GemCraft Frostborn Wrath.swf");
-		public static const moddedSwf:File = File.applicationDirectory.resolvePath("gcfw-modded.swf");
+		private static const gameConfig:File = File.applicationDirectory.resolvePath("game-file.txt");
+        private static var _gameSwf:File;
+		private static var _moddedSwf:File;
+		
+		public function get gameSwf(): File
+		{
+			if (_gameSwf == null)
+			{
+				var config:FileStream = new FileStream();
+				config.open(gameConfig, FileMode.READ);
+				_gameSwf = File.applicationDirectory.resolvePath(config.readUTFBytes(config.bytesAvailable));
+				config.close();
+			}
+			return _gameSwf;
+		}
+		
+		public function get moddedSwf(): File
+		{
+			if (_moddedSwf == null)
+			{
+				_moddedSwf = File.applicationDirectory.resolvePath(gameSwf.name.split('.').slice(0, -1).join('.') + "-modded.swf");
+			}
+			return _moddedSwf;
+		}
 
         [Embed(source = "../../assets/rabcdasm/rabcdasm.exe", mimeType = "application/octet-stream")] private static const disassemble_data:Class;
         [Embed(source = "../../assets/rabcdasm/rabcasm.exe", mimeType = "application/octet-stream")] private static const reassemble_data:Class;
@@ -100,7 +122,7 @@ package Bezel
 
 			if (!gameSwf.exists)
 			{
-				this.logger.log("Bezel", "Game file not found. Try reinstalling the game.");
+				this.logger.log("Bezel", "Game file not found. Try reinstalling the game and Bezel");
 				NativeApplication.nativeApplication.exit(-1);
 			}
 
@@ -159,7 +181,26 @@ package Bezel
 		// After we have the dissassembled game, add BezelCoreMod and load mods
 		private function onLatticeReady(e:Event): void
 		{
-			this.coremods[this.coremods.length] = {"name": "BEZEL_MOD_LOADER", "version": BezelCoreMod.VERSION, "load": BezelCoreMod.installHooks};
+			if (lattice.doesFileExist("com/giab/games/gcfw/Main.class.asasm"))
+			{
+				logger.log("Bezel", "GCFW main found, loading its coremods");
+				this.mainLoader = new GCFWBezel();
+				
+				this.coremods[this.coremods.length] = this.mainLoader.coremodInfo;
+			}
+			else if (lattice.doesFileExist("com/giab/games/gccs/steam/Main.class.asasm"))
+			{
+				logger.log("Bezel", "GCCS main found, loading its coremods");
+				this.mainLoader = new GCCSBezel();
+				
+				this.coremods[this.coremods.length] = this.mainLoader.coremodInfo;
+			}
+			else
+			{
+				logger.log("Bezel", "Game not recognized! All coremods and mods will have to handle themselves.");
+				// Note: a main handling coremod should add a `bezel` field and an `initFromBezel` method that contains all the initialization the constructor would do
+				// Coremods should be handled through MainLoader's coremodInfo instead of the normal coremod interface
+			}
 
 			loadMods();
 		}
@@ -176,81 +217,27 @@ package Bezel
 		// Bind the game and Bezel to each other
 		private function gameLoadSuccess(game:SWFFile): void
 		{
-			this.main = game.instance;
+			if (this.mainLoader != null)
+			{
+				this.mainLoader.main = game.instance;
+			}
 			game.instance.bezel = this;
 			this.removeChild(this.loadingTextField);
 			this.addChild(DisplayObject(game.instance));
 			// Base game's init (main.initFromBezel())
-			main.initFromBezel();
-			bind();
+			game.instance.initFromBezel();
+			if (this.mainLoader != null)
+			{
+				this.gameObjects = new Object();
+				this.mainLoader.loaderBind(this, gameObjects);
+			}
+			bindMods();
 			this.initialLoad = false;
 		}
 
 		private function gameLoadFail(e:Event): void
 		{
 			this.logger.log("gameLoadFail", "Loading game failed");
-		}
-
-		// This method binds the class to the game's objects
-		public function bind() : Bezel
-		{
-			this.GV = getDefinitionByName("com.giab.games.gcfw.GV") as Class;
-			this.SB = getDefinitionByName("com.giab.games.gcfw.SB") as Class;
-			this.prefs = getDefinitionByName("com.giab.games.gcfw.Prefs") as Class;
-			this.gameObjects = new Object();
-			this.gameObjects.main = this.main;
-			this.gameObjects.core = this.GV.ingameCore;
-			this.gameObjects.GV = this.GV;
-			this.gameObjects.SB = this.SB;
-			this.gameObjects.prefs = this.prefs;
-
-			this.gameObjects.mods = getDefinitionByName("com.giab.games.gcfw.Mods");
-			this.gameObjects.constants = new Object();
-			this.gameObjects.constants.achievementIngameStatus = getDefinitionByName("com.giab.games.gcfw.constants.AchievementIngameStatus");
-			this.gameObjects.constants.actionStatus = getDefinitionByName("com.giab.games.gcfw.constants.ActionStatus");
-			this.gameObjects.constants.battleMode = getDefinitionByName("com.giab.games.gcfw.constants.BattleMode");
-			this.gameObjects.constants.battleOutcome = getDefinitionByName("com.giab.games.gcfw.constants.BattleOutcome");
-			this.gameObjects.constants.battleTraitId = getDefinitionByName("com.giab.games.gcfw.constants.BattleTraitId");
-			this.gameObjects.constants.beaconType = getDefinitionByName("com.giab.games.gcfw.constants.BeaconType");
-			this.gameObjects.constants.buildingType = getDefinitionByName("com.giab.games.gcfw.constants.BuildingType");
-			this.gameObjects.constants.dropType = getDefinitionByName("com.giab.games.gcfw.constants.DropType");
-			this.gameObjects.constants.epicCreatureType = getDefinitionByName("com.giab.games.gcfw.constants.EpicCreatureType");
-			this.gameObjects.constants.gameMode = getDefinitionByName("com.giab.games.gcfw.constants.GameMode");
-			this.gameObjects.constants.gemComponentType = getDefinitionByName("com.giab.games.gcfw.constants.GemComponentType");
-			this.gameObjects.constants.gemEnhancementId = getDefinitionByName("com.giab.games.gcfw.constants.GemEnhancementId");
-			this.gameObjects.constants.ingameStatus = getDefinitionByName("com.giab.games.gcfw.constants.IngameStatus");
-			this.gameObjects.constants.monsterBodyPartType = getDefinitionByName("com.giab.games.gcfw.constants.MonsterBodyPartType");
-			this.gameObjects.constants.monsterBuffId = getDefinitionByName("com.giab.games.gcfw.constants.MonsterBuffId");
-			this.gameObjects.constants.monsterType = getDefinitionByName("com.giab.games.gcfw.constants.MonsterType");
-			this.gameObjects.constants.pauseType = getDefinitionByName("com.giab.games.gcfw.constants.PauseType");
-			this.gameObjects.constants.screenId = getDefinitionByName("com.giab.games.gcfw.constants.ScreenId");
-			this.gameObjects.constants.selectorScreenStatus = getDefinitionByName("com.giab.games.gcfw.constants.SelectorScreenStatus");
-			this.gameObjects.constants.skillId = getDefinitionByName("com.giab.games.gcfw.constants.SkillId");
-			this.gameObjects.constants.skillType = getDefinitionByName("com.giab.games.gcfw.constants.SkillType");
-			this.gameObjects.constants.stageType = getDefinitionByName("com.giab.games.gcfw.constants.StageType");
-			this.gameObjects.constants.statId = getDefinitionByName("com.giab.games.gcfw.constants.StatId");
-			this.gameObjects.constants.strikeSpellId = getDefinitionByName("com.giab.games.gcfw.constants.StrikeSpellId");
-			this.gameObjects.constants.talismanFragmentType = getDefinitionByName("com.giab.games.gcfw.constants.TalismanFragmentType");
-			this.gameObjects.constants.talismanPropertyId = getDefinitionByName("com.giab.games.gcfw.constants.TalismanPropertyId");
-			this.gameObjects.constants.targetPriorityId = getDefinitionByName("com.giab.games.gcfw.constants.TargetPriorityId");
-			this.gameObjects.constants.tutorialId = getDefinitionByName("com.giab.games.gcfw.constants.TutorialId");
-			this.gameObjects.constants.url = getDefinitionByName("com.giab.games.gcfw.constants.Url");
-			this.gameObjects.constants.waveFormation = getDefinitionByName("com.giab.games.gcfw.constants.WaveFormation");
-			this.gameObjects.constants.wizLockType = getDefinitionByName("com.giab.games.gcfw.constants.WizLockType");
-			this.gameObjects.constants.wizStashStatus = getDefinitionByName("com.giab.games.gcfw.constants.WizStashStatus");
-
-			this.updateAvailable = false;
-
-			var version:String = main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text;
-			version = version.slice(0, version.search(' ') + 1) + prettyVersion();
-			main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text = version;
-			//checkForUpdates();
-
-			GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
-
-			this.logger.log("Bezel", "Bezel bound to game's objects!");
-			this.bindMods();
-			return this;
 		}
 
 		private function bindMods() : void
@@ -264,7 +251,6 @@ package Bezel
 
 		private function prepareFolders(): void
 		{
-			this.appStorage = File.applicationStorageDirectory;
 			if(!bezelFolder.isDirectory)
 				bezelFolder.createDirectory();
 			if (!latticeFolder.isDirectory)
@@ -305,13 +291,13 @@ package Bezel
 				}
 			}
 			
-			this.modsReloadedTimestamp = getTimer();
+			this._modsReloadedTimestamp = getTimer();
 		}
 
 		// Assuming the file loaded, add the mod to tracked mods. Check compatibility. Check if the mod has a coremod and add the patches if so.
 		public function successfulModLoad(mod:SWFFile): void
 		{
-			var name: String = mod.instance.MOD_NAME;
+			var name:String = mod.instance.MOD_NAME;
 			logger.log("successfulModLoad", "Loaded mod: " + name + " v" + mod.instance.VERSION);
 			mods[name] = mod;
 			if (!this.bezelVersionCompatible(mod.instance.BEZEL_VERSION))
@@ -327,7 +313,21 @@ package Bezel
 			waitingMods--;
 
 			if (this.initialLoad)
-			{
+			{				
+				if (mod.instance is MainLoader)
+				{
+					if (this.mainLoader != null)
+					{
+						logger.log("Bezel", "Multiple main loaders present! This is a fatal error. The two detected are " + this.mainLoader.MOD_NAME + " and " + mod.instance.MOD_NAME);
+						NativeApplication.nativeApplication.exit( -1);
+					}
+					else
+					{
+						this.mainLoader = mod.instance as MainLoader;
+						this.coremods[this.coremods.length] = this.mainLoader.coremodInfo;
+					}
+				}
+
 				if ("loadCoreMod" in mod.instance)
 				{
 					if ("COREMOD_VERSION" in mod.instance)
@@ -361,7 +361,7 @@ package Bezel
 
 		public function bezelVersionCompatible(requiredVersion:String): Boolean
 		{
-			var bezelVer:Array = this.VERSION.split(".");
+			var bezelVer:Array = VERSION.split(".");
 			var thisVer:Array = requiredVersion.split(".");
 			if (bezelVer[0] != thisVer[0])
 				return false;
@@ -409,73 +409,19 @@ package Bezel
 			return null;
 		}
 
-		public function prettyVersion(): String
+		public static function prettyVersion(): String
 		{
 			return 'Bezel v' + VERSION;
 		}
 
-		// Called after the gem's info panel has been formed but before it's returned to the game for rendering
-		public function ingameGemInfoPanelFormed(infoPanel:Object, gem:Object, numberFormatter:Object): void
-		{
-			dispatchEvent(new IngameGemInfoPanelFormedEvent(BezelEvent.INGAME_GEM_INFO_PANEL_FORMED, {"infoPanel": infoPanel, "gem": gem, "numberFormatter": numberFormatter}));
-		}
-
-		// Called before any of the game's logic runs when starting to form an infopanel
-		// This method is called before infoPanelFormed (which should be renamed to ingameGemInfoPanelFormed)
-		public function ingamePreRenderInfoPanel(): Boolean
-		{
-			var eventArgs:Object = {"continueDefault": true};
-			dispatchEvent(new IngamePreRenderInfoPanelEvent(BezelEvent.INGAME_PRE_RENDER_INFO_PANEL, eventArgs));
-			//logger.log("ingamePreRenderInfoPanel", "Dispatched event!");
-			return eventArgs.continueDefault;
-		}
-
-		// Called immediately as a click event is fired by the base game
-		// set continueDefault to false to prevent the base game's handler from running
-		public function ingameClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
-		{
-			var eventArgs:Object = {"continueDefault": true, "event":event, "mouseX":mouseX, "mouseY":mouseY, "buildingX": buildingX, "buildingY": buildingY };
-			dispatchEvent(new IngameClickOnSceneEvent(BezelEvent.INGAME_CLICK_ON_SCENE, eventArgs));
-			return eventArgs.continueDefault;
-		}
-
-		// Called immediately as a right click event is fired by the base game
-		// set continueDefault to false to prevent the base game's handler from running
-		public function ingameRightClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
-		{
-			var eventArgs:Object = {"continueDefault": true, "event":event, "mouseX":mouseX, "mouseY":mouseY, "buildingX": buildingX, "buildingY": buildingY };
-			dispatchEvent(new IngameClickOnSceneEvent(BezelEvent.INGAME_RIGHT_CLICK_ON_SCENE, eventArgs));
-			return eventArgs.continueDefault;
-		}
-
-		// Called after the game checks that a key should be handled, but before any of the actual handling logic
-		// Set continueDefault to false to prevent the base game's handler from running
-		public function ingameKeyDown(e:KeyboardEvent): Boolean
-		{
-			var kbKDEventArgs:Object = {"event": e, "continueDefault": true};
-			dispatchEvent(new IngameKeyDownEvent(BezelEvent.INGAME_KEY_DOWN, kbKDEventArgs));
-			return kbKDEventArgs.continueDefault;
-		}
-
-		//
-		public function stageKeyDown(e: KeyboardEvent): void
-		{
-			if (e.controlKey && e.altKey && e.shiftKey && e.keyCode == 36)
-			{
-				if (this.modsReloadedTimestamp + 10*1000 > getTimer())
-				{
-					GV.vfxEngine.createFloatingText4(GV.main.mouseX,GV.main.mouseY < 60?Number(GV.main.mouseY + 30):Number(GV.main.mouseY - 20),"Please wait 10 secods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
-					return;
-				}
-				SB.playSound("sndalert");
-				GV.vfxEngine.createFloatingText4(GV.main.mouseX,GV.main.mouseY < 60?Number(GV.main.mouseY + 30):Number(GV.main.mouseY - 20),"Reloading mods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
-				reloadAllMods();
-			}
-		}
-		private function reloadAllMods(): void
+		public function reloadAllMods(): void
 		{
 			logger.log("eh_keyboardKeyDown", "Reloading all mods!");
-			this.modsReloadedTimestamp = getTimer();
+			this._modsReloadedTimestamp = getTimer();
+			if (!(this.mainLoader is GCFWBezel) && !(this.mainLoader is GCCSBezel))
+			{
+				this.mainLoader = null;
+			}
 			for each (var mod:SWFFile in mods)
 			{
 				var name: String = mod.instance.MOD_NAME;
@@ -545,21 +491,6 @@ package Bezel
 			{
 				dispatchEvent(new Event(LatticeEvent.REBUILD_DONE));
 			}
-		}
-
-		public function loadSave(): void
-		{
-			dispatchEvent(new LoadSaveEvent(GV.ppd, BezelEvent.LOAD_SAVE));
-		}
-
-		public function saveSave(): void
-		{
-			dispatchEvent(new SaveSaveEvent(GV.ppd, BezelEvent.SAVE_SAVE));
-		}
-
-		public function ingameNewScene(): void
-		{
-			dispatchEvent(new IngameNewSceneEvent(BezelEvent.INGAME_NEW_SCENE));
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package Bezel
+package Bezel.GCFW
 {
 	/**
 	 * ...
@@ -6,9 +6,9 @@ package Bezel
 	 */
     import Bezel.Lattice.Lattice;
 
-    internal class BezelCoreMod
+    internal class GCFWCoreMod
     {
-        public static const VERSION:String = "5";
+        public static const VERSION:String = "6";
 
         private static const files:Array = [
             "com/giab/games/gcfw/Main.class.asasm",
@@ -135,6 +135,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
+					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     getlocal            8 \n \
                     getlocal            1 \n \
                     getlex              QName(PackageNamespace("com.giab.common.utils"), "NumberFormatter") \n \
@@ -147,6 +148,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
+					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     getlocal1 \n \
                     getlocal            2 \n \
                     getlocal            3 \n \
@@ -164,6 +166,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
+					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     getlocal1 \n \
                     getlocal            2 \n \
                     getlocal            3 \n \
@@ -181,6 +184,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
+					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     getlocal1 \n \
                     callproperty        QName(PackageNamespace(""), "ingameKeyDown"), 1 \n \
                     not \n \
@@ -196,6 +200,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
+					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     callproperty        QName(PackageNamespace(""), "ingamePreRenderInfoPanel"), 0 \n \
                     pushtrue \n \
                     ifeq                L160 \n \
@@ -210,6 +215,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
+					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     callpropvoid        QName(PackageNamespace(""), "saveSave"), 0 \n \
                 ',
                 // loadSave
@@ -217,6 +223,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
+					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
                 ',
                 // loadSave
@@ -224,6 +231,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
+					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
                 ',
                 // loadSave
@@ -231,6 +239,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
+					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
                 ',
                 // loadSave
@@ -238,6 +247,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
+					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
                 ',
                 // loadSave
@@ -245,6 +255,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
+					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
                 ',
                 // loadSave
@@ -252,6 +263,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
+					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
                 ',
                 // loadSave
@@ -259,6 +271,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
+					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
                 ',
                 // loadSave
@@ -266,6 +279,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
+					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
                 ',
                 // loadSave
@@ -273,6 +287,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
+					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
                 '
             ],
@@ -282,6 +297,7 @@ package Bezel
                     getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
+					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     callpropvoid        QName(PackageNamespace(""), "ingameNewScene"), 0 \n \
                 '
             ]

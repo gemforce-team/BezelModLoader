@@ -4,11 +4,11 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="C:\Games\Steam\steamapps\common\GemCraft Frostborn Wrath\Mods\BezelModLoader.swf" />
+    <movie path="obj/BezelModLoader.swf" />
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />
-    <movie version="28" />
+    <movie version="17" />
     <movie minorVersion="0" />
     <movie platform="AIR" />
     <movie background="#000000" />
@@ -81,7 +81,7 @@
   <!-- Executed before build -->
   <preBuildCommand />
   <!-- Executed after build -->
-  <postBuildCommand alwaysRun="False">xcopy /Y "$(OutputFile)" "$(ProjectDir)\obj"</postBuildCommand>
+  <postBuildCommand alwaysRun="False" />
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />
