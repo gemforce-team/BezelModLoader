@@ -1,4 +1,4 @@
-package Bezel.GCFW.Events 
+package Bezel.Events
 {
 	/**
 	 * ...
@@ -7,7 +7,7 @@ package Bezel.GCFW.Events
 	
 	import flash.events.Event;
 	import Bezel.BezelEvent;
-	public class IngameRightClickOnSceneEvent extends Event
+	public class IngameGemInfoPanelFormedEvent extends Event
 	{
 		private var _eventArgs:Object;
 		
@@ -16,7 +16,7 @@ package Bezel.GCFW.Events
 			return _eventArgs;
 		}
 	
-		public function IngameRightClickOnSceneEvent(type:String, eventArgs:Object, bubbles:Boolean=false, cancelable:Boolean=false) 
+		public function IngameGemInfoPanelFormedEvent(type:String, eventArgs:Object, bubbles:Boolean=false, cancelable:Boolean=false) 
 		{
 			super(type, bubbles, cancelable);
 			this._eventArgs = eventArgs;

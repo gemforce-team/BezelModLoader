@@ -6,7 +6,14 @@ package Bezel.GCFW
 	 */
 	
 	import Bezel.Bezel;
-	import Bezel.GCFW.Events.*;
+	import Bezel.Events.EventTypes;
+	import Bezel.Events.IngameClickOnSceneEvent;
+	import Bezel.Events.IngameGemInfoPanelFormedEvent;
+	import Bezel.Events.IngameKeyDownEvent;
+	import Bezel.Events.IngameNewSceneEvent;
+	import Bezel.Events.IngamePreRenderInfoPanelEvent;
+	import Bezel.Events.LoadSaveEvent;
+	import Bezel.Events.SaveSaveEvent;
 	import Bezel.Logger;
 	import Bezel.MainLoader;
 	import flash.display.MovieClip;
