@@ -102,6 +102,7 @@ package Bezel
 			prepareFolders();
 			
 			loadingTextField = new TextField();
+			loadingTextField.selectable = false;
 			loadingTextField.text = loadingText;
 			loadingTextField.textColor = 0xFFFFFF;
 			this.addChild(loadingTextField);
