@@ -11,6 +11,7 @@ package Bezel.GCCS
 	import Bezel.Events.SaveSaveEvent;
 	import Bezel.Logger;
 	import Bezel.MainLoader;
+
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.text.TextField;
@@ -25,7 +26,6 @@ package Bezel.GCCS
 	{
 		// Shortcuts to gameObjects
 		private var _main:Object;
-		private var core:Object;/*IngameCore*/
 		private var GV:Object;/*GV*/
 		private var SB:Object;/*SB*/
 		private var prefs:Object;/*Prefs*/
@@ -37,16 +37,15 @@ package Bezel.GCCS
 		{
 		}
 		
-		public static const _MOD_NAME:String = "GCCS Bezel";
-		
-		public function get MOD_NAME():String
-		{
-			return _MOD_NAME;
-		}
+		public function get MOD_NAME():String { return "GCCS Bezel"; }
+		public function get VERSION():String { return Bezel.Bezel.VERSION; }
+		public function get BEZEL_VERSION():String { return Bezel.Bezel.VERSION; }
+		public function bind(b:Bezel, o:Object):void {}
+		public function unload():void {}
 		
 		public function loaderBind(bezel:Bezel, gameObjects:Object): void
 		{
-			this.logger = bezel.getLogger("GCFW Bezel");
+			this.logger = bezel.getLogger("GCCS Bezel");
 			this.bezel = bezel;
 			
 			this.GV = getDefinitionByName("com.giab.games.gccs.steam.GV") as Class;
@@ -173,11 +172,11 @@ package Bezel.GCCS
 			{
 				if (bezel.modsReloadedTimestamp + 10*1000 > getTimer())
 				{
-					GV.vfxEngine.createFloatingText4(_main.mouseX,_main.mouseY < 60?Number(_main.mouseY + 30):Number(_main.mouseY - 20),"Please wait 10 secods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
+					GV.vfxEngine.createFloatingText(_main.mouseX,_main.mouseY < 60?Number(_main.mouseY + 30):Number(_main.mouseY - 20),"Please wait 10 secods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
 					return;
 				}
 				SB.playSound("sndalert");
-				GV.vfxEngine.createFloatingText4(_main.mouseX,_main.mouseY < 60?Number(_main.mouseY + 30):Number(_main.mouseY - 20),"Reloading mods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
+				GV.vfxEngine.createFloatingText(_main.mouseX,_main.mouseY < 60?Number(_main.mouseY + 30):Number(_main.mouseY - 20),"Reloading mods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
 				bezel.reloadAllMods();
 			}
 		}

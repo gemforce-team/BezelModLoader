@@ -6,7 +6,7 @@ package Bezel.Events
 	 */
 	
 	import flash.events.Event;
-	import Bezel.BezelEvent;
+
 	public class SaveSaveEvent extends Event
 	{
 

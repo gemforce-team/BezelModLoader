@@ -5,17 +5,18 @@ package Bezel.Lattice
 	 * @author piepie62
 	 */
 
-    import flash.filesystem.File;
-    import flash.desktop.NativeProcess;
-    import flash.desktop.NativeProcessStartupInfo;
-    import flash.events.NativeProcessExitEvent;
-    import flash.events.EventDispatcher;
-    import flash.filesystem.FileStream;
-    import flash.utils.ByteArray;
     import Bezel.Bezel;
     import Bezel.Logger;
-    import flash.filesystem.FileMode;
+
+    import flash.desktop.NativeProcess;
+    import flash.desktop.NativeProcessStartupInfo;
     import flash.events.Event;
+    import flash.events.EventDispatcher;
+    import flash.events.NativeProcessExitEvent;
+    import flash.filesystem.File;
+    import flash.filesystem.FileMode;
+    import flash.filesystem.FileStream;
+    import flash.utils.ByteArray;
     import flash.utils.Dictionary;
 
     public class Lattice extends EventDispatcher

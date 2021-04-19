@@ -11,6 +11,7 @@ package Bezel
 	import Bezel.Lattice.Lattice;
 	import Bezel.Lattice.LatticeEvent;
 	import Bezel.Logger;
+
 	import flash.desktop.NativeApplication;
 	import flash.display.*;
 	import flash.events.*;
@@ -27,12 +28,13 @@ package Bezel
 	// The loader also requires a parameterless constructor (AFAIK), so we also have a .bind method to bind our class to the game
 	public class Bezel extends MovieClip
 	{
-		public static const VERSION:String = "0.3.2";
+		public static const VERSION:String = "1.0.0";
 
-		// Game objects
-		public var gameObjects:Object;
-		public var lattice:Lattice;
-		public var mainLoader:MainLoader;
+		// Game objects, populated by the MainLoader
+		private var gameObjects:Object;
+		private var lattice:Lattice;
+		private var _mainLoader:MainLoader;
+		public function get mainLoader():MainLoader { return _mainLoader; }
 
 		private var updateAvailable:Boolean;
 
@@ -123,7 +125,7 @@ package Bezel
 
 			if (!gameSwf.exists)
 			{
-				this.logger.log("Bezel", "Game file not found. Try reinstalling the game and Bezel");
+				this.logger.log("Bezel", "Game file not found. Try removing game-file.txt, reinstalling the game, and reinstalling Bezel");
 				NativeApplication.nativeApplication.exit(-1);
 			}
 
@@ -138,7 +140,7 @@ package Bezel
 				if (!file.exists)
 				{
 					this.logger.log("Bezel", "Exporting tool " + tool);
-					var toolData:ByteArray = new tool.data as ByteArray;
+					var toolData:ByteArray = new tool["data"] as ByteArray;
 					var stream:FileStream = new FileStream();
 					stream.open(file, FileMode.WRITE);
 					stream.writeBytes(toolData);
@@ -185,16 +187,16 @@ package Bezel
 			if (lattice.doesFileExist("com/giab/games/gcfw/Main.class.asasm"))
 			{
 				logger.log("Bezel", "GCFW main found, loading its coremods");
-				this.mainLoader = new GCFWBezel();
+				this._mainLoader = new GCFWBezel();
 				
-				this.coremods[this.coremods.length] = this.mainLoader.coremodInfo;
+				this.coremods[this.coremods.length] = this._mainLoader.coremodInfo;
 			}
 			else if (lattice.doesFileExist("com/giab/games/gccs/steam/Main.class.asasm"))
 			{
 				logger.log("Bezel", "GCCS main found, loading its coremods");
-				this.mainLoader = new GCCSBezel();
+				this._mainLoader = new GCCSBezel();
 				
-				this.coremods[this.coremods.length] = this.mainLoader.coremodInfo;
+				this.coremods[this.coremods.length] = this._mainLoader.coremodInfo;
 			}
 			else
 			{
@@ -296,67 +298,93 @@ package Bezel
 		}
 
 		// Assuming the file loaded, add the mod to tracked mods. Check compatibility. Check if the mod has a coremod and add the patches if so.
-		public function successfulModLoad(mod:SWFFile): void
+		public function successfulModLoad(modFile:SWFFile): void
 		{
-			var name:String = mod.instance.MOD_NAME;
-			logger.log("successfulModLoad", "Loaded mod: " + name + " v" + mod.instance.VERSION);
-			mods[name] = mod;
-			if (!this.bezelVersionCompatible(mod.instance.BEZEL_VERSION))
+			var name:String;
+			if (!(modFile.instance is BezelMod))
 			{
-				logger.log("Compatibility", "Bezel version is incompatible! Required: " + mod.instance.BEZEL_VERSION);
-				delete mods[name];
-				var requiredVersion:String = mod.instance.BEZEL_VERSION;
-				mod.unload();
-				throw new Error("Bezel version is incompatible! Bezel: " + VERSION + " while " + name + " requires " + requiredVersion);
-			}
-			this.addChild(DisplayObject(mod.instance));
-
-			waitingMods--;
-
-			if (this.initialLoad)
-			{				
-				if (mod.instance is MainLoader)
+				if ("MOD_NAME" in modFile.instance)
 				{
-					if (this.mainLoader != null)
-					{
-						logger.log("Bezel", "Multiple main loaders present! This is a fatal error. The two detected are " + this.mainLoader.MOD_NAME + " and " + mod.instance.MOD_NAME);
-						NativeApplication.nativeApplication.exit( -1);
-					}
-					else
-					{
-						this.mainLoader = mod.instance as MainLoader;
-						this.coremods[this.coremods.length] = this.mainLoader.coremodInfo;
-					}
+					name = " \'" + modFile.instance.MOD_NAME + "\' ";
+					logger.log("Compatibility", "Unknown type of SWF found. Is the mod" + name + "at \'" + modFile.filePath + "\' using the correct interface?");
 				}
-
-				if ("loadCoreMod" in mod.instance)
+				else
 				{
-					if ("COREMOD_VERSION" in mod.instance)
-					{
-						this.coremods[this.coremods.length] = {"name": name, "version": mod.instance.COREMOD_VERSION, "load": mod.instance.loadCoreMod};
-					}
-					else
-					{
-						this.coremods[this.coremods.length] = {"name": name, "version": mod.instance.VERSION, "load": mod.instance.loadCoreMod};
-					}
+					name = modFile.filePath;
+					logger.log("Compatibility", "Unknown type of SWF found at \'" + name + "\'");
 				}
-
-				if (waitingMods == 0)
-				{
-					this.dispatchEvent(new Event(BezelEvent.BEZEL_DONE_MOD_LOAD));
-				}
+				modFile.unload();
 			}
 			else
 			{
-				if ("loadCoreMod" in mod.instance)
+				var mod:BezelMod = modFile.instance as BezelMod;
+				name = mod.MOD_NAME;
+				logger.log("successfulModLoad", "Loaded mod: " + name + " v" + mod.VERSION);
+				if (!this.bezelVersionCompatible(mod.BEZEL_VERSION))
 				{
-					logger.log("Mod Reload", "The coremod contained in " + name + " was not reloaded. This may cause issues!");
+					logger.log("Compatibility", "Bezel version is incompatible! Required: " + mod.BEZEL_VERSION);
+					var requiredVersion:String = mod.BEZEL_VERSION;
+					mod.unload();
 				}
+				else
+				{
+					if (name in mods)
+					{
+						logger.log("Loader", "Mod \'" + name + "\' is already registered.");
+						logger.log("Loader", "The first loaded \'" + name + "\' will be used over the one at " + modFile.filePath);
+					}
+					else
+					{
+						mods[name] = mod;
+						this.addChild(DisplayObject(mod));
 
-				if (waitingMods == 0)
-				{
-					dispatchEvent(new Event(BezelEvent.BEZEL_DONE_MOD_RELOAD));
+						if (this.initialLoad)
+						{
+							if (mod is MainLoader)
+							{
+								if (this.mainLoader != null)
+								{
+									logger.log("Bezel", "Multiple main loaders present! This is a fatal error. The two detected are " + this.mainLoader.MOD_NAME + " and " + mod.MOD_NAME);
+									NativeApplication.nativeApplication.exit( -1);
+								}
+								else
+								{
+									this._mainLoader = mod as MainLoader;
+									this.coremods[this.coremods.length] = this.mainLoader.coremodInfo;
+								}
+							}
+
+							if (mod is BezelCoreMod)
+							{
+								var coremod:BezelCoreMod = mod as BezelCoreMod;
+								this.coremods[this.coremods.length] = {"name": name, "version": coremod.COREMOD_VERSION, "load": coremod.loadCoreMod};
+							}
+						}
+						else
+						{
+							if (mod is BezelCoreMod)
+							{
+								logger.log("Mod Reload", "Coremod for " + name + " was not reloaded!");
+							}
+						}
+					}
 				}
+			}
+			
+			reduceWaitingMods();
+			
+			if (!(name in mods))
+			{
+				throw new Error("An error occurred while loading " + modFile.filePath + ".\nSee log file for details.");
+			}
+		}
+		
+		private function reduceWaitingMods():void
+		{
+			waitingMods--;
+			if (waitingMods == 0)
+			{
+				dispatchEvent(new Event(this.initialLoad ? BezelEvent.BEZEL_DONE_MOD_LOAD : BezelEvent.BEZEL_DONE_MOD_RELOAD));
 			}
 		}
 
@@ -421,14 +449,15 @@ package Bezel
 			this._modsReloadedTimestamp = getTimer();
 			if (!(this.mainLoader is GCFWBezel) && !(this.mainLoader is GCCSBezel))
 			{
-				this.mainLoader = null;
+				this._mainLoader = null;
 			}
 			for each (var mod:SWFFile in mods)
 			{
-				var name: String = mod.instance.MOD_NAME;
+				var name:String = mod.instance.MOD_NAME;
 				mod.unload();
 				delete mods[name];
 			}
+			this.gameObjects = null;
 			this.removeChildren();
 			this.addChild(DisplayObject(game.instance));
 			mods = new Array();

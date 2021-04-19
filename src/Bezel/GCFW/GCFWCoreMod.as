@@ -91,7 +91,7 @@ package Bezel.GCFW
             [ 0 ]
         ];
 		private static const offsetFromMatches:Array = [
-            [ 0, 0, 20, 0, 0 ],
+            [ -1, -1, 20, 0, 0 ],
             [ -15 ],
             [ -5, 37, -5, 16 ],
             [ 5 ],

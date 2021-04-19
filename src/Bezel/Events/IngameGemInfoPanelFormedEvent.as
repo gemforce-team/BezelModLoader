@@ -6,7 +6,7 @@ package Bezel.Events
 	 */
 	
 	import flash.events.Event;
-	import Bezel.BezelEvent;
+
 	public class IngameGemInfoPanelFormedEvent extends Event
 	{
 		private var _eventArgs:Object;

@@ -6,7 +6,7 @@ package Bezel.Events
 	 */
 	
 	import flash.events.Event;
-	import Bezel.BezelEvent;
+
 	public class IngameClickOnSceneEvent extends Event
 	{
 		private var _eventArgs:Object;

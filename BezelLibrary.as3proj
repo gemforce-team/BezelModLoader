@@ -2,16 +2,16 @@
 <project version="2">
   <!-- Output SWF options -->
   <output>
-    <movie outputType="Application" />
+    <movie outputType="CustomBuild" />
     <movie input="" />
-    <movie path="obj\BezelModLoader.swf" />
-    <movie fps="30" />
-    <movie width="800" />
-    <movie height="600" />
+    <movie path="obj\BezelModLoader.swc" />
+    <movie fps="0" />
+    <movie width="0" />
+    <movie height="0" />
     <movie version="17" />
     <movie minorVersion="0" />
     <movie platform="AIR" />
-    <movie background="#000000" />
+    <movie background="#FFFFFF" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
@@ -56,7 +56,8 @@
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>
-    <!-- example: <element path="..." /> -->
+    <element path="obj\GCCS.swc" />
+    <element path="obj\GCFW.swc" />
   </externalLibraryPaths>
   <!-- Runtime Shared Libraries -->
   <rslPaths>
@@ -72,16 +73,16 @@
   </library>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
-    <compile path="src\Bezel\Bezel.as" />
+    <!-- example: <compile path="..." /> -->
   </compileTargets>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
     <hidden path="obj" />
   </hiddenPaths>
   <!-- Executed before build -->
-  <preBuildCommand />
+  <preBuildCommand>"$(BaseDir)\Tools\swcbuild\swcbuild.exe" "$(ProjectPath)" "-compiler=$(CompilerPath)" "-debug=$(BuildConfig)" "-library=C:\Program Files (x86)\FlashDevelop\Library" -asdoc=true -keep-asdoc=false</preBuildCommand>
   <!-- Executed after build -->
-  <postBuildCommand alwaysRun="False">"$(BaseDir)\Tools\swcbuild\swcbuild.exe" "BezelLibrary.as3proj" "-compiler=$(CompilerPath)" "-debug=$(BuildConfig)" "-library=$(BaseDir)\Library" -asdoc=true -keep-asdoc=true</postBuildCommand>
+  <postBuildCommand alwaysRun="False" />
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />

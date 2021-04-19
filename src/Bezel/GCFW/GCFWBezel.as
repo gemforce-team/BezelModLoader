@@ -16,17 +16,16 @@ package Bezel.GCFW
 	import Bezel.Events.SaveSaveEvent;
 	import Bezel.Logger;
 	import Bezel.MainLoader;
-	import flash.display.MovieClip;
-	import flash.utils.getDefinitionByName;
+
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.utils.getDefinitionByName;
 	import flash.utils.getTimer;
 
 	public class GCFWBezel implements MainLoader
 	{
 		// Shortcuts to gameObjects
 		private var _main:Object;/*Main*/
-		private var core:Object;/*IngameCore*/
 		private var GV:Object;/*GV*/
 		private var SB:Object;/*SB*/
 		private var prefs:Object;/*Prefs*/
@@ -34,12 +33,11 @@ package Bezel.GCFW
 		private var logger:Logger;
 		private var bezel:Bezel;
 		
-		public static const _MOD_NAME:String = "GCFW Bezel";
-		
-		public function get MOD_NAME():String
-		{
-			return _MOD_NAME;
-		}
+		public function get MOD_NAME():String { return "GCFW Bezel"; }
+		public function get VERSION():String { return Bezel.Bezel.VERSION; }
+		public function get BEZEL_VERSION():String { return Bezel.Bezel.VERSION; }
+		public function bind(b:Bezel, o:Object):void {}
+		public function unload():void {}
 		
 		public function GCFWBezel()
 		{
