@@ -12,6 +12,7 @@ package Bezel.GCFW
 	import Bezel.Events.IngameKeyDownEvent;
 	import Bezel.Events.IngameNewSceneEvent;
 	import Bezel.Events.IngamePreRenderInfoPanelEvent;
+	import Bezel.Events.IngameRightClickOnSceneEvent;
 	import Bezel.Events.LoadSaveEvent;
 	import Bezel.Events.SaveSaveEvent;
 	import Bezel.Logger;
@@ -142,7 +143,7 @@ package Bezel.GCFW
 		public function ingameRightClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
 		{
 			var eventArgs:Object = {"continueDefault": true, "event":event, "mouseX":mouseX, "mouseY":mouseY, "buildingX": buildingX, "buildingY": buildingY };
-			bezel.dispatchEvent(new IngameClickOnSceneEvent(EventTypes.INGAME_RIGHT_CLICK_ON_SCENE, eventArgs));
+			bezel.dispatchEvent(new IngameRightClickOnSceneEvent(EventTypes.INGAME_RIGHT_CLICK_ON_SCENE, eventArgs));
 			return eventArgs.continueDefault;
 		}
 
