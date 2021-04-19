@@ -4,8 +4,13 @@
 #include <iostream>
 #include <array>
 
-extern unsigned char swfData[] asm("swfData");
-extern int swfSize asm("swfSize");
+extern "C"
+{
+    extern unsigned char swfData[];
+    extern int swfSize;
+    extern unsigned char swcData[];
+    extern int swcSize;
+}
 
 [[noreturn]] void waitExit(const char *exitMessage, int exitCode)
 {
@@ -92,6 +97,7 @@ int main()
     metadata.replace(metadata.cbegin() + contentStart + 9, metadata.cbegin() + contentEnd, "Mods/BezelModLoader.swf");
 
     const std::filesystem::path bezelFile{"Mods/BezelModLoader.swf"};
+    const std::filesystem::path bezelLibrary{"Mods/BezelModLoader.swc"};
 
     std::filesystem::path appdata{getenv("APPDATA")};
     if (std::filesystem::exists(appdata))
@@ -140,6 +146,10 @@ int main()
 
     FILE *outFile = _wfopen(bezelFile.generic_wstring().c_str(), L"wb");
     fwrite(swfData, 1, swfSize, outFile);
+    fclose(outFile);
+
+    outFile = _wfopen(bezelLibrary.generic_wstring().c_str(), L"wb");
+    fwrite(swcData, 1, swcSize, outFile);
     fclose(outFile);
 
     outFile = _wfopen(metadataFile.generic_wstring().c_str(), L"wt");
