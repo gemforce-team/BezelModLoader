@@ -204,7 +204,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    getlocal            8 \n \
+                    getlocal            6 \n \
                     getlocal            1 \n \
                     getlex              QName(PackageNamespace("com.giab.common.utils"), "NumberFormatter") \n \
                     callpropvoid        QName(PackageNamespace(""), "ingameGemInfoPanelFormed"), 3 \n \
