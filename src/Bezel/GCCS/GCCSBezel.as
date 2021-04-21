@@ -9,12 +9,19 @@ package Bezel.GCCS
 	import Bezel.Events.IngamePreRenderInfoPanelEvent;
 	import Bezel.Events.IngameRightClickOnSceneEvent;
 	import Bezel.Events.LoadSaveEvent;
+	import Bezel.Events.Persistence.IngameClickOnSceneEventArgs;
+	import Bezel.Events.Persistence.IngameGemInfoPanelFormedEventArgs;
+	import Bezel.Events.Persistence.IngameKeyDownEventArgs;
+	import Bezel.Events.Persistence.IngamePreRenderInfoPanelEventArgs;
 	import Bezel.Events.SaveSaveEvent;
 	import Bezel.Logger;
 	import Bezel.MainLoader;
 
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.filesystem.File;
+	import flash.filesystem.FileMode;
+	import flash.filesystem.FileStream;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
 	import flash.utils.getDefinitionByName;
@@ -33,6 +40,48 @@ package Bezel.GCCS
 		
 		private var bezel:Bezel;
 		private var logger:Logger;
+		
+		private static const hotkeysFile:File = Bezel.Bezel.bezelFolder.resolvePath("hotkeys.json");
+		
+		private var _defaultHotkeys:Object;
+		private var _configuredHotkeys:Object;
+		
+		private function get defaultHotkeys():Object
+		{
+			if (_defaultHotkeys == null)
+			{
+				_defaultHotkeys = createDefaultKeyConfiguration();
+			}
+			return _defaultHotkeys;
+		}
+		
+		private function get configuredHotkeys():Object
+		{
+			if (_configuredHotkeys == null)
+			{
+				var hotkeysStream:FileStream = new FileStream();
+				if (hotkeysFile.exists)
+				{
+					try
+					{
+						hotkeysStream.open(hotkeysFile, FileMode.READ);
+						_configuredHotkeys = JSON.parse(hotkeysStream.readUTFBytes(hotkeysStream.bytesAvailable));
+						hotkeysStream.close();
+					}
+					catch (e:Error)
+					{
+						logger.log("configuredHotkeys", "Error reading hotkeys from disk, using default");
+						_configuredHotkeys = createDefaultKeyConfiguration();
+					}
+				}
+				else
+				{
+					_configuredHotkeys = createDefaultKeyConfiguration();
+					this.saveHotkeys();
+				}
+			}
+			return _configuredHotkeys;
+		}
 		
 		public function GCCSBezel() 
 		{
@@ -122,18 +171,18 @@ package Bezel.GCCS
 			//version = version.slice(0, version.search(' ') + 1) + Bezel.Bezel.prettyVersion();
 			//_main.scrMainMenu.mc.mcBottomTexts.getChildAt(0).text = version;
 		}
-		
+
 		// Called after the gem's info panel has been formed but before it's returned to the game for rendering
 		public function ingameGemInfoPanelFormed(infoPanel:Object, gem:Object, numberFormatter:Object): void
 		{
-			bezel.dispatchEvent(new IngameGemInfoPanelFormedEvent(EventTypes.INGAME_GEM_INFO_PANEL_FORMED, {"infoPanel": infoPanel, "gem": gem, "numberFormatter": numberFormatter}));
+			bezel.dispatchEvent(new IngameGemInfoPanelFormedEvent(EventTypes.INGAME_GEM_INFO_PANEL_FORMED, new IngameGemInfoPanelFormedEventArgs(infoPanel, gem, numberFormatter)));
 		}
 
 		// Called before any of the game's logic runs when starting to form an infopanel
 		// This method is called before infoPanelFormed (which should be renamed to ingameGemInfoPanelFormed)
 		public function ingamePreRenderInfoPanel(): Boolean
 		{
-			var eventArgs:Object = {"continueDefault": true};
+			var eventArgs:IngamePreRenderInfoPanelEventArgs = new IngamePreRenderInfoPanelEventArgs(true);
 			bezel.dispatchEvent(new IngamePreRenderInfoPanelEvent(EventTypes.INGAME_PRE_RENDER_INFO_PANEL, eventArgs));
 			//logger.log("ingamePreRenderInfoPanel", "Dispatched event!");
 			return eventArgs.continueDefault;
@@ -143,7 +192,7 @@ package Bezel.GCCS
 		// set continueDefault to false to prevent the base game's handler from running
 		public function ingameClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
 		{
-			var eventArgs:Object = {"continueDefault": true, "event":event, "mouseX":mouseX, "mouseY":mouseY, "buildingX": buildingX, "buildingY": buildingY };
+			var eventArgs:IngameClickOnSceneEventArgs = new IngameClickOnSceneEventArgs(true, event, mouseX, mouseY, buildingX, buildingY);
 			bezel.dispatchEvent(new IngameClickOnSceneEvent(EventTypes.INGAME_CLICK_ON_SCENE, eventArgs));
 			return eventArgs.continueDefault;
 		}
@@ -152,7 +201,7 @@ package Bezel.GCCS
 		// set continueDefault to false to prevent the base game's handler from running
 		public function ingameRightClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
 		{
-			var eventArgs:Object = {"continueDefault": true, "event":event, "mouseX":mouseX, "mouseY":mouseY, "buildingX": buildingX, "buildingY": buildingY };
+			var eventArgs:IngameClickOnSceneEventArgs = new IngameClickOnSceneEventArgs(true, event, mouseX, mouseY, buildingX, buildingY);
 			bezel.dispatchEvent(new IngameRightClickOnSceneEvent(EventTypes.INGAME_RIGHT_CLICK_ON_SCENE, eventArgs));
 			return eventArgs.continueDefault;
 		}
@@ -161,12 +210,12 @@ package Bezel.GCCS
 		// Set continueDefault to false to prevent the base game's handler from running
 		public function ingameKeyDown(e:KeyboardEvent): Boolean
 		{
-			var kbKDEventArgs:Object = {"event": e, "continueDefault": true};
-			bezel.dispatchEvent(new IngameKeyDownEvent(EventTypes.INGAME_KEY_DOWN, kbKDEventArgs));
-			return kbKDEventArgs.continueDefault;
+			var eventArgs:IngameKeyDownEventArgs = new IngameKeyDownEventArgs(e, true);
+			bezel.dispatchEvent(new IngameKeyDownEvent(EventTypes.INGAME_KEY_DOWN, eventArgs));
+			doHotkeyTransformation(e);
+			return eventArgs.continueDefault;
 		}
 
-		//
 		public function stageKeyDown(e: KeyboardEvent): void
 		{
 			if (e.controlKey && e.altKey && e.shiftKey && e.keyCode == 36)
@@ -182,19 +231,102 @@ package Bezel.GCCS
 			}
 		}
 
+		// Called after the game is done loading its data
 		public function loadSave(): void
 		{
 			bezel.dispatchEvent(new LoadSaveEvent(GV.ppd, EventTypes.LOAD_SAVE));
 		}
 
+		// Called after the game is done saving its data
 		public function saveSave(): void
 		{
 			bezel.dispatchEvent(new SaveSaveEvent(GV.ppd, EventTypes.SAVE_SAVE));
 		}
 
+		// Called when a level is loaded or reloaded
 		public function ingameNewScene(): void
 		{
 			bezel.dispatchEvent(new IngameNewSceneEvent(EventTypes.INGAME_NEW_SCENE));
+		}
+		
+		private function createDefaultKeyConfiguration():Object
+		{
+			var config:Object = new Object();
+			config["Throw gem bombs"] = 66;
+			config["Build tower"] = 84;
+			config["Build trap"] = 82;
+			config["Build wall"] = 87;
+			config["Combine gems"] = 71;
+			config["Switch time speed"] = 81;
+			config["Pause time"] = 32;
+			config["Start next wave"] = 78;
+			config["Destroy gem for mana"] = 88;
+			config["Drop gem to inventory"] = 9;
+			config["Duplicate gem"] = 68;
+			config["Upgrade gem"] = 85;
+			config["Show/hide info panels"] = 190;
+			config["Cast freeze strike spell"] = 49;
+			config["Cast curse strike spell"] = 50;
+			config["Cast wake of eternity strike spell"] = 51;
+			config["Cast bolt enhancement spell"] = 52;
+			config["Cast beam enhancement spell"] = 53;
+			config["Cast barrage enhancement spell"] = 54;
+			config["Create Mana Leeching gem"] = 103;
+			config["Create Critical Hit gem"] = 104;
+			config["Create Poolbound gem"] = 105;
+			config["Create Chain Hit gem"] = 100;
+			config["Create Poison gem"] = 101;
+			config["Create Suppression gem"] = 102;
+			config["Create Bloodbound gem"] = 97;
+			config["Create Slowing gem"] = 98;
+			config["Create Armor Tearing gem"] = 99;
+			config["Up arrow function"] = 38;
+			config["Down arrow function"] = 40;
+			config["Left arrow function"] = 37;
+			config["Right arrow function"] = 39;
+
+			return config;
+		}
+		
+		private function doHotkeyTransformation(e:KeyboardEvent):void
+		{
+			for(var name:String in this.defaultHotkeys)
+			{
+				if(this.configuredHotkeys[name] == e.keyCode)
+				{
+					e.keyCode = this.defaultHotkeys[name];
+					break;
+				}
+			}
+		}
+		
+		public function registerHotkey(name:String, defaultVal:int):void
+		{
+			if (!(name in this.configuredHotkeys))
+			{
+				this.configuredHotkeys[name] = defaultVal;
+				this.saveHotkeys();
+			}
+		}
+		
+		public function getHotkeyValue(name:String):int
+		{
+			return this.configuredHotkeys[name] || 0;
+		}
+		
+		private function saveHotkeys():void
+		{
+			var stream:FileStream = new FileStream();
+			try
+			{
+				stream.open(hotkeysFile, FileMode.WRITE);
+				stream.writeUTFBytes(JSON.stringify(this.configuredHotkeys, null, 2));
+				stream.close();
+			}
+			catch (e:Error)
+			{
+				logger.log("saveHotkeys", "Could not save hotkey information");
+			}
 		}
 		
 	}
