@@ -16,6 +16,11 @@ package Bezel.Events
 		{
 			return _eventArgs;
 		}
+		
+		public override function clone():Event
+		{
+			return new IngameRightClickOnSceneEvent(type, eventArgs, bubbles, cancelable);
+		}
 	
 		public function IngameRightClickOnSceneEvent(type:String, eventArgs:IngameClickOnSceneEventArgs, bubbles:Boolean=false, cancelable:Boolean=false) 
 		{

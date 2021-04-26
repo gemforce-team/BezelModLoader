@@ -16,6 +16,11 @@ package Bezel.Events
 		{
 			return _eventArgs;
 		}
+		
+		public override function clone():Event
+		{
+			return new IngamePreRenderInfoPanelEvent(type, eventArgs, bubbles, cancelable);
+		}
 	
 		public function IngamePreRenderInfoPanelEvent(type:String, eventArgs:IngamePreRenderInfoPanelEventArgs, bubbles:Boolean=false, cancelable:Boolean=false) 
 		{

@@ -16,6 +16,11 @@ package Bezel.Events
 		{
 			return _eventArgs;
 		}
+		
+		public override function clone():Event
+		{
+			return new IngameKeyDownEvent(type, eventArgs, bubbles, cancelable);
+		}
 	
 		public function IngameKeyDownEvent(type:String, eventArgs:IngameKeyDownEventArgs, bubbles:Boolean=false, cancelable:Boolean=false) 
 		{

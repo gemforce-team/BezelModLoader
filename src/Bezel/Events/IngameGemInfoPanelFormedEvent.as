@@ -16,6 +16,11 @@ package Bezel.Events
 		{
 			return _eventArgs;
 		}
+		
+		public override function clone():Event
+		{
+			return new IngameGemInfoPanelFormedEvent(type, eventArgs, bubbles, cancelable);
+		}
 	
 		public function IngameGemInfoPanelFormedEvent(type:String, eventArgs:IngameGemInfoPanelFormedEventArgs, bubbles:Boolean=false, cancelable:Boolean=false) 
 		{
