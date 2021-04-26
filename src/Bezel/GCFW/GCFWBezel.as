@@ -6,6 +6,7 @@ package Bezel.GCFW
 	 */
 	
 	import Bezel.Bezel;
+	import Bezel.bezel_internal;
 	import Bezel.Events.EventTypes;
 	import Bezel.Events.IngameClickOnSceneEvent;
 	import Bezel.Events.IngameGemInfoPanelFormedEvent;
@@ -29,6 +30,8 @@ package Bezel.GCFW
 	import flash.filesystem.FileStream;
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getTimer;
+	
+	use namespace bezel_internal;
 
 	public class GCFWBezel implements MainLoader
 	{
@@ -93,17 +96,12 @@ package Bezel.GCFW
 		{
 		}
 		
-		public function set main(main:Object): void
-		{
-			this._main = main;
-		}
-		
 		public function get coremodInfo(): Object
 		{
 			return {"name": "GCFW_BEZEL_MOD_LOADER", "version": GCFWCoreMod.VERSION, "load": GCFWCoreMod.installHooks};
 		}
 		
-		public function loaderBind(bezel:Bezel, gameObjects:Object): void
+		public function loaderBind(bezel:Bezel, mainGame:Object, gameObjects:Object): void
 		{
 			this.logger = bezel.getLogger("GCFW Bezel");
 			this.bezel = bezel;
@@ -111,7 +109,7 @@ package Bezel.GCFW
 			this.GV = getDefinitionByName("com.giab.games.gcfw.GV") as Class;
 			this.SB = getDefinitionByName("com.giab.games.gcfw.SB") as Class;
 			this.prefs = getDefinitionByName("com.giab.games.gcfw.Prefs") as Class;
-			gameObjects.main = this._main;
+			gameObjects.main = mainGame;
 			gameObjects.core = this.GV.ingameCore;
 			gameObjects.GV = this.GV;
 			gameObjects.SB = this.SB;
@@ -152,9 +150,9 @@ package Bezel.GCFW
 			gameObjects.constants.wizLockType = getDefinitionByName("com.giab.games.gcfw.constants.WizLockType");
 			gameObjects.constants.wizStashStatus = getDefinitionByName("com.giab.games.gcfw.constants.WizStashStatus");
 
-			var version:String = _main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text;
+			var version:String = GV.main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text;
 			version = version.slice(0, version.search(' ') + 1) + Bezel.Bezel.prettyVersion();
-			_main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text = version;
+			GV.main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text = version;
 			//checkForUpdates();
 
 			GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
@@ -163,14 +161,14 @@ package Bezel.GCFW
 		}
 
 		// Called after the gem's info panel has been formed but before it's returned to the game for rendering
-		public function ingameGemInfoPanelFormed(infoPanel:Object, gem:Object, numberFormatter:Object): void
+		bezel_internal function ingameGemInfoPanelFormed(infoPanel:Object, gem:Object, numberFormatter:Object): void
 		{
 			bezel.dispatchEvent(new IngameGemInfoPanelFormedEvent(EventTypes.INGAME_GEM_INFO_PANEL_FORMED, new IngameGemInfoPanelFormedEventArgs(infoPanel, gem, numberFormatter)));
 		}
 
 		// Called before any of the game's logic runs when starting to form an infopanel
 		// This method is called before infoPanelFormed (which should be renamed to ingameGemInfoPanelFormed)
-		public function ingamePreRenderInfoPanel(): Boolean
+		bezel_internal function ingamePreRenderInfoPanel(): Boolean
 		{
 			var eventArgs:IngamePreRenderInfoPanelEventArgs = new IngamePreRenderInfoPanelEventArgs(true);
 			bezel.dispatchEvent(new IngamePreRenderInfoPanelEvent(EventTypes.INGAME_PRE_RENDER_INFO_PANEL, eventArgs));
@@ -180,7 +178,7 @@ package Bezel.GCFW
 
 		// Called immediately as a click event is fired by the base game
 		// set continueDefault to false to prevent the base game's handler from running
-		public function ingameClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
+		bezel_internal function ingameClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
 		{
 			var eventArgs:IngameClickOnSceneEventArgs = new IngameClickOnSceneEventArgs(true, event, mouseX, mouseY, buildingX, buildingY);
 			bezel.dispatchEvent(new IngameClickOnSceneEvent(EventTypes.INGAME_CLICK_ON_SCENE, eventArgs));
@@ -189,7 +187,7 @@ package Bezel.GCFW
 
 		// Called immediately as a right click event is fired by the base game
 		// set continueDefault to false to prevent the base game's handler from running
-		public function ingameRightClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
+		bezel_internal function ingameRightClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
 		{
 			var eventArgs:IngameClickOnSceneEventArgs = new IngameClickOnSceneEventArgs(true, event, mouseX, mouseY, buildingX, buildingY);
 			bezel.dispatchEvent(new IngameRightClickOnSceneEvent(EventTypes.INGAME_RIGHT_CLICK_ON_SCENE, eventArgs));
@@ -198,7 +196,7 @@ package Bezel.GCFW
 
 		// Called after the game checks that a key should be handled, but before any of the actual handling logic
 		// Set continueDefault to false to prevent the base game's handler from running
-		public function ingameKeyDown(e:KeyboardEvent): Boolean
+		bezel_internal function ingameKeyDown(e:KeyboardEvent): Boolean
 		{
 			var eventArgs:IngameKeyDownEventArgs = new IngameKeyDownEventArgs(e, true);
 			bezel.dispatchEvent(new IngameKeyDownEvent(EventTypes.INGAME_KEY_DOWN, eventArgs));
@@ -206,7 +204,7 @@ package Bezel.GCFW
 			return eventArgs.continueDefault;
 		}
 
-		public function stageKeyDown(e: KeyboardEvent): void
+		bezel_internal function stageKeyDown(e: KeyboardEvent): void
 		{
 			if (e.controlKey && e.altKey && e.shiftKey && e.keyCode == 36)
 			{
@@ -222,19 +220,19 @@ package Bezel.GCFW
 		}
 
 		// Called after the game is done loading its data
-		public function loadSave(): void
+		bezel_internal function loadSave(): void
 		{
 			bezel.dispatchEvent(new LoadSaveEvent(GV.ppd, EventTypes.LOAD_SAVE));
 		}
 
 		// Called after the game is done saving its data
-		public function saveSave(): void
+		bezel_internal function saveSave(): void
 		{
 			bezel.dispatchEvent(new SaveSaveEvent(GV.ppd, EventTypes.SAVE_SAVE));
 		}
 
 		// Called when a level is loaded or reloaded
-		public function ingameNewScene(): void
+		bezel_internal function ingameNewScene(): void
 		{
 			bezel.dispatchEvent(new IngameNewSceneEvent(EventTypes.INGAME_NEW_SCENE));
 		}

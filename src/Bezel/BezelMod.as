@@ -2,7 +2,7 @@ package Bezel
 {
 	
 	/**
-	 * ...
+	 * Defines the interface of a normal mod
 	 * @author Chris
 	 */
 	public interface BezelMod 
@@ -22,7 +22,7 @@ package Bezel
 		/**
 		 * Binds the any required game data to the mod.
 		 * Called after all other mods and the game are loaded.
-		 * Other mods may not be bound when this is called.
+		 * Other mods may not yet be bound when this is called.
 		 * @param	bezel The instance of Bezel.Bezel loading the mod
 		 * @param	gameObjects A container of objects set up by the game's Bezel.MainLoader that may be useful to the mod
 		 * @return  this

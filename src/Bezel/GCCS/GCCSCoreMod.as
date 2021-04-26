@@ -207,7 +207,7 @@ package Bezel.GCCS
                     getlocal            6 \n \
                     getlocal            1 \n \
                     getlex              QName(PackageNamespace("com.giab.common.utils"), "NumberFormatter") \n \
-                    callpropvoid        QName(PackageNamespace(""), "ingameGemInfoPanelFormed"), 3 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "ingameGemInfoPanelFormed"), 3 \n \
                 '
             ],
             [
@@ -222,7 +222,7 @@ package Bezel.GCCS
                     getlocal            3 \n \
                     getlocal            4 \n \
                     getlocal            5 \n \
-                    callproperty        QName(PackageNamespace(""), "ingameClickOnScene"), 5 \n \
+                    callproperty        QName(PackageInternalNs("Bezel:bezel_internal"), "ingameClickOnScene"), 5 \n \
                     not \n \
                     iffalse             L86 \n \
                         returnvoid \n \
@@ -240,7 +240,7 @@ package Bezel.GCCS
                     getlocal            3 \n \
                     getlocal            4 \n \
                     getlocal            5 \n \
-                    callproperty        QName(PackageNamespace(""), "ingameRightClickOnScene"), 5 \n \
+                    callproperty        QName(PackageInternalNs("Bezel:bezel_internal"), "ingameRightClickOnScene"), 5 \n \
                     not \n \
                     iffalse             L28 \n \
                         returnvoid \n \
@@ -254,7 +254,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     getlocal1 \n \
-                    callproperty        QName(PackageNamespace(""), "ingameKeyDown"), 1 \n \
+                    callproperty        QName(PackageInternalNs("Bezel:bezel_internal"), "ingameKeyDown"), 1 \n \
                     not \n \
                     iffalse             L55 \n \
                         returnvoid \n \
@@ -284,7 +284,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "saveSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "saveSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -292,7 +292,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -300,7 +300,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -308,7 +308,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -316,7 +316,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -324,7 +324,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -332,7 +332,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -340,7 +340,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -348,7 +348,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -356,7 +356,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -364,7 +364,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -372,7 +372,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -380,7 +380,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -388,7 +388,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -396,7 +396,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -404,7 +404,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -412,7 +412,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -420,7 +420,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -428,7 +428,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -436,7 +436,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -444,7 +444,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -452,7 +452,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -460,7 +460,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -468,7 +468,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
@@ -476,7 +476,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "loadSave"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 '
             ],
             [
@@ -486,7 +486,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callpropvoid        QName(PackageNamespace(""), "ingameNewScene"), 0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "ingameNewScene"), 0 \n \
                 '
             ],
 			[
@@ -497,7 +497,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
 					getlocal1 \n \
-					callpropvoid        QName(PackageNamespace(""), "setVersion"), 1 \n \
+					callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "setVersion"), 1 \n \
 				'
 			]
         ];

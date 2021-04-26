@@ -23,6 +23,8 @@ package Bezel
 	import flash.text.TextField;
 	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
+	
+	use namespace bezel_internal;
 
 	// We extend MovieClip so that flash.display.Loader accepts our class
 	// The loader also requires a parameterless constructor (AFAIK), so we also have a .bind method to bind our class to the game
@@ -117,7 +119,6 @@ package Bezel
 
 			NativeApplication.nativeApplication.addEventListener(Event.EXITING, this.onExit);
 
-			Logger.init();
 			this.logger = Logger.getLogger("Bezel");
 			this.mods = new Object();
 
@@ -220,10 +221,6 @@ package Bezel
 		// Bind the game and Bezel to each other
 		private function gameLoadSuccess(game:SWFFile): void
 		{
-			if (this.mainLoader != null)
-			{
-				this.mainLoader.main = game.instance;
-			}
 			game.instance.bezel = this;
 			this.removeChild(this.loadingTextField);
 			this.addChild(DisplayObject(game.instance));
@@ -232,7 +229,7 @@ package Bezel
 			if (this.mainLoader != null)
 			{
 				this.gameObjects = new Object();
-				this.mainLoader.loaderBind(this, gameObjects);
+				this.mainLoader.loaderBind(this, game.instance, gameObjects);
 			}
 			bindMods();
 			this.initialLoad = false;
@@ -298,7 +295,7 @@ package Bezel
 		}
 
 		// Assuming the file loaded, add the mod to tracked mods. Check compatibility. Check if the mod has a coremod and add the patches if so.
-		public function successfulModLoad(modFile:SWFFile): void
+		private function successfulModLoad(modFile:SWFFile): void
 		{
 			var name:String;
 			if (!(modFile.instance is BezelMod))
@@ -320,7 +317,7 @@ package Bezel
 				var mod:BezelMod = modFile.instance as BezelMod;
 				name = mod.MOD_NAME;
 				logger.log("successfulModLoad", "Loaded mod: " + name + " v" + mod.VERSION);
-				if (!this.bezelVersionCompatible(mod.BEZEL_VERSION))
+				if (!bezelVersionCompatible(mod.BEZEL_VERSION))
 				{
 					logger.log("Compatibility", "Bezel version is incompatible! Required: " + mod.BEZEL_VERSION);
 					var requiredVersion:String = mod.BEZEL_VERSION;
@@ -388,7 +385,7 @@ package Bezel
 			}
 		}
 
-		public function bezelVersionCompatible(requiredVersion:String): Boolean
+		public static function bezelVersionCompatible(requiredVersion:String): Boolean
 		{
 			var bezelVer:Array = VERSION.split(".");
 			var thisVer:Array = requiredVersion.split(".");
@@ -407,7 +404,7 @@ package Bezel
 			return false;
 		}
 
-		public function failedModLoad(e:Event): void
+		private function failedModLoad(e:Event): void
 		{
 			logger.log("failedLoad", "Failed to load mod: " + e.currentTarget.url);
 
@@ -430,7 +427,11 @@ package Bezel
 			return Logger.getLogger(id);
 		}
 
-		// Returns a mod's instance, if such a mod is loaded. Used for cross-mod interactions
+		/**
+		 * Returns a mod's instance, if such a mod is loaded. Used for cross-mod interactions
+		 * @param	modName Name of the mod to retrive
+		 * @return  The mod loaded by the name "modName", or null if none exists
+		 */
 		public function getModByName(modName:String): Object
 		{
 			if (this.mods[modName])
@@ -438,12 +439,19 @@ package Bezel
 			return null;
 		}
 
-		public static function prettyVersion(): String
+		/**
+		 * Returns the version formatted for display in a game version string. Probably unnecessary for anything except MainLoaders
+		 * @return Formatted version string
+		 */
+		bezel_internal static function prettyVersion(): String
 		{
 			return 'Bezel v' + VERSION;
 		}
 
-		public function reloadAllMods(): void
+		/**
+		 * Unloads, then reloads every mod. Almost certainly should only be used by MainLoaders
+		 */
+		bezel_internal function reloadAllMods(): void
 		{
 			logger.log("eh_keyboardKeyDown", "Reloading all mods!");
 			this._modsReloadedTimestamp = getTimer();

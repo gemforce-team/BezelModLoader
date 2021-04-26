@@ -2,7 +2,7 @@ package Bezel
 {
 	
 	/**
-	 * ...
+	 * Defines the interface of a main loader mod. Only one of these may be present per game. Having more is a hard error
 	 * @author Chris
 	 */
 	public interface MainLoader extends BezelMod
@@ -10,13 +10,10 @@ package Bezel
 		/**
 		 * Fills out gameObjects with data from the game
 		 * @param	bezel The bezel instance loading the mod
+		 * @param   mainGame The object loaded and instantiated from the game's SWF
 		 * @param	gameObjects The object to fill with game object data
 		 */
-		function loaderBind(bezel:Bezel, gameObjects:Object):void;
-		/**
-		 * Sets the main game object from the game
-		 */
-		function set main(value:Object):void;
+		function loaderBind(bezel:Bezel, mainGame:Object, gameObjects:Object):void;
 		/**
 		 * Gets coremods in {name, version, load function} format.
 		 * The load function should have the same signature as Bezel.BezelCoreMod.loadCoreMod

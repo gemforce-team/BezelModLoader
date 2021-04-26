@@ -1,6 +1,7 @@
 package Bezel.GCCS 
 {
 	import Bezel.Bezel;
+	import Bezel.bezel_internal;
 	import Bezel.Events.EventTypes;
 	import Bezel.Events.IngameClickOnSceneEvent;
 	import Bezel.Events.IngameGemInfoPanelFormedEvent;
@@ -26,6 +27,9 @@ package Bezel.GCCS
 	import flash.text.TextFormat;
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getTimer;
+	
+	use namespace bezel_internal;
+	
 	/*
 	 * ...
 	 * @author piepie62
@@ -33,7 +37,6 @@ package Bezel.GCCS
 	public class GCCSBezel implements MainLoader
 	{
 		// Shortcuts to gameObjects
-		private var _main:Object;
 		private var GV:Object;/*GV*/
 		private var SB:Object;/*SB*/
 		private var prefs:Object;/*Prefs*/
@@ -93,7 +96,7 @@ package Bezel.GCCS
 		public function bind(b:Bezel, o:Object):void {}
 		public function unload():void {}
 		
-		public function loaderBind(bezel:Bezel, gameObjects:Object): void
+		public function loaderBind(bezel:Bezel, mainGame:Object, gameObjects:Object): void
 		{
 			this.logger = bezel.getLogger("GCCS Bezel");
 			this.bezel = bezel;
@@ -101,7 +104,7 @@ package Bezel.GCCS
 			this.GV = getDefinitionByName("com.giab.games.gccs.steam.GV") as Class;
 			this.SB = getDefinitionByName("com.giab.games.gccs.steam.SB") as Class;
 			this.prefs = getDefinitionByName("com.giab.games.gccs.steam.Prefs") as Class;
-			gameObjects.main = this._main;
+			gameObjects.main = mainGame;
 			gameObjects.core = this.GV.ingameCore;
 			gameObjects.GV = this.GV;
 			gameObjects.SB = this.SB;
@@ -144,14 +147,9 @@ package Bezel.GCCS
 
 			//checkForUpdates();
 
-			_main.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
+			mainGame.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
 
 			this.logger.log("GCCS Bezel", "GCCS Bezel bound to game's objects!");
-		}
-		
-		public function set main(value:Object):void 
-		{
-			_main = value;
 		}
 		
 		public function get coremodInfo():Object 
@@ -159,7 +157,7 @@ package Bezel.GCCS
 			return {"name": "GCCS_BEZEL_MOD_LOADER", "version": GCCSCoreMod.VERSION, "load": GCCSCoreMod.installHooks};
 		}
 		
-		public function setVersion(mcmainmenu:Object): void
+		bezel_internal function setVersion(mcmainmenu:Object): void
 		{
 			var versionText:TextField = new TextField();
 			versionText.selectable = false;
@@ -167,20 +165,20 @@ package Bezel.GCCS
 			versionText.setTextFormat(new TextFormat("Celtic Garamond for GemCraft", 10, 0xFFFFFF, null, null, null, null, null, "center"));
 			mcmainmenu.mcBottomTexts.addChild(versionText);
 			versionText.width = versionText.parent.width;
-			//var version:String = _main.scrMainMenu.mc.mcBottomTexts.getChildAt(0).text;
+			//var version:String = GV.main.scrMainMenu.mc.mcBottomTexts.getChildAt(0).text;
 			//version = version.slice(0, version.search(' ') + 1) + Bezel.Bezel.prettyVersion();
-			//_main.scrMainMenu.mc.mcBottomTexts.getChildAt(0).text = version;
+			//GV.main.scrMainMenu.mc.mcBottomTexts.getChildAt(0).text = version;
 		}
 
 		// Called after the gem's info panel has been formed but before it's returned to the game for rendering
-		public function ingameGemInfoPanelFormed(infoPanel:Object, gem:Object, numberFormatter:Object): void
+		bezel_internal function ingameGemInfoPanelFormed(infoPanel:Object, gem:Object, numberFormatter:Object): void
 		{
 			bezel.dispatchEvent(new IngameGemInfoPanelFormedEvent(EventTypes.INGAME_GEM_INFO_PANEL_FORMED, new IngameGemInfoPanelFormedEventArgs(infoPanel, gem, numberFormatter)));
 		}
 
 		// Called before any of the game's logic runs when starting to form an infopanel
 		// This method is called before infoPanelFormed (which should be renamed to ingameGemInfoPanelFormed)
-		public function ingamePreRenderInfoPanel(): Boolean
+		bezel_internal function ingamePreRenderInfoPanel(): Boolean
 		{
 			var eventArgs:IngamePreRenderInfoPanelEventArgs = new IngamePreRenderInfoPanelEventArgs(true);
 			bezel.dispatchEvent(new IngamePreRenderInfoPanelEvent(EventTypes.INGAME_PRE_RENDER_INFO_PANEL, eventArgs));
@@ -190,7 +188,7 @@ package Bezel.GCCS
 
 		// Called immediately as a click event is fired by the base game
 		// set continueDefault to false to prevent the base game's handler from running
-		public function ingameClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
+		bezel_internal function ingameClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
 		{
 			var eventArgs:IngameClickOnSceneEventArgs = new IngameClickOnSceneEventArgs(true, event, mouseX, mouseY, buildingX, buildingY);
 			bezel.dispatchEvent(new IngameClickOnSceneEvent(EventTypes.INGAME_CLICK_ON_SCENE, eventArgs));
@@ -199,7 +197,7 @@ package Bezel.GCCS
 
 		// Called immediately as a right click event is fired by the base game
 		// set continueDefault to false to prevent the base game's handler from running
-		public function ingameRightClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
+		bezel_internal function ingameRightClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
 		{
 			var eventArgs:IngameClickOnSceneEventArgs = new IngameClickOnSceneEventArgs(true, event, mouseX, mouseY, buildingX, buildingY);
 			bezel.dispatchEvent(new IngameRightClickOnSceneEvent(EventTypes.INGAME_RIGHT_CLICK_ON_SCENE, eventArgs));
@@ -208,7 +206,7 @@ package Bezel.GCCS
 
 		// Called after the game checks that a key should be handled, but before any of the actual handling logic
 		// Set continueDefault to false to prevent the base game's handler from running
-		public function ingameKeyDown(e:KeyboardEvent): Boolean
+		bezel_internal function ingameKeyDown(e:KeyboardEvent): Boolean
 		{
 			var eventArgs:IngameKeyDownEventArgs = new IngameKeyDownEventArgs(e, true);
 			bezel.dispatchEvent(new IngameKeyDownEvent(EventTypes.INGAME_KEY_DOWN, eventArgs));
@@ -216,35 +214,35 @@ package Bezel.GCCS
 			return eventArgs.continueDefault;
 		}
 
-		public function stageKeyDown(e: KeyboardEvent): void
+		bezel_internal function stageKeyDown(e: KeyboardEvent): void
 		{
 			if (e.controlKey && e.altKey && e.shiftKey && e.keyCode == 36)
 			{
 				if (bezel.modsReloadedTimestamp + 10*1000 > getTimer())
 				{
-					GV.vfxEngine.createFloatingText(_main.mouseX,_main.mouseY < 60?Number(_main.mouseY + 30):Number(_main.mouseY - 20),"Please wait 10 secods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
+					GV.vfxEngine.createFloatingText(GV.main.mouseX,GV.main.mouseY < 60?Number(GV.main.mouseY + 30):Number(GV.main.mouseY - 20),"Please wait 10 secods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
 					return;
 				}
 				SB.playSound("sndalert");
-				GV.vfxEngine.createFloatingText(_main.mouseX,_main.mouseY < 60?Number(_main.mouseY + 30):Number(_main.mouseY - 20),"Reloading mods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
+				GV.vfxEngine.createFloatingText(GV.main.mouseX,GV.main.mouseY < 60?Number(GV.main.mouseY + 30):Number(GV.main.mouseY - 20),"Reloading mods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
 				bezel.reloadAllMods();
 			}
 		}
 
 		// Called after the game is done loading its data
-		public function loadSave(): void
+		bezel_internal function loadSave(): void
 		{
 			bezel.dispatchEvent(new LoadSaveEvent(GV.ppd, EventTypes.LOAD_SAVE));
 		}
 
 		// Called after the game is done saving its data
-		public function saveSave(): void
+		bezel_internal function saveSave(): void
 		{
 			bezel.dispatchEvent(new SaveSaveEvent(GV.ppd, EventTypes.SAVE_SAVE));
 		}
 
 		// Called when a level is loaded or reloaded
-		public function ingameNewScene(): void
+		bezel_internal function ingameNewScene(): void
 		{
 			bezel.dispatchEvent(new IngameNewSceneEvent(EventTypes.INGAME_NEW_SCENE));
 		}

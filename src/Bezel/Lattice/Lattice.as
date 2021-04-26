@@ -1,11 +1,12 @@
 package Bezel.Lattice
 {
 	/**
-	 * "Coremod" handling system: accepts and applies changes to GCFW assembly
+	 * Coremod handling system: accepts and applies changes to game assembly
 	 * @author piepie62
 	 */
 
     import Bezel.Bezel;
+	import Bezel.bezel_internal;
     import Bezel.Logger;
 
     import flash.desktop.NativeProcess;
@@ -18,6 +19,8 @@ package Bezel.Lattice
     import flash.filesystem.FileStream;
     import flash.utils.ByteArray;
     import flash.utils.Dictionary;
+	
+	use namespace bezel_internal;
 
     public class Lattice extends EventDispatcher
     {
@@ -121,7 +124,8 @@ package Bezel.Lattice
 
 		// Disassembles the game into a clean asm. Prepares Lattice patches.
         // Returns whether coremods should be reloaded, regardless of if they've changed or not
-        public function init(): Boolean
+		// Should not be called by anything other than Bezel.Bezel
+        bezel_internal function init(): Boolean
         {
             var ret:Boolean = false;
 
@@ -168,7 +172,8 @@ package Bezel.Lattice
             return ret;
         }
 
-        public function apply(): void
+		// Should not be called by anything other than Bezel.Bezel
+        bezel_internal function apply(): void
         {
             var comp:Function = function (patch1:LatticePatch, patch2:LatticePatch) : int {
                 if (patch1.filename < patch2.filename)

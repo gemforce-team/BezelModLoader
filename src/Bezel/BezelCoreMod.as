@@ -3,7 +3,7 @@ package Bezel
 	import Bezel.Lattice.Lattice;
 	
 	/**
-	 * ...
+	 * Defines the interface of a coremod. Coremods can perform assembly edits to the game using Lattice
 	 * @author Chris
 	 */
 	public interface BezelCoreMod extends BezelMod
