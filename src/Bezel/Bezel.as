@@ -332,23 +332,23 @@ package Bezel
 					{
 						mods[name] = mod;
 						this.addChild(DisplayObject(mod));
+						
+						if (mod is MainLoader)
+						{
+							if (this.mainLoader != null)
+							{
+								logger.log("Bezel", "Multiple main loaders present! This is a fatal error. The two detected are " + this.mainLoader.MOD_NAME + " and " + mod.MOD_NAME);
+								NativeApplication.nativeApplication.exit( -1);
+							}
+							else
+							{
+								this._mainLoader = mod as MainLoader;
+								this.coremods[this.coremods.length] = this.mainLoader.coremodInfo;
+							}
+						}
 
 						if (this.initialLoad)
 						{
-							if (mod is MainLoader)
-							{
-								if (this.mainLoader != null)
-								{
-									logger.log("Bezel", "Multiple main loaders present! This is a fatal error. The two detected are " + this.mainLoader.MOD_NAME + " and " + mod.MOD_NAME);
-									NativeApplication.nativeApplication.exit( -1);
-								}
-								else
-								{
-									this._mainLoader = mod as MainLoader;
-									this.coremods[this.coremods.length] = this.mainLoader.coremodInfo;
-								}
-							}
-
 							if (mod is BezelCoreMod)
 							{
 								var coremod:BezelCoreMod = mod as BezelCoreMod;
