@@ -21,6 +21,7 @@ package Bezel
 		function get coremodInfo():Object;
 		/**
 		 * Gets the value of a hotkey registered with registerHotkey.
+		 * NOTE: main handler coremod should add a `bezel` field and an `initFromBezel` method that contains all the initialization the constructor normally would
 		 * @param	name Name of the hotkey to retrieve
 		 * @return Value currently registered with the MainLoader
 		 */

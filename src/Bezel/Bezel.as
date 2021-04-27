@@ -202,8 +202,6 @@ package Bezel
 			else
 			{
 				logger.log("Bezel", "Game not recognized! All coremods and mods will have to handle themselves.");
-				// Note: a main handling coremod should add a `bezel` field and an `initFromBezel` method that contains all the initialization the constructor would do
-				// Coremods should be handled through MainLoader's coremodInfo instead of the normal coremod interface
 			}
 
 			loadMods();
