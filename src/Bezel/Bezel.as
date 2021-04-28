@@ -330,7 +330,7 @@ package Bezel
 					}
 					else
 					{
-						mods[name] = mod;
+						mods[name] = modFile;
 						this.addChild(DisplayObject(mod));
 						
 						if (mod is MainLoader)
