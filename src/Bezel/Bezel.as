@@ -240,10 +240,10 @@ package Bezel
 
 		private function bindMods() : void
 		{
-			for each (var mod:BezelMod in mods)
+			for each (var mod:SWFFile in mods)
 			{
-				mod.bind(this, this.gameObjects);
-				this.logger.log("bindMods", "Bound mod: " + mod.MOD_NAME);
+				mod.instance.bind(this, this.gameObjects);
+				this.logger.log("bindMods", "Bound mod: " + mod.instance.MOD_NAME);
 			}
 		}
 
