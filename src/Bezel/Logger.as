@@ -5,7 +5,9 @@ package Bezel
 	 * @author Hellrage
 	 */
 	
+	import flash.desktop.NativeApplication;
 	import flash.errors.IllegalOperationError;
+	import flash.events.Event;
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
@@ -23,7 +25,8 @@ package Bezel
 			if (_logStream == null)
 			{
 				_logStream = new FileStream();
-				_logStream.open(logFile, FileMode.APPEND);
+				_logStream.open(logFile, FileMode.WRITE);
+				NativeApplication.nativeApplication.addEventListener(Event.EXITING, onExit);
 			}
 			return _logStream;
 		}
@@ -39,11 +42,12 @@ package Bezel
 		
 		private var id:String;
 		
-		internal static function exit(): void
+		private static function onExit(e:Event): void
 		{
 			if (_logStream != null)
 			{
-				logStream.close();
+				_logStream.close();
+				_logStream = null;
 			}
 		}
 

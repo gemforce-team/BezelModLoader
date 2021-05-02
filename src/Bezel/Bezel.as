@@ -117,8 +117,6 @@ package Bezel
 			this.addEventListener(BezelEvent.BEZEL_DONE_MOD_RELOAD, this.doneModReload);
 			this.addEventListener(BezelEvent.BEZEL_DONE_MOD_LOAD, this.doneModLoad);
 
-			NativeApplication.nativeApplication.addEventListener(Event.EXITING, this.onExit);
-
 			this.logger = Logger.getLogger("Bezel");
 			this.mods = new Object();
 
@@ -175,11 +173,6 @@ package Bezel
 					coremodStream.close();
 				}
 			}
-		}
-
-		private function onExit(e:Event): void
-		{
-			Logger.exit();
 		}
 
 		// After we have the dissassembled game, add BezelCoreMod and load mods
