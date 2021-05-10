@@ -11,6 +11,7 @@ package Bezel
 	import Bezel.Lattice.Lattice;
 	import Bezel.Lattice.LatticeEvent;
 	import Bezel.Logger;
+	import Bezel.Utils.KeybindManager;
 
 	import flash.desktop.NativeApplication;
 	import flash.display.*;
@@ -36,7 +37,15 @@ package Bezel
 		private var gameObjects:Object;
 		private var lattice:Lattice;
 		private var _mainLoader:MainLoader;
+		/**
+		 * The MainLoader for the game
+		 */
 		public function get mainLoader():MainLoader { return _mainLoader; }
+		private var _keybindManager:KeybindManager;
+		/**
+		 * The KeybindManager used for the game
+		 */
+		public function get keybindManager():KeybindManager { return _keybindManager; }
 
 		private var updateAvailable:Boolean;
 
@@ -104,6 +113,8 @@ package Bezel
 		{
 			super();
 			prepareFolders();
+			
+			this._keybindManager = new KeybindManager();
 			
 			loadingTextField = new TextField();
 			loadingTextField.selectable = false;
@@ -233,6 +244,11 @@ package Bezel
 
 		private function bindMods() : void
 		{
+			// Special case necessary
+			if (mainLoader is GCCSBezel || mainLoader is GCFWBezel)
+			{
+				mainLoader.bind(this, this.gameObjects);
+			}
 			for each (var mod:SWFFile in mods)
 			{
 				mod.instance.bind(this, this.gameObjects);

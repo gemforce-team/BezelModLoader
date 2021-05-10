@@ -1,6 +1,7 @@
 package Bezel.GCCS 
 {
 	import Bezel.Bezel;
+	import Bezel.Utils.Keybind;
 	import Bezel.bezel_internal;
 	import Bezel.Events.EventTypes;
 	import Bezel.Events.IngameClickOnSceneEvent;
@@ -20,9 +21,6 @@ package Bezel.GCCS
 
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
-	import flash.filesystem.File;
-	import flash.filesystem.FileMode;
-	import flash.filesystem.FileStream;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
 	import flash.utils.getDefinitionByName;
@@ -43,48 +41,8 @@ package Bezel.GCCS
 		
 		private var bezel:Bezel;
 		private var logger:Logger;
-		
-		private static const hotkeysFile:File = Bezel.Bezel.bezelFolder.resolvePath("hotkeys.json");
-		
-		private var _defaultHotkeys:Object;
-		private var _configuredHotkeys:Object;
-		
-		private function get defaultHotkeys():Object
-		{
-			if (_defaultHotkeys == null)
-			{
-				_defaultHotkeys = createDefaultKeyConfiguration();
-			}
-			return _defaultHotkeys;
-		}
-		
-		private function get configuredHotkeys():Object
-		{
-			if (_configuredHotkeys == null)
-			{
-				var hotkeysStream:FileStream = new FileStream();
-				if (hotkeysFile.exists)
-				{
-					try
-					{
-						hotkeysStream.open(hotkeysFile, FileMode.READ);
-						_configuredHotkeys = JSON.parse(hotkeysStream.readUTFBytes(hotkeysStream.bytesAvailable));
-						hotkeysStream.close();
-					}
-					catch (e:Error)
-					{
-						logger.log("configuredHotkeys", "Error reading hotkeys from disk, using default");
-						_configuredHotkeys = createDefaultKeyConfiguration();
-					}
-				}
-				else
-				{
-					_configuredHotkeys = createDefaultKeyConfiguration();
-					this.saveHotkeys();
-				}
-			}
-			return _configuredHotkeys;
-		}
+
+		private static const defaultHotkeys:Object = createDefaultKeyConfiguration();
 		
 		public function GCCSBezel() 
 		{
@@ -93,7 +51,16 @@ package Bezel.GCCS
 		public function get MOD_NAME():String { return "GCCS Bezel"; }
 		public function get VERSION():String { return Bezel.Bezel.VERSION; }
 		public function get BEZEL_VERSION():String { return Bezel.Bezel.VERSION; }
-		public function bind(b:Bezel, o:Object):void {}
+		
+		public function bind(b:Bezel, o:Object):void
+		{
+			for (var hotkey:String in defaultHotkeys)
+			{
+				b.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
+			}
+			
+			b.keybindManager.registerHotkey("GCFW Bezel: Reload all mods", new Keybind(36, true, true, true));
+		}
 		public function unload():void {}
 		
 		public function loaderBind(bezel:Bezel, mainGame:Object, gameObjects:Object): void
@@ -216,7 +183,7 @@ package Bezel.GCCS
 
 		bezel_internal function stageKeyDown(e: KeyboardEvent): void
 		{
-			if (e.controlKey && e.altKey && e.shiftKey && e.keyCode == 36)
+			if (this.bezel.keybindManager.getHotkeyValue("GCCS Bezel: Reload all mods").matches(e))
 			{
 				if (bezel.modsReloadedTimestamp + 10*1000 > getTimer())
 				{
@@ -247,83 +214,54 @@ package Bezel.GCCS
 			bezel.dispatchEvent(new IngameNewSceneEvent(EventTypes.INGAME_NEW_SCENE));
 		}
 		
-		private function createDefaultKeyConfiguration():Object
+		private static function createDefaultKeyConfiguration():Object
 		{
 			var config:Object = new Object();
-			config["Throw gem bombs"] = 66;
-			config["Build tower"] = 84;
-			config["Build trap"] = 82;
-			config["Build wall"] = 87;
-			config["Combine gems"] = 71;
-			config["Switch time speed"] = 81;
-			config["Pause time"] = 32;
-			config["Start next wave"] = 78;
-			config["Destroy gem for mana"] = 88;
-			config["Drop gem to inventory"] = 9;
-			config["Duplicate gem"] = 68;
-			config["Upgrade gem"] = 85;
-			config["Show/hide info panels"] = 190;
-			config["Cast freeze strike spell"] = 49;
-			config["Cast curse strike spell"] = 50;
-			config["Cast wake of eternity strike spell"] = 51;
-			config["Cast bolt enhancement spell"] = 52;
-			config["Cast beam enhancement spell"] = 53;
-			config["Cast barrage enhancement spell"] = 54;
-			config["Create Mana Leeching gem"] = 103;
-			config["Create Critical Hit gem"] = 104;
-			config["Create Poolbound gem"] = 105;
-			config["Create Chain Hit gem"] = 100;
-			config["Create Poison gem"] = 101;
-			config["Create Suppression gem"] = 102;
-			config["Create Bloodbound gem"] = 97;
-			config["Create Slowing gem"] = 98;
-			config["Create Armor Tearing gem"] = 99;
-			config["Up arrow function"] = 38;
-			config["Down arrow function"] = 40;
-			config["Left arrow function"] = 37;
-			config["Right arrow function"] = 39;
+			config["Throw gem bombs"] = new Keybind(66);
+			config["Build tower"] = new Keybind(84);
+			config["Build trap"] = new Keybind(82);
+			config["Build wall"] = new Keybind(87);
+			config["Combine gems"] = new Keybind(71);
+			config["Switch time speed"] = new Keybind(81);
+			config["Pause time"] = new Keybind(32);
+			config["Start next wave"] = new Keybind(78);
+			config["Destroy gem for mana"] = new Keybind(88);
+			config["Drop gem to inventory"] = new Keybind(9);
+			config["Duplicate gem"] = new Keybind(68);
+			config["Upgrade gem"] = new Keybind(85);
+			config["Show/hide info panels"] = new Keybind(190);
+			config["Cast freeze strike spell"] = new Keybind(49);
+			config["Cast curse strike spell"] = new Keybind(50);
+			config["Cast wake of eternity strike spell"] = new Keybind(51);
+			config["Cast bolt enhancement spell"] = new Keybind(52);
+			config["Cast beam enhancement spell"] = new Keybind(53);
+			config["Cast barrage enhancement spell"] = new Keybind(54);
+			config["Create Mana Leeching gem"] = new Keybind(103);
+			config["Create Critical Hit gem"] = new Keybind(104);
+			config["Create Poolbound gem"] = new Keybind(105);
+			config["Create Chain Hit gem"] = new Keybind(100);
+			config["Create Poison gem"] = new Keybind(101);
+			config["Create Suppression gem"] = new Keybind(102);
+			config["Create Bloodbound gem"] = new Keybind(97);
+			config["Create Slowing gem"] = new Keybind(98);
+			config["Create Armor Tearing gem"] = new Keybind(99);
+			config["Up arrow function"] = new Keybind(38);
+			config["Down arrow function"] = new Keybind(40);
+			config["Left arrow function"] = new Keybind(37);
+			config["Right arrow function"] = new Keybind(39);
 
 			return config;
 		}
 		
 		private function doHotkeyTransformation(e:KeyboardEvent):void
 		{
-			for(var name:String in this.defaultHotkeys)
+			for(var name:String in defaultHotkeys)
 			{
-				if(this.configuredHotkeys[name] == e.keyCode)
+				if(this.bezel.keybindManager.getHotkeyValue(name).matches(e))
 				{
-					e.keyCode = this.defaultHotkeys[name];
+					e.keyCode = defaultHotkeys[name];
 					break;
 				}
-			}
-		}
-		
-		public function registerHotkey(name:String, defaultVal:int):void
-		{
-			if (!(name in this.configuredHotkeys))
-			{
-				this.configuredHotkeys[name] = defaultVal;
-				this.saveHotkeys();
-			}
-		}
-		
-		public function getHotkeyValue(name:String):int
-		{
-			return this.configuredHotkeys[name] || 0;
-		}
-		
-		private function saveHotkeys():void
-		{
-			var stream:FileStream = new FileStream();
-			try
-			{
-				stream.open(hotkeysFile, FileMode.WRITE);
-				stream.writeUTFBytes(JSON.stringify(this.configuredHotkeys, null, 2));
-				stream.close();
-			}
-			catch (e:Error)
-			{
-				logger.log("saveHotkeys", "Could not save hotkey information");
 			}
 		}
 		
