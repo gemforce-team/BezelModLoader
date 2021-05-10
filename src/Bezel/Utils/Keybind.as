@@ -1,5 +1,6 @@
 package Bezel.Utils 
 {
+	import Bezel.Events.IngameKeyDownEvent;
 	import flash.events.KeyboardEvent;
 	/**
 	 * Represents a keybind for an action
@@ -27,20 +28,26 @@ package Bezel.Utils
 		
 		/**
 		 * Checks that this Keybind represents the same combination as the given argument
-		 * @param	other Either a KeyboardEvent or a Keybind to check against
+		 * @param	other KeyboardEvent, Keybind, or IngameKeyDownEvent to check against
 		 * @return True if other is a KeyboardEvent or a Keybind and the control, alt, shift, and keycode match. False otherwise
 		 */
 		public function matches(other:*):Boolean
 		{
+			var e:KeyboardEvent;
 			if (other is KeyboardEvent)
 			{
-				var e:KeyboardEvent = other as KeyboardEvent;
+				e = other as KeyboardEvent;
 				return (e.altKey == this.alt) && (e.ctrlKey == this.ctrl) && (e.shiftKey == this.shift) && (e.keyCode == this.key);
 			}
 			else if (other is Keybind)
 			{
 				var o:Keybind = other as Keybind;
 				return (o.alt == this.alt) && (o.ctrl == this.ctrl) && (o.shift == this.shift) && (o.key == this.key);
+			}
+			else if (other is IngameKeyDownEvent)
+			{
+				e = (other as IngameKeyDownEvent).eventArgs.event;
+				return (e.altKey == this.alt) && (e.ctrlKey == this.ctrl) && (e.shiftKey == this.shift) && (e.keyCode == this.key);
 			}
 			
 			return false;
