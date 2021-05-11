@@ -59,7 +59,7 @@ package Bezel.GCCS
 				b.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
 			}
 			
-			b.keybindManager.registerHotkey("GCFW Bezel: Reload all mods", new Keybind(36, true, true, true));
+			b.keybindManager.registerHotkey("GCCS Bezel: Reload all mods", new Keybind(36, true, true, true));
 		}
 		public function unload():void {}
 		
