@@ -59,7 +59,7 @@ package Bezel.GCCS
 				b.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
 			}
 			
-			b.keybindManager.registerHotkey("GCCS Bezel: Reload all mods", new Keybind(36, true, true, true));
+			b.keybindManager.registerHotkey("GCCS Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
 		}
 		public function unload():void {}
 		
@@ -217,38 +217,38 @@ package Bezel.GCCS
 		private static function createDefaultKeyConfiguration():Object
 		{
 			var config:Object = new Object();
-			config["Throw gem bombs"] = new Keybind(66);
-			config["Build tower"] = new Keybind(84);
-			config["Build trap"] = new Keybind(82);
-			config["Build wall"] = new Keybind(87);
-			config["Combine gems"] = new Keybind(71);
-			config["Switch time speed"] = new Keybind(81);
-			config["Pause time"] = new Keybind(32);
-			config["Start next wave"] = new Keybind(78);
-			config["Destroy gem for mana"] = new Keybind(88);
-			config["Drop gem to inventory"] = new Keybind(9);
-			config["Duplicate gem"] = new Keybind(68);
-			config["Upgrade gem"] = new Keybind(85);
-			config["Show/hide info panels"] = new Keybind(190);
-			config["Cast freeze strike spell"] = new Keybind(49);
-			config["Cast curse strike spell"] = new Keybind(50);
-			config["Cast wake of eternity strike spell"] = new Keybind(51);
-			config["Cast bolt enhancement spell"] = new Keybind(52);
-			config["Cast beam enhancement spell"] = new Keybind(53);
-			config["Cast barrage enhancement spell"] = new Keybind(54);
-			config["Create Mana Leeching gem"] = new Keybind(103);
-			config["Create Critical Hit gem"] = new Keybind(104);
-			config["Create Poolbound gem"] = new Keybind(105);
-			config["Create Chain Hit gem"] = new Keybind(100);
-			config["Create Poison gem"] = new Keybind(101);
-			config["Create Suppression gem"] = new Keybind(102);
-			config["Create Bloodbound gem"] = new Keybind(97);
-			config["Create Slowing gem"] = new Keybind(98);
-			config["Create Armor Tearing gem"] = new Keybind(99);
-			config["Up arrow function"] = new Keybind(38);
-			config["Down arrow function"] = new Keybind(40);
-			config["Left arrow function"] = new Keybind(37);
-			config["Right arrow function"] = new Keybind(39);
+			config["Throw gem bombs"] = new Keybind("b");
+			config["Build tower"] = new Keybind("t");
+			config["Build trap"] = new Keybind("r");
+			config["Build wall"] = new Keybind("w");
+			config["Combine gems"] = new Keybind("g");
+			config["Switch time speed"] = new Keybind("q");
+			config["Pause time"] = new Keybind("space");
+			config["Start next wave"] = new Keybind("n");
+			config["Destroy gem for mana"] = new Keybind("x");
+			config["Drop gem to inventory"] = new Keybind("tab");
+			config["Duplicate gem"] = new Keybind("d");
+			config["Upgrade gem"] = new Keybind("u");
+			config["Show/hide info panels"] = new Keybind("period");
+			config["Cast freeze strike spell"] = new Keybind("number_1");
+			config["Cast curse strike spell"] = new Keybind("number_2");
+			config["Cast wake of eternity strike spell"] = new Keybind("number_3");
+			config["Cast bolt enhancement spell"] = new Keybind("number_4");
+			config["Cast beam enhancement spell"] = new Keybind("number_5");
+			config["Cast barrage enhancement spell"] = new Keybind("number_6");
+			config["Create Mana Leeching gem"] = new Keybind("numpad_7");
+			config["Create Critical Hit gem"] = new Keybind("numpad_8");
+			config["Create Poolbound gem"] = new Keybind("numpad_9");
+			config["Create Chain Hit gem"] = new Keybind("numpad_4");
+			config["Create Poison gem"] = new Keybind("numpad_5");
+			config["Create Suppression gem"] = new Keybind("numpad_6");
+			config["Create Bloodbound gem"] = new Keybind("numpad_1");
+			config["Create Slowing gem"] = new Keybind("numpad_2");
+			config["Create Armor Tearing gem"] = new Keybind("numpad_3");
+			config["Up arrow function"] = new Keybind("up");
+			config["Down arrow function"] = new Keybind("down");
+			config["Left arrow function"] = new Keybind("left");
+			config["Right arrow function"] = new Keybind("right");
 
 			return config;
 		}

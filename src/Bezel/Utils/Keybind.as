@@ -2,6 +2,7 @@ package Bezel.Utils
 {
 	import Bezel.Events.IngameKeyDownEvent;
 	import flash.events.KeyboardEvent;
+	import flash.ui.Keyboard;
 	/**
 	 * Represents a keybind for an action
 	 * @author Chris
@@ -12,18 +13,74 @@ package Bezel.Utils
 		private var _ctrl:Boolean;
 		private var _alt:Boolean;
 		private var _shift:Boolean;
+		internal var _stringRep:String;
 		
 		public function get key():int { return _key; }
 		public function get ctrl():Boolean { return _ctrl; }
 		public function get alt():Boolean { return _alt; }
 		public function get shift():Boolean { return _shift; }
 		
-		public function Keybind(key:int, ctrl:Boolean = false, alt:Boolean = false, shift:Boolean = false) 
+		/**
+		 * Constructs a Keybind that represents the given sequence
+		 * @param	sequence A string in the form "[modifiers]+key". Examples: "ctrl+f", "f", "shift+alt+ctrl+f". Exactly one non-modifier key must be specified.
+		 * Note that this non-modifier key must be specified as the case-insensitive name of a property of flash.ui.Keyboard, such as "NUMpad_0"
+		 * @return Keybind that represents the given sequence
+		 * @throws ArgumentError if the given sequence is invalid
+		 */
+		public function Keybind(sequence:String)
 		{
-			_key = key;
-			_ctrl = ctrl;
-			_alt = alt;
-			_shift = shift;
+			if (sequence == null)
+			{
+				throw new ArgumentError("Keybind sequence must not be null");
+			}
+
+			var components:Array = sequence.split('+');
+
+			for (var i:int = 0; i < components.length; i++)
+			{
+				components[i] = components[i].toUpperCase();
+			}
+
+			for each (var component:String in components)
+			{
+				if (component == "CTRL")
+				{
+					_ctrl = true;
+				}
+				else if (component == "ALT")
+				{
+					_alt = true;
+				}
+				else if (component == "SHIFT")
+				{
+					_shift = true;
+				}
+				else
+				{
+					if (_key != 0)
+					{
+						throw new ArgumentError("More than one key provided");
+					}
+					else
+					{
+						if (component in Keyboard && Keyboard[component] is uint)
+						{
+							_key = Keyboard[component];
+						}
+						else
+						{
+							throw new ArgumentError("Key \'" + component + "\' was not found");
+						}
+					}
+				}
+			}
+
+			if (_key == 0)
+			{
+				throw new ArgumentError("No key provided");
+			}
+			
+			_stringRep = sequence;
 		}
 		
 		/**
@@ -55,7 +112,7 @@ package Bezel.Utils
 		
 		public function toJSON(k):*
 		{
-			return {"key":this.key, "ctrl":this.ctrl, "alt":this.alt, "shift":this.shift};
+			return this._stringRep;
 		}
 	}
 

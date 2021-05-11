@@ -95,37 +95,22 @@ package Bezel.Utils
 		
 		private static function reviver(k:*, v:*):*
 		{
-			if (k != "" && v is Object)
+			if (k != "")
 			{
-				var keyValue:int;
-				if (!(v["key"] is String || v["key"] is Number) ||
-					!(v["ctrl"] is Boolean) ||
-					!(v["alt"] is Boolean) ||
-					!(v["shift"] is Boolean))
+				if (v is String)
 				{
-					Logger.getLogger("KeybindManager").log("reviver", "Could not parse key '" + k + "'. Discarding it!");
-					return undefined;
-				}
-				if (v["key"] is String)
-				{
-					if (v["key"] in Keyboard && Keyboard[v["key"]] is uint)
+					try
 					{
-						keyValue = Keyboard[v["key"]];
+						return new Keybind(v);
 					}
-					else
+					catch (e:ArgumentError)
 					{
-						Logger.getLogger("KeybindManager").log("reviver", "Could not find key value for string '" + v["key"] + "'");
-						keyValue = 0;
+						Logger.getLogger("KeybindManager").log("reviver", e.message);
+						return undefined;
 					}
 				}
-				else
-				{
-					keyValue = v["key"];
-				}
-				return new Keybind(v["key"], v["ctrl"], v["alt"], v["shift"]);
 			}
-			
-			if (k == "")
+			else // root object
 			{
 				for (var item:String in v)
 				{
@@ -136,6 +121,7 @@ package Bezel.Utils
 					}
 				}
 			}
+			
 			return v;
 		}
 	}
