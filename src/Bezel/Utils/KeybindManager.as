@@ -27,12 +27,15 @@ package Bezel.Utils
 					{
 						hotkeysStream.open(hotkeysFile, FileMode.READ);
 						_configuredHotkeys = JSON.parse(hotkeysStream.readUTFBytes(hotkeysStream.bytesAvailable), reviver);
-						hotkeysStream.close();
 					}
 					catch (e:Error)
 					{
 						Logger.getLogger("KeybindManager").log("configuredHotkeys", "Error reading hotkeys from disk, using default (empty)");
 						_configuredHotkeys = new Object();
+					}
+					finally
+					{
+						hotkeysStream.close();
 					}
 				}
 				else
@@ -79,11 +82,14 @@ package Bezel.Utils
 			{
 				stream.open(hotkeysFile, FileMode.WRITE);
 				stream.writeUTFBytes(JSON.stringify(this.configuredHotkeys, null, 2));
-				stream.close();
 			}
 			catch (e:Error)
 			{
-				Logger.getLogger("KeybindManager").log("saveHotkeys", "Could not save hotkey information");
+				Logger.getLogger("KeybindManager").log("saveHotkeys", "Could not save hotkey information " + e.message);
+			}
+			finally
+			{
+				stream.close();
 			}
 		}
 		

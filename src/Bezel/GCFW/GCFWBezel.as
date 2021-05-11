@@ -248,7 +248,10 @@ package Bezel.GCFW
 			{
 				if(this.bezel.keybindManager.getHotkeyValue(name).matches(e))
 				{
-					e.keyCode = defaultHotkeys[name];
+					e.keyCode = defaultHotkeys[name].key;
+					e.altKey = defaultHotkeys[name].alt;
+					e.ctrlKey = defaultHotkeys[name].ctrl;
+					e.shiftKey = defaultHotkeys[name].shift;
 					break;
 				}
 			}
