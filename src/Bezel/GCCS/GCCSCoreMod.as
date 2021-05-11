@@ -8,7 +8,7 @@ package Bezel.GCCS
      */
     internal class GCCSCoreMod
     {
-        public static const VERSION:String = "1";
+        public static const VERSION:String = "2";
 
         private static const files:Array = [
             "com/giab/games/gccs/steam/Main.class.asasm",
@@ -269,7 +269,7 @@ package Bezel.GCCS
                     getproperty         QName(PackageNamespace(""), "main") \n \
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
-                    callproperty        QName(PackageNamespace(""), "ingamePreRenderInfoPanel"), 0 \n \
+                    callproperty        QName(PackageInternalNs("Bezel:bezel_internal"), "ingamePreRenderInfoPanel"), 0 \n \
                     pushtrue \n \
                     ifeq                L160 \n \
                         returnvoid \n \
