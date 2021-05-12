@@ -166,8 +166,9 @@ package Bezel.GCFW
 		bezel_internal function ingameKeyDown(e:KeyboardEvent): Boolean
 		{
 			var eventArgs:IngameKeyDownEventArgs = new IngameKeyDownEventArgs(e, true);
-			bezel.dispatchEvent(new IngameKeyDownEvent(EventTypes.INGAME_KEY_DOWN, eventArgs));
-			doHotkeyTransformation(e);
+			var keyDownEvent:IngameKeyDownEvent = new IngameKeyDownEvent(EventTypes.INGAME_KEY_DOWN, eventArgs);
+			bezel.dispatchEvent(keyDownEvent);
+			doHotkeyTransformation(keyDownEvent);
 			return eventArgs.continueDefault;
 		}
 
@@ -242,17 +243,23 @@ package Bezel.GCFW
 			return config;
 		}
 		
-		private function doHotkeyTransformation(e:KeyboardEvent):void
+		private function doHotkeyTransformation(e:IngameKeyDownEvent):void
 		{
+			var origDefault:Boolean = e.eventArgs.continueDefault;
 			for(var name:String in defaultHotkeys)
 			{
 				if(this.bezel.keybindManager.getHotkeyValue(name).matches(e))
 				{
-					e.keyCode = defaultHotkeys[name].key;
-					e.altKey = defaultHotkeys[name].alt;
-					e.ctrlKey = defaultHotkeys[name].ctrl;
-					e.shiftKey = defaultHotkeys[name].shift;
-					break;
+					e.eventArgs.event.keyCode = defaultHotkeys[name].key;
+					e.eventArgs.event.altKey = defaultHotkeys[name].alt;
+					e.eventArgs.event.ctrlKey = defaultHotkeys[name].ctrl;
+					e.eventArgs.event.shiftKey = defaultHotkeys[name].shift;
+					e.eventArgs.continueDefault = origDefault;
+					return;
+				}
+				else if (defaultHotkeys[name].matches(e))
+				{
+					e.eventArgs.continueDefault = false;
 				}
 			}
 		}
