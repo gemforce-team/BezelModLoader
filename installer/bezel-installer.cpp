@@ -62,12 +62,12 @@ int main()
         waitExit("Metadata file does not exist.", -3);
     }
 
-    FILE *inFile = _wfopen(metadataFile.generic_wstring().c_str(), L"rt");
+    FILE *inFile = _wfopen(metadataBkpFile.generic_wstring().c_str(), L"rt");
     if (!inFile)
     {
         waitExit("Metadata file could not be opened for reading.", -5);
     }
-    std::string metadata{static_cast<std::string::size_type>(std::filesystem::file_size(metadataFile)), '\0', std::allocator<char>()};
+    std::string metadata{static_cast<std::string::size_type>(std::filesystem::file_size(metadataBkpFile)), '\0', std::allocator<char>()};
     fread(metadata.data(), 1, metadata.size(), inFile);
     fclose(inFile);
 
