@@ -1,7 +1,7 @@
 package Bezel.Lattice
 {
 	/**
-	 * ...
+	 * Storage class for Lattice patches
 	 * @author piepie62
 	 */
 

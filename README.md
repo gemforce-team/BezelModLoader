@@ -91,6 +91,18 @@ Please submit an issue to [The issue tracker](https://github.com/gemforce-team/B
 
 You can find me on GemCraft's Discord server: https://discord.gg/ftyaJhx - Hellrage#5076
 
+# Building
+Building Bezel as a library requires [SwcBuild](https://github.com/wise0704/SwcBuild)
+
+Building the game you are modding as a library requires [SwcBuild](https://github.com/wise0704/SwcBuild) and for the game's scripts
+to be unpacked to GameScripts/scripts. One recommended tool for doing this is [JPEXS](https://github.com/jindrapetrik/jpexs-decompiler).
+
+## Game type-checking in mods
+To use a game as a library for type checking in your mod, first build it as described above, then add it as an **external** library to your FlashDevelop project.
+This ensures that the game's data is not copied into your mod when built.
+Note that because mods are loaded *before* the game, you cannot use any of the game's classes in your BezelMod's interface.
+This include any accessibility of properties and arguments to functions.
+They can be used for local variables within bind and other functions called after it.
 
 # Disclaimer
 This is not an official modification.

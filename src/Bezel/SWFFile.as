@@ -8,18 +8,23 @@ package Bezel
 	import flash.display.Loader;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
-	import flash.system.LoaderContext;
-	import flash.system.ApplicationDomain;
 	import flash.filesystem.File;
-	import flash.utils.ByteArray;
-	import flash.filesystem.FileStream;
 	import flash.filesystem.FileMode;
+	import flash.filesystem.FileStream;
+	import flash.system.ApplicationDomain;
+	import flash.system.LoaderContext;
+	import flash.utils.ByteArray;
 	 
 	internal class SWFFile 
 	{
 		private var loader:Loader;
 		private var file:File;
 		public var instance:Object;
+		
+		public function get filePath(): String
+		{
+			return file.nativePath;
+		}
 
 		private var successfulLoadCallback:Function;
 		private var failedLoadCallback:Function;

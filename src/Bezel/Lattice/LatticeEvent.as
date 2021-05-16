@@ -1,16 +1,18 @@
 package Bezel.Lattice
 {
 	/**
-	 * ...
+	 * Lattice lifetime events. Shouldn't be used by anything other than Bezel.Bezel
 	 * @author piepie62
 	 */
+	
+	import Bezel.bezel_internal;
 
     import flash.errors.IllegalOperationError;
 
     public class LatticeEvent
     {
-        public static const REBUILD_DONE:String = "rebuildDone";
-        public static const DISASSEMBLY_DONE:String = "disassemblyDone";
+        bezel_internal static const REBUILD_DONE:String = "rebuildDone";
+        bezel_internal static const DISASSEMBLY_DONE:String = "disassemblyDone";
 
         public function LatticeEvent()
         {

@@ -16,6 +16,11 @@ automation/output/
 *.apk
 installer/*.exe
 installer/*.o
+assets/rabcdasm/splitter/*.exe
+assets/rabcdasm/splitter/*.o
+
+GameScripts/scripts/*
+!GameScripts/scripts/.gitkeep
 
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
 # should NOT be excluded as they contain compiler settings and other important

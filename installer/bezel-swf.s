@@ -1,11 +1,11 @@
 .section rodata
-.global swfData
+.global _swfData
 .align 4
 
-swfData:
+_swfData:
 .incbin "../obj/BezelModLoader.swf"
 
-.global swfSize
+.global _swfSize
 .align 4
-swfSize:
-.int swfSize - swfData
+_swfSize:
+.int _swfSize - _swfData
