@@ -110,7 +110,7 @@ package Bezel.Utils
 			return false;
 		}
 		
-		public function toJSON(k):*
+		public function toJSON(k:*):*
 		{
 			return this._stringRep;
 		}
