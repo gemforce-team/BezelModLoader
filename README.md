@@ -85,6 +85,10 @@ At the moment there is only one key combination:
 Ctrl+Alt+Shift+Home - reload all mods. This is used for debugging \ development. Does not reapply coremods, but will load additional mods were added to the `Mods` folder after starting the game.
 ```
 
+Bezel manages hotkeys for itself, mods, and GCCS and GCFW. These hotkeys can be edited in Bezel's `hotkeys.json` (located in the game's Local Store folder)
+by using strings like "ctrl+shift+alt+home", "CtRl+numpad_6", "alt+ctrl+k", or "f". Accepted modifiers are ctrl, shift, and alt, and accepted non-modifiers are listed
+in [the AS3 Keyboard documentation](https://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/ui/Keyboard.html).
+
 
 # Bug reports and feedback
 Please submit an issue to [The issue tracker](https://github.com/gemforce-team/BezelModLoader/issues) if you encounter a bug and there isn't already an open issue about it.
