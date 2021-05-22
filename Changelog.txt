@@ -30,3 +30,7 @@
 03.04.2021 v0.3.2
 		Fixed freezing when no mods are present.
 		Added a message to bezel's swf to show that it's loading.
+22.05.2021 v1.0.0-prerelease
+		Update by piepie62
+		Makes Bezel game-agnostic, GCCS and GCFW are supported out of the box.
+		Mods will need to be updated before they work.
