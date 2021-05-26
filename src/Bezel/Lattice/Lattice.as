@@ -196,7 +196,18 @@ package Bezel.Lattice
                     }
                     else
                     {
-                        return 0;
+                        if (patch1.overwritten < patch2.overwritten)
+                        {
+                            return 1;
+                        }
+                        else if (patch2.overwritten < patch1.overwritten)
+                        {
+                            return -1;
+                        }
+                        else
+                        {
+                            return 0;
+                        }
                     }
                 }
             };
@@ -269,7 +280,9 @@ package Bezel.Lattice
             {
                 if (patch.filename in replaced && Dictionary(replaced[patch.filename])[patch.offset] != null && Dictionary(replaced[patch.filename])[patch.offset] != patch)
                 {
-                    throw new Error("Lattice: Modifications at line " + patch.offset + " conflict");
+                    if (patch.overwritten != 0 || (patch.offset != 0 && Dictionary(replaced[patch.filename])[patch.offset - 1] != null)) {
+                        throw new Error("Lattice: Modifications at line " + patch.offset + " conflict");
+                    }
                 }
             }
         }
