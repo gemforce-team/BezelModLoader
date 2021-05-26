@@ -270,9 +270,11 @@ package Bezel.Lattice
 
             for each (patch in patches)
             {
-                if (patch.overwritten != 0 && patch.filename in replaced && Dictionary(replaced[patch.filename])[patch.offset] != null && Dictionary(replaced[patch.filename])[patch.offset] != patch)
+                if (patch.filename in replaced && Dictionary(replaced[patch.filename])[patch.offset] != null && Dictionary(replaced[patch.filename])[patch.offset] != patch)
                 {
-                    throw new Error("Lattice: Modifications at line " + patch.offset + " conflict");
+                    if (patch.overwritten != 0 || (patch.offset != 0 && Dictionary(replaced[patch.filename])[patch.offset - 1] != null)) {
+                        throw new Error("Lattice: Modifications at line " + patch.offset + " conflict");
+                    }
                 }
             }
         }
