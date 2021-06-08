@@ -44,8 +44,8 @@ package Bezel.Lattice
 
                 while (bytes.bytesAvailable != 0)
                 {
-                    var name:String = readNTString(bytes);
-                    this.asasmFiles[name] = readNTString(bytes);
+                    var name:String = LatticeUtils.readNTString(bytes);
+                    this.asasmFiles[name] = LatticeUtils.readNTString(bytes);
                 }
             }
 
@@ -306,8 +306,8 @@ package Bezel.Lattice
             stream.open(asm, FileMode.WRITE);
             for (var file:String in this.asasmFiles)
             {
-                writeNTString(stream, file);
-                writeNTString(stream, this.asasmFiles[file]);
+                LatticeUtils.writeNTString(stream, file);
+                LatticeUtils.writeNTString(stream, this.asasmFiles[file]);
             }
             stream.close();
         }
@@ -481,25 +481,6 @@ package Bezel.Lattice
             this.patchFile(filename, offset, lines, "");
 
             return retrieveCode(filename, offset, lines);
-        }
-
-        private static function readNTString(data:ByteArray): String
-        {
-            var num:uint = 0;
-            while (num + data.position < data.length && data[num + data.position] != 0)
-            {
-                ++num;
-            }
-
-            var ret:String = data.readUTFBytes(num);
-            data.position++; // Consume the null terminator
-            return ret;
-        }
-
-        private static function writeNTString(stream:FileStream, data:String): void
-        {
-            stream.writeUTFBytes(data);
-            stream.writeByte(0);
         }
     }
 }
