@@ -15,8 +15,9 @@ package Bezel.Lattice.Assembly
 		private var flags:uint;
 		private var name:String;
 
-		private var file:ABCFile;
+		private var _file:ABCFile;
 
+		public function get abc():ABCFile { return _file; }
 		
 		public function ABCTagData(data:ByteArray) 
 		{
@@ -24,7 +25,7 @@ package Bezel.Lattice.Assembly
 			this.flags = data.readUnsignedInt();
 			this.name = LatticeUtils.readNTString(data);
 			
-			this.file = ABCFile.parse(data);
+			this._file = ABCFile.parse(data);
 		}
 	}
 

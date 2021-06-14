@@ -6,17 +6,17 @@ package Bezel.Lattice.Assembly
 	 */
     public class ExceptionInfo
     {
-        public var fromRaw:int;
-        public var toRaw:int;
-        public var targetRaw:int;
+        public var from:ABCLabel;
+        public var to:ABCLabel;
+        public var target:ABCLabel;
         public var exceptionType:int;
         public var varName:int;
 
-        public function ExceptionInfo(fromRaw:int = 0, toRaw:int = 0, targetRaw:int = 0, exceptionType:int = 0, varName:int = 0)
+        public function ExceptionInfo(from:ABCLabel = null, to:ABCLabel = null, target:ABCLabel = null, exceptionType:int = 0, varName:int = 0)
         {
-            this.fromRaw = fromRaw;
-            this.toRaw = toRaw;
-            this.targetRaw = targetRaw;
+            this.from = from;
+            this.to = to;
+            this.target = target;
             this.exceptionType = exceptionType;
             this.varName = varName;
         }
