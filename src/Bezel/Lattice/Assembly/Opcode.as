@@ -261,6 +261,24 @@ package Bezel.Lattice.Assembly
 		public static const OP_0xFE:Opcode               = new Opcode(0xFE, "0xFE", new <OpcodeArgumentType>[OpcodeArgumentType.Unknown], new OpcodeConstructorBlocker());
 		public static const OP_0xFF:Opcode               = new Opcode(0xFF, "0xFF", new <OpcodeArgumentType>[OpcodeArgumentType.Unknown], new OpcodeConstructorBlocker());
 		
+		public static const codesByByte:Vector.<Opcode>  = new <Opcode>[OP_db, OP_bkpt, OP_nop, OP_throw, OP_getsuper, OP_setsuper, OP_dxns, OP_dxnslate, OP_kill, OP_label, OP_0x0A, OP_0x0B, OP_ifnlt, OP_ifnle, OP_ifngt, OP_ifnge, OP_jump, OP_iftrue, OP_iffalse, OP_ifeq, OP_ifne, OP_iflt, OP_ifle, OP_ifgt, OP_ifge, OP_ifstricteq, OP_ifstrictne, OP_lookupswitch, OP_pushwith, OP_popscope, OP_nextname, OP_hasnext, OP_pushnull, OP_pushundefined, OP_pushuninitialized, OP_nextvalue, OP_pushbyte, OP_pushshort, OP_pushtrue, OP_pushfalse, OP_pushnan, OP_pop, OP_dup, OP_swap, OP_pushstring, OP_pushint, OP_pushuint, OP_pushdouble, OP_pushscope, OP_pushnamespace, OP_hasnext2, OP_pushdecimal, OP_pushdnan, OP_li8, OP_li16, OP_li32, OP_lf32, OP_lf64, OP_si8, OP_si16, OP_si32, OP_sf32, OP_sf64, OP_0x3F, OP_newfunction, OP_call, OP_construct, OP_callmethod, OP_callstatic, OP_callsuper, OP_callproperty, OP_returnvoid, OP_returnvalue, OP_constructsuper, OP_constructprop, OP_callsuperid, OP_callproplex, OP_callinterface, OP_callsupervoid, OP_callpropvoid, OP_sxi1, OP_sxi8, OP_sxi16, OP_applytype, OP_0x54, OP_newobject, OP_newarray, OP_newactivation, OP_newclass, OP_getdescendants, OP_newcatch, OP_deldescendants, OP_0x5C, OP_findpropstrict, OP_findproperty, OP_finddef, OP_getlex, OP_setproperty, OP_getlocal, OP_setlocal, OP_getglobalscope, OP_getscopeobject, OP_getproperty, OP_getpropertylate, OP_initproperty, OP_setpropertylate, OP_deleteproperty, OP_deletepropertylate, OP_getslot, OP_setslot, OP_getglobalslot, OP_setglobalslot, OP_convert_s, OP_esc_xelem, OP_esc_xattr, OP_convert_i, OP_convert_u, OP_convert_d, OP_convert_b, OP_convert_o, OP_checkfilter, OP_convert_m, OP_convert_m_p, OP_0x7B, OP_0x7C, OP_0x7D, OP_0x7E, OP_0x7F, OP_coerce, OP_coerce_b, OP_coerce_a, OP_coerce_i, OP_coerce_d, OP_coerce_s, OP_astype, OP_astypelate, OP_coerce_u, OP_coerce_o, OP_0x8A, OP_0x8B, OP_0x8C, OP_0x8D, OP_0x8E, OP_negate_p, OP_negate, OP_increment, OP_inclocal, OP_decrement, OP_declocal, OP_typeof, OP_not, OP_bitnot, OP_0x98, OP_0x99, OP_concat, OP_add_d, OP_increment_p, OP_inclocal_p, OP_decrement_p, OP_declocal_p, OP_add, OP_subtract, OP_multiply, OP_divide, OP_modulo, OP_lshift, OP_rshift, OP_urshift, OP_bitand, OP_bitor, OP_bitxor, OP_equals, OP_strictequals, OP_lessthan, OP_lessequals, OP_greaterthan, OP_greaterequals, OP_instanceof, OP_istype, OP_istypelate, OP_in, OP_add_p, OP_subtract_p, OP_multiply_p, OP_divide_p, OP_modulo_p, OP_0xBA, OP_0xBB, OP_0xBC, OP_0xBD, OP_0xBE, OP_0xBF, OP_increment_i, OP_decrement_i, OP_inclocal_i, OP_declocal_i, OP_negate_i, OP_add_i, OP_subtract_i, OP_multiply_i, OP_0xC8, OP_0xC9, OP_0xCA, OP_0xCB, OP_0xCC, OP_0xCD, OP_0xCE, OP_0xCF, OP_getlocal0, OP_getlocal1, OP_getlocal2, OP_getlocal3, OP_setlocal0, OP_setlocal1, OP_setlocal2, OP_setlocal3, OP_0xD8, OP_0xD9, OP_0xDA, OP_0xDB, OP_0xDC, OP_0xDD, OP_0xDE, OP_0xDF, OP_0xE0, OP_0xE1, OP_0xE2, OP_0xE3, OP_0xE4, OP_0xE5, OP_0xE6, OP_0xE7, OP_0xE8, OP_0xE9, OP_0xEA, OP_0xEB, OP_0xEC, OP_0xED, OP_0xEE, OP_debug, OP_debugline, OP_debugfile, OP_bkptline, OP_timestamp, OP_0xF4, OP_0xF5, OP_0xF6, OP_0xF7, OP_0xF8, OP_0xF9, OP_0xFA, OP_0xFB, OP_0xFC, OP_0xFD, OP_0xFE, OP_0xFF,];
+		public static const codesByName:Object = new Object();
+
+		// Gets the Opcode associated with the passed in string, int, or uint
+		public static function fromInfo(info:*):Opcode
+		{
+			if (info is String)
+			{
+				return codesByName[info];
+			}
+			if (info is int || info is uint)
+			{
+				return codesByByte[info];
+			}
+
+			throw new Error("Opcode can only be found by byte value or by name");
+		}
+		
 		private var _instrVal:int;
 		private var _instrName:String;
 		private var _argTypes:Vector.<OpcodeArgumentType>;
@@ -270,6 +288,13 @@ package Bezel.Lattice.Assembly
 		public function get name():String  { return _instrName; }
 		
 		public function get arguments():Vector.<OpcodeArgumentType>  { return _argTypes; }
+
+        public function get stopsExecution():Boolean
+        {
+            return this == OP_returnvalue || this == OP_returnvoid || this == OP_throw || this == OP_jump || this == OP_lookupswitch;
+        }
+
+        public function get usable():Boolean { return !this._argTypes.some(function(argType:OpcodeArgumentType):Boolean { return argType == OpcodeArgumentType.Unknown; }); }
 		
 		public function Opcode(val:int, name:String, argTypes:Vector.<OpcodeArgumentType>, constructorBlocker:OpcodeConstructorBlocker)
 		{
@@ -282,16 +307,6 @@ package Bezel.Lattice.Assembly
 			this._argTypes = argTypes;
             this._argTypes.fixed = true;
 		}
-		
-		public static const codesByByte:Vector.<Opcode>  = new <Opcode>[OP_db, OP_bkpt, OP_nop, OP_throw, OP_getsuper, OP_setsuper, OP_dxns, OP_dxnslate, OP_kill, OP_label, OP_0x0A, OP_0x0B, OP_ifnlt, OP_ifnle, OP_ifngt, OP_ifnge, OP_jump, OP_iftrue, OP_iffalse, OP_ifeq, OP_ifne, OP_iflt, OP_ifle, OP_ifgt, OP_ifge, OP_ifstricteq, OP_ifstrictne, OP_lookupswitch, OP_pushwith, OP_popscope, OP_nextname, OP_hasnext, OP_pushnull, OP_pushundefined, OP_pushuninitialized, OP_nextvalue, OP_pushbyte, OP_pushshort, OP_pushtrue, OP_pushfalse, OP_pushnan, OP_pop, OP_dup, OP_swap, OP_pushstring, OP_pushint, OP_pushuint, OP_pushdouble, OP_pushscope, OP_pushnamespace, OP_hasnext2, OP_pushdecimal, OP_pushdnan, OP_li8, OP_li16, OP_li32, OP_lf32, OP_lf64, OP_si8, OP_si16, OP_si32, OP_sf32, OP_sf64, OP_0x3F, OP_newfunction, OP_call, OP_construct, OP_callmethod, OP_callstatic, OP_callsuper, OP_callproperty, OP_returnvoid, OP_returnvalue, OP_constructsuper, OP_constructprop, OP_callsuperid, OP_callproplex, OP_callinterface, OP_callsupervoid, OP_callpropvoid, OP_sxi1, OP_sxi8, OP_sxi16, OP_applytype, OP_0x54, OP_newobject, OP_newarray, OP_newactivation, OP_newclass, OP_getdescendants, OP_newcatch, OP_deldescendants, OP_0x5C, OP_findpropstrict, OP_findproperty, OP_finddef, OP_getlex, OP_setproperty, OP_getlocal, OP_setlocal, OP_getglobalscope, OP_getscopeobject, OP_getproperty, OP_getpropertylate, OP_initproperty, OP_setpropertylate, OP_deleteproperty, OP_deletepropertylate, OP_getslot, OP_setslot, OP_getglobalslot, OP_setglobalslot, OP_convert_s, OP_esc_xelem, OP_esc_xattr, OP_convert_i, OP_convert_u, OP_convert_d, OP_convert_b, OP_convert_o, OP_checkfilter, OP_convert_m, OP_convert_m_p, OP_0x7B, OP_0x7C, OP_0x7D, OP_0x7E, OP_0x7F, OP_coerce, OP_coerce_b, OP_coerce_a, OP_coerce_i, OP_coerce_d, OP_coerce_s, OP_astype, OP_astypelate, OP_coerce_u, OP_coerce_o, OP_0x8A, OP_0x8B, OP_0x8C, OP_0x8D, OP_0x8E, OP_negate_p, OP_negate, OP_increment, OP_inclocal, OP_decrement, OP_declocal, OP_typeof, OP_not, OP_bitnot, OP_0x98, OP_0x99, OP_concat, OP_add_d, OP_increment_p, OP_inclocal_p, OP_decrement_p, OP_declocal_p, OP_add, OP_subtract, OP_multiply, OP_divide, OP_modulo, OP_lshift, OP_rshift, OP_urshift, OP_bitand, OP_bitor, OP_bitxor, OP_equals, OP_strictequals, OP_lessthan, OP_lessequals, OP_greaterthan, OP_greaterequals, OP_instanceof, OP_istype, OP_istypelate, OP_in, OP_add_p, OP_subtract_p, OP_multiply_p, OP_divide_p, OP_modulo_p, OP_0xBA, OP_0xBB, OP_0xBC, OP_0xBD, OP_0xBE, OP_0xBF, OP_increment_i, OP_decrement_i, OP_inclocal_i, OP_declocal_i, OP_negate_i, OP_add_i, OP_subtract_i, OP_multiply_i, OP_0xC8, OP_0xC9, OP_0xCA, OP_0xCB, OP_0xCC, OP_0xCD, OP_0xCE, OP_0xCF, OP_getlocal0, OP_getlocal1, OP_getlocal2, OP_getlocal3, OP_setlocal0, OP_setlocal1, OP_setlocal2, OP_setlocal3, OP_0xD8, OP_0xD9, OP_0xDA, OP_0xDB, OP_0xDC, OP_0xDD, OP_0xDE, OP_0xDF, OP_0xE0, OP_0xE1, OP_0xE2, OP_0xE3, OP_0xE4, OP_0xE5, OP_0xE6, OP_0xE7, OP_0xE8, OP_0xE9, OP_0xEA, OP_0xEB, OP_0xEC, OP_0xED, OP_0xEE, OP_debug, OP_debugline, OP_debugfile, OP_bkptline, OP_timestamp, OP_0xF4, OP_0xF5, OP_0xF6, OP_0xF7, OP_0xF8, OP_0xF9, OP_0xFA, OP_0xFB, OP_0xFC, OP_0xFD, OP_0xFE, OP_0xFF,];
-		public static const codesByName:Object = new Object();
-
-        public function get stopsExecution():Boolean
-        {
-            return this == OP_returnvalue || this == OP_returnvoid || this == OP_throw || this == OP_jump || this == OP_lookupswitch;
-        }
-
-        public function get usable():Boolean { return !this._argTypes.some(function(argType:OpcodeArgumentType):Boolean { return argType == OpcodeArgumentType.Unknown; }); }
 
         // Static initializer
 		{

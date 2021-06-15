@@ -7,25 +7,25 @@ package Bezel.Lattice.Assembly
 	 */
 	public class ABCFile
     {
-		private var minorVersion:uint;
-		private var majorVersion:uint;
+		internal var minorVersion:uint;
+		internal var majorVersion:uint;
 		
 		// 0 should not be written out from any of these; they are constants for 0, 0, 0, "", <any namespace>, an unusable value, and an unusable value, respectively
-		private var integers:Vector.<int>;
-		private var uintegers:Vector.<uint>;
-		private var doubles:Vector.<Number>;
-		private var strings:Vector.<String>;
-        private var namespaces:Vector.<NamespaceInfo>;
-        private var ns_sets:Vector.<Vector.<uint>>;
-        private var multinames:Vector.<MultinameData>;
+		internal var integers:Vector.<int>;
+		internal var uintegers:Vector.<uint>;
+		internal var doubles:Vector.<Number>;
+		internal var strings:Vector.<String>;
+        internal var namespaces:Vector.<ABCNamespace>;
+        internal var ns_sets:Vector.<Vector.<uint>>;
+        internal var multinames:Vector.<ABCMultiname>;
 
-        private var methods:Vector.<MethodInfo>;
-        private var metadata:Vector.<Metadata>;
+        internal var methods:Vector.<ABCMethodInfo>;
+        internal var metadata:Vector.<ABCMetadata>;
         
-        private var instances:Vector.<Instance>;
-        private var classes:Vector.<ABCClass>;
-        private var scripts:Vector.<ABCScript>;
-        private var methodBodies:Vector.<MethodBody>;
+        internal var instances:Vector.<ABCInstance>;
+        internal var classes:Vector.<ABCClass>;
+        internal var scripts:Vector.<ABCScript>;
+        internal var methodBodies:Vector.<ABCMethodBody>;
 
         public function ABCFile()
         {
@@ -36,17 +36,17 @@ package Bezel.Lattice.Assembly
             uintegers = new <uint>[0];
             doubles = new <Number>[0];
             strings = new <String>[""];
-            namespaces = new <NamespaceInfo>[null];
+            namespaces = new <ABCNamespace>[null];
             ns_sets = new <Vector.<uint>>[null];
-            multinames = new <MultinameData>[null];
+            multinames = new <ABCMultiname>[null];
 
-            methods = new <MethodInfo>[];
-            metadata = new <Metadata>[];
+            methods = new <ABCMethodInfo>[];
+            metadata = new <ABCMetadata>[];
 
-            instances = new <Instance>[];
+            instances = new <ABCInstance>[];
             classes = new <ABCClass>[];
             scripts = new <ABCScript>[];
-            methodBodies = new <MethodBody>[];
+            methodBodies = new <ABCMethodBody>[];
         }
 
         public static function parse(data:ByteArray):ABCFile
@@ -85,7 +85,7 @@ package Bezel.Lattice.Assembly
             numConstants = reader.readU30();
             for (i = 0; i < numConstants; i++)
             {
-                ret.namespaces[i + 1] = reader.readNamespaceInfo();
+                ret.namespaces[i + 1] = reader.readNamespace();
             }
 
             numConstants = reader.readU30();

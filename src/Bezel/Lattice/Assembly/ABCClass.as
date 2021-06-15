@@ -7,9 +7,9 @@ package Bezel.Lattice.Assembly
     public class ABCClass
     {
         public var cinit:int;
-        public var traits:Vector.<TraitInfo>;
+        public var traits:Vector.<ABCTrait>;
 
-        public function ABCClass(cinit:int = 0, traits:Vector.<TraitInfo> = null)
+        public function ABCClass(cinit:int = 0, traits:Vector.<ABCTrait> = null)
         {
             this.cinit = cinit;
             this.traits = traits;

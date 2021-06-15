@@ -96,7 +96,5 @@ package Bezel.Lattice.Assembly
 			
 			this.abcTag = new ABCTagData(abcData);
 		}
-		
 	}
-
 }
