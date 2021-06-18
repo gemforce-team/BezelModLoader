@@ -12,5 +12,8 @@ package Bezel.Lattice.Assembly.values
         public static const HAS_OPTIONAL:int = 0x8;
         public static const SET_DXNS:int = 0x40;
         public static const HAS_PARAM_NAMES:int = 0x80;
+
+        public static const names:Vector.<String> = new <String>["NEED_ARGUMENTS", "NEED_ACTIVATION", "NEED_REST", "HAS_OPTIONAL", "???", "???", "SET_DXNS", "HAS_PARAM_NAMES"];
+        
     }
 }

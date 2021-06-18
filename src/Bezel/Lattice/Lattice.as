@@ -19,6 +19,9 @@ package Bezel.Lattice
     import flash.filesystem.FileStream;
     import flash.utils.ByteArray;
     import flash.utils.Dictionary;
+    import Bezel.Lattice.Assembly.serialization.SwfParser;
+    import Bezel.Lattice.Assembly.serialization.Disassembler;
+    import Bezel.Lattice.Assembly.ASProgram;
 	
 	use namespace bezel_internal;
 
@@ -109,6 +112,20 @@ package Bezel.Lattice
             {
                 case "disassemble":
                     cleanAsm.copyTo(asm);
+                    var stream:FileStream = new FileStream();
+                    stream.open(bezel.gameSwf, FileMode.READ);
+                    var parser:SwfParser = new SwfParser(stream);
+                    stream.close();
+                    var disassembler:Disassembler = new Disassembler(ASProgram.fromABC(parser.abcFile));
+                    var data:Object = disassembler.disassemble();
+                    var outFile:File = Bezel.Bezel.latticeFolder.resolvePath("game-clean.basasm.new");
+                    stream.open(outFile, FileMode.WRITE);
+                    for (var filename:String in data)
+                    {
+                        LatticeUtils.writeNTString(stream, filename);
+                        LatticeUtils.writeNTString(stream, data[filename]);
+                    }
+                    stream.close();
                     dispatchEvent(new Event(LatticeEvent.DISASSEMBLY_DONE));
                     break;
                 case "reassemble":

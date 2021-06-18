@@ -12,7 +12,7 @@ package Bezel.Lattice.Assembly
     import Bezel.Lattice.Assembly.multiname.ABCMultinameL;
     import Bezel.Lattice.Assembly.multiname.ASTypeName;
     import Bezel.Lattice.Assembly.multiname.ABCTypeName;
-    import Bezel.Lattice.Assembly.values.TraitTypes;
+    import Bezel.Lattice.Assembly.values.TraitType;
     import Bezel.Lattice.Assembly.trait.ASTraitSlot;
     import Bezel.Lattice.Assembly.trait.ABCTraitSlot;
     import Bezel.Lattice.Assembly.trait.ABCTraitClass;
@@ -113,30 +113,30 @@ package Bezel.Lattice.Assembly
                     ret[i].attributes = traits[i].attributes;
                     switch (ret[i].type)
                     {
-                        case TraitTypes.Slot:
-                        case TraitTypes.Const:
+                        case TraitType.Slot:
+                        case TraitType.Const:
                         {
                             var slot:ABCTraitSlot = traits[i].extraData as ABCTraitSlot;
                             ret[i].extraData = new ASTraitSlot(slot.slotId, multinames[slot.typeName], convertValue(slot.valueType, slot.valueIndex));
                         }
                         break;
-                        case TraitTypes.Class:
+                        case TraitType.Class:
                         {
                             var clazz:ABCTraitClass = traits[i].extraData as ABCTraitClass;
                             ret[i].extraData = new ASTraitClass(clazz.slotId, classes[clazz.classi]);
                             classesAdded[clazz.classi] = true;
                         }
                         break;
-                        case TraitTypes.Function:
+                        case TraitType.Function:
                         {
                             var func:ABCTraitFunction = traits[i].extraData as ABCTraitFunction;
                             ret[i].extraData = new ASTraitFunction(func.slotId, methods[func.functioni]);
                             methodsAdded[func.functioni] = true;
                         }
                         break;
-                        case TraitTypes.Method:
-                        case TraitTypes.Getter:
-                        case TraitTypes.Setter:
+                        case TraitType.Method:
+                        case TraitType.Getter:
+                        case TraitType.Setter:
                         {
                             var method:ABCTraitMethod = traits[i].extraData as ABCTraitMethod;
                             ret[i].extraData = new ASTraitMethod(method.slotId, methods[method.methodi]);

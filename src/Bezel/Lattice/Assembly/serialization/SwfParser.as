@@ -1,8 +1,11 @@
-package Bezel.Lattice.Assembly
+package Bezel.Lattice.Assembly.serialization
 {
 	import flash.utils.ByteArray;
 	import flash.utils.CompressionAlgorithm;
+	import flash.utils.Endian;
 	import flash.utils.IDataInput;
+	import Bezel.Lattice.Assembly.serialization.ABCTagData;
+	import Bezel.Lattice.Assembly.ABCFile;
 	/**
 	 * ...
 	 * @author Chris
@@ -11,15 +14,19 @@ package Bezel.Lattice.Assembly
 	{
 		private var abcTag:ABCTagData;
 		private var _editedSwf:ByteArray;
+
+		public function get abcFile():ABCFile { return abcTag.abc; }
 		
 		public function SwfParser(swf:IDataInput) 
 		{
 			_editedSwf = new ByteArray();
+			_editedSwf.endian = Endian.LITTLE_ENDIAN;
 			
 			var signature:String = swf.readUTFBytes(3);
 			var version:uint = swf.readUnsignedByte();
 			var fileSizeDecompressed:uint = swf.readUnsignedInt();
 			var restOfData:ByteArray = new ByteArray();
+			restOfData.endian = Endian.LITTLE_ENDIAN;
 			swf.readBytes(restOfData);
 			
 			if (signature == "CWS")
@@ -41,7 +48,7 @@ package Bezel.Lattice.Assembly
 			_editedSwf.writeUnsignedInt(0);
 			
 			// Get data about the frame
-			var frameSize:uint = restOfData.readByte() >> 3;
+			var frameSize:uint = restOfData.readUnsignedByte() >> 3;
 			restOfData.position -= 1;
 			frameSize = frameSize * 4 + 5;
 			if (frameSize % 8 != 0)
@@ -58,6 +65,9 @@ package Bezel.Lattice.Assembly
 			
 			// ABC tag data for use with ABC
 			var abcData:ByteArray = new ByteArray();
+			abcData.endian = Endian.LITTLE_ENDIAN;
+			
+			var tags:Vector.<uint> = new Vector.<uint>();
 			
 			while (restOfData.bytesAvailable != 0)
 			{
@@ -68,6 +78,8 @@ package Bezel.Lattice.Assembly
 				{
 					tagSize = restOfData.readUnsignedInt();
 				}
+				
+				tags.push(tagType, tagSize);
 				
 				// DoABC2
 				if (tagType == 82)
@@ -90,8 +102,16 @@ package Bezel.Lattice.Assembly
 					{
 						_editedSwf.writeUnsignedInt(tagSize);
 					}
-					restOfData.readBytes(_editedSwf, _editedSwf.length, tagSize);
+					if (tagSize > 0)
+					{
+						restOfData.readBytes(_editedSwf, _editedSwf.length, tagSize);
+					}
 				}
+			}
+			
+			if (abcData.length == 0)
+			{
+				throw new Error("Empty or no ABC found");
 			}
 			
 			this.abcTag = new ABCTagData(abcData);

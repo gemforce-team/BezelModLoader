@@ -14,7 +14,7 @@ package Bezel.Lattice.Assembly
 	import Bezel.Lattice.Assembly.values.ABCType;
 	import Bezel.Lattice.Assembly.values.MethodFlags;
 	import Bezel.Lattice.Assembly.values.InstanceFlags;
-	import Bezel.Lattice.Assembly.values.TraitTypes;
+	import Bezel.Lattice.Assembly.values.TraitType;
 	import Bezel.Lattice.Assembly.values.TraitAttributes;
 	/**
 	 * ...
@@ -98,6 +98,7 @@ package Bezel.Lattice.Assembly
 		public function readString():String
 		{
 			var size:int = readU30();
+			if (size == 0) return "";
 			return data.readUTFBytes(size);
 		}
 
@@ -109,8 +110,8 @@ package Bezel.Lattice.Assembly
 		public function readNamespaceSet():Vector.<uint>
 		{
 			var ret:Vector.<uint> = new <uint>[];
-			var length:int = readU30();
-			for (var i:int = 0; i < length; i++)
+			var num:int = readU30();
+			for (var i:int = 0; i < num; i++)
 			{
 				ret.push(readU30());
 			}
@@ -144,9 +145,9 @@ package Bezel.Lattice.Assembly
 					ret.subdata = new ABCMultinameL(readU30());
 					break;
 				case ABCType.TypeName:
-					ret.subdata = new ABCTypeName(readU30());
+					ret.subdata = new ABCTypeName(readU30(), new <int>[]);
 					var num:int = readU30();
-					while ((ret.subdata as ABCTypeName).params.length < num)
+					for (var i:int = 0; i < num; i++)
 					{
 						(ret.subdata as ABCTypeName).params.push(readU30());
 					}
@@ -159,11 +160,11 @@ package Bezel.Lattice.Assembly
 
 		public function readMethodInfo():ABCMethodInfo
 		{
-			var ret:ABCMethodInfo = new ABCMethodInfo(new <int>[]);
+			var ret:ABCMethodInfo = new ABCMethodInfo(new <int>[], 0, 0, 0, new <ABCDefaultOption>[], new <int>[]);
 
 			var num:int = readU30();
 			ret.returnType = readU30();
-			while (ret.parameterTypes.length < num)
+			for (var i:int = 0; i < num; i++)
 			{
 				ret.parameterTypes.push(readU30());
 			}
@@ -173,29 +174,19 @@ package Bezel.Lattice.Assembly
 			if (ret.flags & MethodFlags.HAS_OPTIONAL)
 			{
 				num = readU30();
-				ret.defaultOptions = new <ABCDefaultOption>[];
-				while (ret.defaultOptions.length < num)
+				for (i = 0; i < num; i++)
 				{
 					ret.defaultOptions.push(readDefaultOption());
 				}
-			}
-			else
-			{
-				ret.defaultOptions = new <ABCDefaultOption>[];
 			}
 
 			if (ret.flags & MethodFlags.HAS_PARAM_NAMES)
 			{
 				num = readU30();
-				ret.parameterNames = new <int>[];
-				while (ret.parameterNames.length < num)
+				for (i = 0; i < num; i++)
 				{
 					ret.parameterNames.push(readU30());
 				}
-			}
-			else
-			{
-				ret.parameterNames = new <int>[];
 			}
 
 			return ret;
@@ -212,7 +203,7 @@ package Bezel.Lattice.Assembly
 			var num:int = readU30();
 			var ret:ABCMetadata = new ABCMetadata(name, new <int>[], new <int>[]);
 
-			while (ret.keys.length < num)
+			for (var i:int = 0; i < num; i++)
 			{
 				ret.keys.push(readU30());
 				ret.values.push(readU30());
@@ -231,7 +222,7 @@ package Bezel.Lattice.Assembly
 			}
 			
 			var num:int = readU30();
-			while (ret.interfaces.length < num)
+			for (var i:int = 0; i < num; i++)
 			{
 				ret.interfaces.push(readU30());
 			}
@@ -239,7 +230,7 @@ package Bezel.Lattice.Assembly
 			ret.iinit = readU30();
 			
 			num = readU30();
-			while (ret.traits.length < num)
+			for (i = 0; i < num; i++)
 			{
 				ret.traits.push(readTrait());
 			}
@@ -252,13 +243,13 @@ package Bezel.Lattice.Assembly
 			var ret:ABCTrait = new ABCTrait(readU30());
 
 			var num:int = readU8();
-			ret.type = num & 0xF;
+			ret.type = TraitType.fromByte(num & 0xF);
 			ret.attributes = num >> 4;
 
 			switch (ret.type)
 			{
-				case TraitTypes.Slot:
-				case TraitTypes.Const:
+				case TraitType.Slot:
+				case TraitType.Const:
 					ret.extraData = new ABCTraitSlot(readU30(), readU30(), readU30());
 					if ((ret.extraData as ABCTraitSlot).valueIndex != 0)
 					{
@@ -269,15 +260,15 @@ package Bezel.Lattice.Assembly
 						(ret.extraData as ABCTraitSlot).valueType = ABCType.Void;
 					}
 					break;
-				case TraitTypes.Class:
+				case TraitType.Class:
 					ret.extraData = new ABCTraitClass(readU30(), readU30());
 					break;
-				case TraitTypes.Function:
+				case TraitType.Function:
 					ret.extraData = new ABCTraitFunction(readU30(), readU30());
 					break;
-				case TraitTypes.Method:
-				case TraitTypes.Getter:
-				case TraitTypes.Setter:
+				case TraitType.Method:
+				case TraitType.Getter:
+				case TraitType.Setter:
 					ret.extraData = new ABCTraitMethod(readU30(), readU30());
 					break;
 				default:
@@ -288,7 +279,7 @@ package Bezel.Lattice.Assembly
 			{
 				num = readU30();
 				ret.metadata = new <int>[];
-				while (ret.metadata.length < num)
+				for (var i:int = 0; i < num; i++)
 				{
 					ret.metadata.push(readU30());
 				}
@@ -306,7 +297,7 @@ package Bezel.Lattice.Assembly
 			var ret:ABCClass = new ABCClass(readU30(), new <ABCTrait>[]);
 
 			var num:int = readU30();
-			while (ret.traits.length < num)
+			for (var i:int = 0; i < num; i++)
 			{
 				ret.traits.push(readTrait());
 			}
@@ -319,7 +310,7 @@ package Bezel.Lattice.Assembly
 			var ret:ABCScript = new ABCScript(readU30(), new <ABCTrait>[]);
 
 			var num:int = readU30();
-			while (ret.traits.length < num)
+			for (var i:int = 0; i < num; i++)
 			{
 				ret.traits.push(readTrait());
 			}
@@ -336,13 +327,13 @@ package Bezel.Lattice.Assembly
 
 			data.position = startCode + numCodeBytes;
 			var numObjects:int = readU30();
-			while (ret.exceptions.length < numObjects)
+			for (var i:int = 0; i < numObjects; i++)
 			{
 				ret.exceptions.push(readException());
 			}
 
 			numObjects = readU30();
-			while (ret.traits.length < numObjects)
+			for (i = 0; i < numObjects; i++)
 			{
 				ret.traits.push(readTrait());
 			}
@@ -401,7 +392,7 @@ package Bezel.Lattice.Assembly
 
 							instruction.arguments = new Array();
 
-							for (var i:int = 0; i < instruction.opcode.arguments.length; i++)
+							for (i = 0; i < instruction.opcode.arguments.length; i++)
 							{
 								switch (instruction.opcode.arguments[i])
 								{

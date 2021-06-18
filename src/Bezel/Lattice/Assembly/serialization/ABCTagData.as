@@ -1,5 +1,6 @@
-package Bezel.Lattice.Assembly
+package Bezel.Lattice.Assembly.serialization
 {
+	import Bezel.Lattice.Assembly.ABCFile;
 	import Bezel.bezel_internal;
 	import Bezel.Lattice.LatticeUtils;
 	import flash.utils.ByteArray;

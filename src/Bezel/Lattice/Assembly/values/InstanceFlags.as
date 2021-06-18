@@ -10,5 +10,8 @@ package Bezel.Lattice.Assembly.values
         public static const FINAL:int = 0x2;
         public static const INTERFACE:int = 0x4;
         public static const PROTECTEDNS:int = 0x8;
+
+        public static const names:Vector.<String> = new <String>["SEALED", "FINAL", "INTERFACE", "PROTECTEDNS"];
+        
     }
 }

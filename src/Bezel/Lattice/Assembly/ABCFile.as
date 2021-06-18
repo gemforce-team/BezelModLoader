@@ -1,5 +1,6 @@
 package Bezel.Lattice.Assembly
 {
+	import Bezel.Lattice.Assembly.ABCReader;
 	import flash.utils.ByteArray;
 	/**
 	 * ...
@@ -59,51 +60,51 @@ package Bezel.Lattice.Assembly
             ret.majorVersion = reader.readU16();
 
             var numConstants:int = reader.readU30();
-            for (var i:int = 0; i < numConstants; i++)
+            for (var i:int = 1; i < numConstants; i++)
             {
-                ret.integers[i + 1] = reader.readS32();
+                ret.integers[i] = reader.readS32();
             }
 
             numConstants = reader.readU30();
-            for (i = 0; i < numConstants; i++)
+            for (i = 1; i < numConstants; i++)
             {
-                ret.uintegers[i + 1] = reader.readU32();
+                ret.uintegers[i] = reader.readU32();
             }
             
             numConstants = reader.readU30();
-            for (i = 0; i < numConstants; i++)
+            for (i = 1; i < numConstants; i++)
             {
-                ret.doubles[i + 1] = reader.readD64();
+                ret.doubles[i] = reader.readD64();
+            }
+
+            numConstants = reader.readU30();
+            for (i = 1; i < numConstants; i++)
+            {
+                ret.strings[i] = reader.readString();
+            }
+
+            numConstants = reader.readU30();
+            for (i = 1; i < numConstants; i++)
+            {
+                ret.namespaces[i] = reader.readNamespace();
+            }
+
+            numConstants = reader.readU30();
+            for (i = 1; i < numConstants; i++)
+            {
+                ret.ns_sets[i] = reader.readNamespaceSet();
+            }
+
+            numConstants = reader.readU30();
+            for (i = 1; i < numConstants; i++)
+            {
+                ret.multinames[i] = reader.readMultiname();
             }
 
             numConstants = reader.readU30();
             for (i = 0; i < numConstants; i++)
             {
-                ret.strings[i + 1] = reader.readString();
-            }
-
-            numConstants = reader.readU30();
-            for (i = 0; i < numConstants; i++)
-            {
-                ret.namespaces[i + 1] = reader.readNamespace();
-            }
-
-            numConstants = reader.readU30();
-            for (i = 0; i < numConstants; i++)
-            {
-                ret.ns_sets[i + 1] = reader.readNamespaceSet();
-            }
-
-            numConstants = reader.readU30();
-            for (i = 0; i < numConstants; i++)
-            {
-                ret.multinames[i + 1] = reader.readMultiname();
-            }
-
-            numConstants = reader.readU30();
-            for (i = 0; i < numConstants; i++)
-            {
-                ret.methods[i + 1] = reader.readMethodInfo();
+                ret.methods[i] = reader.readMethodInfo();
             }
 
             numConstants = reader.readU30();
