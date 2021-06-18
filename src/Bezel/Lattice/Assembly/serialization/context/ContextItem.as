@@ -123,6 +123,7 @@ package Bezel.Lattice.Assembly.serialization.context
                 }
                 break;
                 case TYPE_String:
+                    expanding = false;
                     break;
                 case TYPE_Group:
                     expanding = false;
@@ -240,7 +241,10 @@ package Bezel.Lattice.Assembly.serialization.context
             {
                 var tmp:* = c1.multiname;
                 c1.multiname = c2.multiname;
-                c2.multiname = c1.multiname;
+                c2.multiname = tmp;
+                tmp = c1.expanding;
+                c1.expanding = c2.expanding;
+                c2.expanding = tmp;
                 tmp = name1;
                 name1 = name2;
                 name2 = tmp;
@@ -265,7 +269,7 @@ package Bezel.Lattice.Assembly.serialization.context
             {
                 if (nsSimilar(ns1, ns2))
                 {
-                    if (name1 != name2) throw new Error("This should already have been handled");
+                    if (name1 == name2) throw new Error("This should already have been handled");
                     if (truncate) throw new Error("This should already have been handled");
 
                     if (name2.length != 0)
@@ -283,6 +287,9 @@ package Bezel.Lattice.Assembly.serialization.context
                     tmp = c1.multiname;
                     c1.multiname = c2.multiname;
                     c2.multiname = tmp;
+                    tmp = c1.expanding;
+                    c1.expanding = c2.expanding;
+                    c2.expanding = tmp;
                     tmp = name1;
                     name1 = name2;
                     name2 = tmp;
@@ -299,7 +306,7 @@ package Bezel.Lattice.Assembly.serialization.context
                 }
             }
 
-            return null;
+            return new <ContextItem>[];
         }
 
         public static function commonRoot(c1:ContextItem, c2:ContextItem):Vector.<ContextItem>
@@ -323,7 +330,7 @@ package Bezel.Lattice.Assembly.serialization.context
         public static function fromString(s:String, filenameSuffix:Boolean = false):ContextItem
         {
             var ret:ContextItem = new ContextItem();
-            ret.type = TYPE_Group;
+            ret.type = TYPE_String;
             ret.str = s;
             ret.filenameSuffix = filenameSuffix;
             return ret;

@@ -94,18 +94,18 @@ package Bezel.Lattice.Assembly.serialization.context
                 homonyms[ns.type.val][ns.name] = new Vector.<int>();
             }
 
-            homonyms[ns.type.val][ns.name].push(true);
+            homonyms[ns.type.val][ns.name].push(ns.uniqueId);
         }
 
         public override function run():void
         {
             for each (var clazz:ASClass in asp.orphanClasses)
             {
-                orphans.push(clazz);
+                if (!isOrphan(clazz)) orphans.push(clazz);
             }
             for each (var method:ASMethod in asp.orphanMethods)
             {
-                orphans.push(method);
+                if (!isOrphan(method)) orphans.push(method);
             }
 
             super.run();
@@ -206,7 +206,7 @@ package Bezel.Lattice.Assembly.serialization.context
                     super.visitTrait(trait);
                     break;
                 case TraitType.Class:
-                    var classData:ASTraitClass = trait.extraData as ASTraitClass
+                    var classData:ASTraitClass = trait.extraData as ASTraitClass;
                     addClass(classData.classv, ContextSet.PRIORITY_Declaration);
 
                     context.push(ContextItem.fromString("class", true));
@@ -469,7 +469,7 @@ package Bezel.Lattice.Assembly.serialization.context
                     visitMultiname(paramType, ContextSet.PRIORITY_Usage);
                 }
                 visitMultiname(method.returnType, ContextSet.PRIORITY_Usage);
-                if (method.body)
+                if (method.body != null)
                 {
                     visitMethodBody(method.body);
                 }

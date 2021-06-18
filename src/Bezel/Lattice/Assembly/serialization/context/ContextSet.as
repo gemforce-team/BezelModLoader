@@ -96,7 +96,7 @@ package Bezel.Lattice.Assembly.serialization.context
                 var context:Vector.<ContextItem> = contexts[obj] as Vector.<ContextItem>;
                 var bname:String = refs.contextToString(context, false);
                 var bfilename:String = refs.contextToString(context, true);
-                var counter:int = collisionCounter[bname];
+                var counter:int = bname in collisionCounter ? collisionCounter[bname] : 0;
                 if (counter == 1)
                 {
                     var firstObj:* = first[bname];
@@ -141,9 +141,9 @@ package Bezel.Lattice.Assembly.serialization.context
             if (allowDuplicates)
             {
                 var context:Vector.<ContextItem> = ContextItem.expand(refs, set[0]);
-                for each (var setContext:Vector.<ContextItem> in set.slice(1))
+                for (var i:int = 1; i < set.length; i++)
                 {
-                    context = ContextItem.contextRoot(context, ContextItem.expand(refs, setContext));
+                    context = ContextItem.contextRoot(context, ContextItem.expand(refs, set[i]));
                 }
                 return contexts[obj] = context;
             }
@@ -151,7 +151,7 @@ package Bezel.Lattice.Assembly.serialization.context
             {
                 if (set.length > 1)
                 {
-                    return contexts[obj] = [ContextItem.fromString("multireferenced")];
+                    return contexts[obj] = new <ContextItem>[ContextItem.fromString("multireferenced")];
                 }
                 else
                 {
