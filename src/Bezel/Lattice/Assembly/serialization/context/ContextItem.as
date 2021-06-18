@@ -49,7 +49,7 @@ package Bezel.Lattice.Assembly.serialization.context
                 context = contexts[0];
                 for (var i:int = 1; i < contexts.length; i++)
                 {
-                    contextRoot(context, contexts[i]);
+                    context = contextRoot(context, contexts[i]);
                 }
             }
             else
@@ -65,7 +65,10 @@ package Bezel.Lattice.Assembly.serialization.context
             for each (var c:ContextItem in context)
             {
                 var expanded:Vector.<ContextItem> = c.expand(refs);
-                ret = ret.concat(expanded);
+                if (expanded != null && expanded.length != 0)
+                {
+                    ret = ret.concat(expanded);
+                }
             }
             return ret;
         }
@@ -98,7 +101,7 @@ package Bezel.Lattice.Assembly.serialization.context
                             var ns:ASNamespace = (multiname.subdata as ASQName).ns;
                             if (ns.type == ABCType.PrivateNamespace)
                             {
-                                var context:Vector.<ContextItem> = refs.namespaces[ns.type].getContext(refs, ns.uniqueId);
+                                var context:Vector.<ContextItem> = refs.namespaces[ns.type.val].getContext(refs, ns.uniqueId);
                                 expanding = false;
                                 if ((multiname.subdata as ASQName).name.length != 0)
                                 {
@@ -180,9 +183,10 @@ package Bezel.Lattice.Assembly.serialization.context
         {
             function uninteresting(c:Vector.<ContextItem>):Boolean
             {
+                CONFIG::debug
                 for each (var item:ContextItem in c)
                 {
-                    if (item.type != TYPE_Group) throw new Error("Groups should be expanded by now");
+                    if (item.type == TYPE_Group) throw new Error("Groups should be expanded by now");
                 }
 
                 return (c.length == 1 && c[0].type == TYPE_String && c[0].str.indexOf("script_") == 0 && c[0].str.lastIndexOf("_sinit") == c[0].str.length - 6) ||

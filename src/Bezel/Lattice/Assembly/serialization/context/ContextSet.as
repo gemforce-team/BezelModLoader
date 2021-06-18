@@ -55,12 +55,12 @@ package Bezel.Lattice.Assembly.serialization.context
             {
                 contextSets[obj] = new <Vector.<Vector.<ContextItem>>>[new <Vector.<ContextItem>>[], new <Vector.<ContextItem>>[], new <Vector.<ContextItem>>[]];
                 (contextSets[obj] as Vector.<Vector.<Vector.<ContextItem>>>).fixed = true;
-                (contextSets[obj] as Vector.<Vector.<Vector.<ContextItem>>>)[priority].push(context.concat());
+                (contextSets[obj] as Vector.<Vector.<Vector.<ContextItem>>>)[priority].push(context);
                 return true;
             }
             else
             {
-                contextSets[obj][priority].push(context.concat());
+                contextSets[obj][priority].push(context);
                 return false;
             }
         }
@@ -132,7 +132,7 @@ package Bezel.Lattice.Assembly.serialization.context
             var set:Vector.<Vector.<ContextItem>> = new <Vector.<ContextItem>>[];
             for each (var prioritySet:Vector.<Vector.<ContextItem>> in (contextSets[obj] as Vector.<Vector.<Vector.<ContextItem>>>))
             {
-                if (prioritySet)
+                if (prioritySet != null && prioritySet.length != 0)
                 {
                     set = prioritySet;
                 }

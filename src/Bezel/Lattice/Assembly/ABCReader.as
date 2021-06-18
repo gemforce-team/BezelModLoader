@@ -239,7 +239,7 @@ package Bezel.Lattice.Assembly
 
 		public function readTrait():ABCTrait
 		{
-			var ret:ABCTrait = new ABCTrait(readU30());
+			var ret:ABCTrait = new ABCTrait(readU30(), null,0, null, new <int>[]);
 
 			var num:int = readU8();
 			ret.type = TraitType.fromByte(num & 0xF);
@@ -277,15 +277,10 @@ package Bezel.Lattice.Assembly
 			if (ret.attributes & TraitAttributes.METADATA)
 			{
 				num = readU30();
-				ret.metadata = new <int>[];
 				for (var i:int = 0; i < num; i++)
 				{
 					ret.metadata.push(readU30());
 				}
-			}
-			else
-			{
-				ret.metadata = new <int>[];
 			}
 
 			return ret;

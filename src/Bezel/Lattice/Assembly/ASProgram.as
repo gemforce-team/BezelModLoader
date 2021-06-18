@@ -108,6 +108,7 @@ package Bezel.Lattice.Assembly
                 var ret:Vector.<ASTrait> = new Vector.<ASTrait>(traits.length, true);
                 for (var i:int = 0; i < ret.length; i++)
                 {
+                    ret[i] = new ASTrait();
                     ret[i].name = multinames[traits[i].name];
                     ret[i].type = traits[i].type;
                     ret[i].attributes = traits[i].attributes;

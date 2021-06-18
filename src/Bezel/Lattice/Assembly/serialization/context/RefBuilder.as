@@ -41,7 +41,7 @@ package Bezel.Lattice.Assembly.serialization.context
         public var objects:ContextSet;
         public var scripts:ContextSet;
 
-        // bool[void*] -> Array
+        // bool[void*] -> Array[void*], checked w/function
         public var orphans:Array;
         // bool[uint] -> Vector.<uint>
         public var possibleOrphanPrivateNamespaces:Vector.<uint>;
@@ -164,17 +164,17 @@ package Bezel.Lattice.Assembly.serialization.context
                 {
                     if (trait.name.type == ABCType.QName)
                     {
-                        namespaces[(trait.name.subdata as ASQName).ns.type].addIfNew((trait.name.subdata as ASQName).ns.uniqueId, scripts.getContext(this, script), ContextSet.PRIORITY_Declaration);
+                        namespaces[(trait.name.subdata as ASQName).ns.type.val].addIfNew((trait.name.subdata as ASQName).ns.uniqueId, scripts.getContext(this, script), ContextSet.PRIORITY_Declaration);
                     }
                 }
             }
 
             for each (var id:uint in possibleOrphanPrivateNamespaces)
             {
-                if (!namespaces[ABCType.PrivateNamespace].isAdded(id))
+                if (!namespaces[ABCType.PrivateNamespace.val].isAdded(id))
                 {
                     this.context.push(ContextItem.fromString("orphan_namespace_" + id));
-                    namespaces[ABCType.PrivateNamespace].add(id, context, ContextSet.PRIORITY_Orphan);
+                    namespaces[ABCType.PrivateNamespace.val].add(id, context, ContextSet.PRIORITY_Orphan);
                     this.context.pop();
                 }
             }
@@ -275,7 +275,7 @@ package Bezel.Lattice.Assembly.serialization.context
             }
 
             var myContext:Vector.<ContextItem> = context.slice(0, myPos);
-            namespaces[ns.type].add(ns.uniqueId, myContext, priority);
+            namespaces[ns.type.val].add(ns.uniqueId, myContext, priority);
         }
 
         public function visitNamespaceSet(nsSet:Vector.<ASNamespace>, priority:int):void
