@@ -1,3 +1,4 @@
+class OpcodeConstructorBlocker {}
 package Bezel.Lattice.Assembly
 {
 	
@@ -294,7 +295,7 @@ package Bezel.Lattice.Assembly
             return this == OP_returnvalue || this == OP_returnvoid || this == OP_throw || this == OP_jump || this == OP_lookupswitch;
         }
 
-        public function get usable():Boolean { return !this._argTypes.some(function(argType:OpcodeArgumentType):Boolean { return argType == OpcodeArgumentType.Unknown; }); }
+        public function get usable():Boolean { return !this._argTypes.some(function(argType:OpcodeArgumentType, index:int, array:Vector.<OpcodeArgumentType>):Boolean { return argType == OpcodeArgumentType.Unknown; }); }
 		
 		public function Opcode(val:int, name:String, argTypes:Vector.<OpcodeArgumentType>, constructorBlocker:OpcodeConstructorBlocker)
 		{
@@ -569,8 +570,4 @@ package Bezel.Lattice.Assembly
             codesByName["0xFF"] = OP_0xFF;
 		}
 	}
-}
-
-class OpcodeConstructorBlocker
-{
 }

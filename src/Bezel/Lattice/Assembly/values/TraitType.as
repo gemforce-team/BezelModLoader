@@ -23,7 +23,7 @@ package Bezel.Lattice.Assembly.values
 
         public function TraitType(val:int, name:String, blocker:TraitTypeConstructorBlocker)
         {
-            if (blocker != null)
+            if (blocker == null)
             {
                 throw new Error("Do not use the TraitType constructor");
             }
@@ -31,7 +31,7 @@ package Bezel.Lattice.Assembly.values
             this._name = name;
         }
 
-        public static function fromByte(val:int):TraitType
+        public static function fromByte(val:uint):TraitType
         {
             switch (val)
             {

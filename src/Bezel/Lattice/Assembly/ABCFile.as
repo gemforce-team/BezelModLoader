@@ -119,7 +119,6 @@ package Bezel.Lattice.Assembly
                 ret.instances[i] = reader.readInstance();
             }
 
-            numConstants = reader.readU30();
             for (i = 0; i < numConstants; i++)
             {
                 ret.classes[i] = reader.readABCClass();

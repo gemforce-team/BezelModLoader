@@ -182,8 +182,7 @@ package Bezel.Lattice.Assembly
 
 			if (ret.flags & MethodFlags.HAS_PARAM_NAMES)
 			{
-				num = readU30();
-				for (i = 0; i < num; i++)
+				for (i = 0; i < ret.parameterTypes.length; i++)
 				{
 					ret.parameterNames.push(readU30());
 				}
@@ -325,7 +324,7 @@ package Bezel.Lattice.Assembly
 			var numCodeBytes:int = readU30();
 			var startCode:uint = data.position;
 
-			data.position = startCode + numCodeBytes;
+			data.position += numCodeBytes;
 			var numObjects:int = readU30();
 			for (var i:int = 0; i < numObjects; i++)
 			{
@@ -370,14 +369,13 @@ package Bezel.Lattice.Assembly
 				pendingExploration = false;
 				data.position = startCode;
 
-				while (data.position < endBody)
+				while (data.position < startCode + numCodeBytes)
 				{
 					if (traceStates[offset()] == 1)
 					{
-						while (data.position < endBody)
+						while (data.position < startCode + numCodeBytes)
 						{
-							var instructionBegin:int;
-							instructionBegin = offset();
+							var instructionBegin:int = offset();
 
 							if (traceStates[instructionBegin] == 3)
 								throw new Error("Overlapping instruction");
@@ -457,7 +455,7 @@ package Bezel.Lattice.Assembly
 								}
 							}
 
-							if (data.position > endBody)
+							if (data.position > startCode + numCodeBytes)
 							{
 								throw new Error("Out-of-bounds code read error");
 							}
@@ -541,10 +539,10 @@ package Bezel.Lattice.Assembly
 					{
 						case OpcodeArgumentType.JumpTarget:
 						case OpcodeArgumentType.SwitchDefaultTarget:
-							translateLabel(instruction.arguments[i] as InstructionLabel);
+							translateLabel(ret.instructions[i].arguments[j] as InstructionLabel);
 							break;
 						case OpcodeArgumentType.SwitchTargets:
-							for each (var label:InstructionLabel in (instruction.arguments[i] as Vector.<InstructionLabel>))
+							for each (var label:InstructionLabel in (ret.instructions[i].arguments[j] as Vector.<InstructionLabel>))
 							{
 								translateLabel(label);
 							}
