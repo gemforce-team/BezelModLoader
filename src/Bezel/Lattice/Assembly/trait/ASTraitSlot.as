@@ -14,7 +14,7 @@ package Bezel.Lattice.Assembly.trait
         public var typeName:ASMultiname;
         public var value:ASValue;
 
-        public function ASTraitSlot(slotId:int = 0, typeName:ASMultiname = null, valueIndex:ASValue = null)
+        public function ASTraitSlot(slotId:int = 0, typeName:ASMultiname = null, value:ASValue = null)
         {
             this.slotId = slotId;
             this.typeName = typeName;

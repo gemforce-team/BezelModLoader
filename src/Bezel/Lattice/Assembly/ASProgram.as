@@ -21,6 +21,7 @@ package Bezel.Lattice.Assembly
     import Bezel.Lattice.Assembly.trait.ASTraitFunction;
     import Bezel.Lattice.Assembly.trait.ABCTraitMethod;
     import Bezel.Lattice.Assembly.trait.ASTraitMethod;
+    import Bezel.Logger;
 
     /**
 	 * ...
@@ -66,6 +67,7 @@ package Bezel.Lattice.Assembly
 
             function convertValue(type:ABCType, index:int):ASValue
             {
+                CONFIG::debug{Logger.getLogger("ASProgram").log("convertValue", "Value being converted: " + type.name + " with index " + index);}
                 var ret:ASValue = new ASValue();
                 ret.type = type;
                 switch (type)

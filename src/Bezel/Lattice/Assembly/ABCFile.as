@@ -36,7 +36,7 @@ package Bezel.Lattice.Assembly
             integers = new <int>[0];
             uintegers = new <uint>[0];
             doubles = new <Number>[0];
-            strings = new <String>[""];
+            strings = new <String>[null];
             namespaces = new <ABCNamespace>[null];
             ns_sets = new <Vector.<uint>>[null];
             multinames = new <ABCMultiname>[null];

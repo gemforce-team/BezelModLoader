@@ -31,6 +31,7 @@ package Bezel.Lattice.Assembly.serialization
     import Bezel.Lattice.Assembly.ASInstruction;
     import Bezel.Lattice.Assembly.OpcodeArgumentType;
     import Bezel.Lattice.Assembly.Opcode;
+    import Bezel.Logger;
 
     /**
      * ...
@@ -136,26 +137,12 @@ package Bezel.Lattice.Assembly.serialization
 
         private function dumpInt(sb:StringBuilder, v:int):void
         {
-            if (v == 0)
-            {
-                sb.put("null");
-            }
-            else
-            {
-                sb.put(v.toString());
-            }
+            sb.put(v.toString());
         }
 
         private function dumpUInt(sb:StringBuilder, v:uint):void
         {
-            if (v == 0)
-            {
-                sb.put("null");
-            }
-            else
-            {
-                sb.put(v.toString());
-            }
+            sb.put(v.toString());
         }
 
         private function dumpDouble(sb:StringBuilder, v:Number):void
@@ -351,7 +338,7 @@ package Bezel.Lattice.Assembly.serialization
                             sb.put(" type ");
                             dumpMultiname(sb, slot.typeName);
                         }
-                        if (slot.value != null)
+                        if (slot.value.type != ABCType.Undefined)
                         {
                             sb.put(" value ");
                             dumpValue(sb, slot.value);
@@ -389,7 +376,7 @@ package Bezel.Lattice.Assembly.serialization
                         var method:ASTraitMethod = trait.extraData as ASTraitMethod;
                         if (method.slotId != 0)
                         {
-                            sb.put(" slotid ");
+                            sb.put(" dispid ");
                             dumpUInt(sb, method.slotId);
                         }
                         sb.newLine();
