@@ -1,6 +1,8 @@
 package Bezel.Lattice.Assembly.serialization.context
 {
     import flash.utils.Dictionary;
+    import Bezel.Logger;
+    import flash.utils.getQualifiedClassName;
 
     /**
      * ...
@@ -46,21 +48,36 @@ package Bezel.Lattice.Assembly.serialization.context
 
         public function add(obj:*, context:Vector.<ContextItem>, priority:int):Boolean
         {
-            CONFIG::debug
-            if (coagulated) throw new Error("ContextSet must not be coagulated");
-            CONFIG::debug
-            if (contextsSealed) throw new Error("ContextSet must not be sealed");
+            CONFIG::debug {
+                if (coagulated) throw new Error("ContextSet must not be coagulated");
+                if (contextsSealed) throw new Error("ContextSet must not be sealed");
 
+                Logger.getLogger("ContextSet").log("add", "Adding a " + getQualifiedClassName(obj) + " with context " + context.toString());
+            }
+
+            var set:Vector.<Vector.<Vector.<ContextItem>>> = contextSets[obj] as Vector.<Vector.<Vector.<ContextItem>>>;
             if (!isAdded(obj))
             {
-                contextSets[obj] = new <Vector.<Vector.<ContextItem>>>[new <Vector.<ContextItem>>[], new <Vector.<ContextItem>>[], new <Vector.<ContextItem>>[]];
-                (contextSets[obj] as Vector.<Vector.<Vector.<ContextItem>>>).fixed = true;
-                (contextSets[obj] as Vector.<Vector.<Vector.<ContextItem>>>)[priority].push(context);
+                set = contextSets[obj] = new <Vector.<Vector.<ContextItem>>>[new <Vector.<ContextItem>>[], new <Vector.<ContextItem>>[], new <Vector.<ContextItem>>[]];
+                set.fixed = true;
+                set[priority].push(context.slice());
                 return true;
             }
             else
             {
-                contextSets[obj][priority].push(context);
+                function rawEqual(a:Vector.<ContextItem>, b:Vector.<ContextItem>):Boolean
+                {
+                    if (a.length != b.length) return false;
+                    for (var i:int = 0; i < a.length; i++)
+                    {
+                        if (!a[i].equals(b[i])) return false;
+                    }
+                    return true;
+                }
+                if (set[priority].length == 0 || !rawEqual(set[priority][set[priority].length - 1], context))
+                {
+                    set[priority].push(context.slice());
+                }
                 return false;
             }
         }
@@ -75,8 +92,7 @@ package Bezel.Lattice.Assembly.serialization.context
 
         public function coagulate(refs:RefBuilder):void
         {
-            CONFIG::debug
-            if (coagulated) throw new Error("ContextSet must not be coagulated");
+            CONFIG::debug{if (coagulated) throw new Error("ContextSet must not be coagulated");}
 
             // int[string]
             var collisionCounter:Object = new Object();
@@ -89,14 +105,16 @@ package Bezel.Lattice.Assembly.serialization.context
                 {
                     getContext(refs, obj);
                 }
+                Logger.getLogger("ContextSet").log("coagulate", "This " + getQualifiedClassName(obj) + "'s final context is " + contexts[obj]);
             }
 
             for (obj in contexts)
             {
                 var context:Vector.<ContextItem> = contexts[obj] as Vector.<ContextItem>;
                 var bname:String = refs.contextToString(context, false);
+                Logger.getLogger("ContextSet").log("coagulate", "This " + getQualifiedClassName(obj) + " has context name " + bname);
                 var bfilename:String = refs.contextToString(context, true);
-                var counter:int = bname in collisionCounter ? collisionCounter[bname] : 0;
+                var counter:int = (bname in collisionCounter) ? collisionCounter[bname] : 0;
                 if (counter == 1)
                 {
                     var firstObj:* = first[bname];
@@ -118,14 +136,12 @@ package Bezel.Lattice.Assembly.serialization.context
                 collisionCounter[bname] = counter + 1;
             }
 
-            CONFIG::debug
-            this.coagulated = true;
+            CONFIG::debug{this.coagulated = true;}
         }
 
         public function getContext(refs:RefBuilder, obj:*):Vector.<ContextItem>
         {
-            CONFIG::debug
-            this.contextsSealed = true;
+            CONFIG::debug{this.contextsSealed = true;}
 
             if (obj in contexts) return contexts[obj];
 
@@ -137,6 +153,8 @@ package Bezel.Lattice.Assembly.serialization.context
                     set = prioritySet;
                 }
             }
+
+            Logger.getLogger("ContextSet").log("getContext", "Context sets are " + set.toString());
 
             if (allowDuplicates)
             {
@@ -162,8 +180,7 @@ package Bezel.Lattice.Assembly.serialization.context
 
         public function getName(obj:*):String
         {
-            CONFIG::debug
-            if (!coagulated) throw new Error("ContextSet must be coagulated");
+            CONFIG::debug{if (!coagulated) throw new Error("ContextSet must be coagulated");}
 
             if (!(obj in names)) throw new Error("Object not found in ContextSet");
             return names[obj];
@@ -171,8 +188,7 @@ package Bezel.Lattice.Assembly.serialization.context
 
         public function getFilename(obj:*, suffix:String):String
         {
-            CONFIG::debug
-            if (!coagulated) throw new Error("ContextSet must be coagulated");
+            CONFIG::debug{if (!coagulated) throw new Error("ContextSet must be coagulated");}
 
             if (!(obj in filenames)) throw new Error("Object not found in filenames");
 

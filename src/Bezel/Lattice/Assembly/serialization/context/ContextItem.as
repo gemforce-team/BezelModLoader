@@ -7,6 +7,7 @@ package Bezel.Lattice.Assembly.serialization.context
     import Bezel.Lattice.Assembly.ASNamespace;
     import Bezel.Lattice.Assembly.ASProgram;
     import Bezel.Lattice.Assembly.multiname.ASMultinameSubdata;
+    import Bezel.Logger;
 
     /**
      * ...
@@ -31,17 +32,29 @@ package Bezel.Lattice.Assembly.serialization.context
         public var group:Vector.<ContextItem>;
         public var groupFallback:String;
 
-        private var expanding:Boolean = false;
+        private var expanding:Boolean;
+
+        public function ContextItem()
+        {
+            expanding = false;
+        }
+
+        public function toString():String
+        {
+            return "{ type = " + type + ", multiname = " + (multiname == null ? "null" : multiname.toString()) + ", str = \'" + str + "\', group = " + (group == null ? "null" : group.toString()) + " }";
+        }
 
         public function reduceGroup(refs:RefBuilder):Vector.<ContextItem>
         {
             if (type != TYPE_Group) throw new Error("Tried using group method on ContextItem of a different type");
 
             var contexts:Vector.<Vector.<ContextItem>> = new <Vector.<ContextItem>>[];
-            for each (var c:ContextItem in this.group)
+            for each (var c:ContextItem in group)
             {
                 contexts.push(ContextItem.expand(refs, new <ContextItem>[c]));
             }
+
+            Logger.getLogger("ContextItem").log("reduceGroup", "Group contexts after expanding are " + contexts.toString());
 
             var context:Vector.<ContextItem>;
             if (contexts.length != 0)
@@ -85,6 +98,8 @@ package Bezel.Lattice.Assembly.serialization.context
                         return new <ContextItem>[this];
                     case TYPE_Group:
                         return new <ContextItem>[fromString(groupFallback)];
+                    default:
+                        throw new Error("Unknown ContextItem type");
                 }
             }
 
@@ -116,20 +131,21 @@ package Bezel.Lattice.Assembly.serialization.context
                             return (multiname.subdata as ASMultinameSubdata).name.length != 0 ? new <ContextItem>[fromString((multiname.subdata as ASMultinameSubdata).name)] : new <ContextItem>[];
                         default:
                             expanding = false;
-                            CONFIG::debug
-                            throw new Error("Multiname of type " + multiname.type.val + " trying to be expanded");
+                            CONFIG::debug{throw new Error("Multiname of type " + multiname.type.val + " trying to be expanded");}
                             break;
                     }
                 }
                 break;
                 case TYPE_String:
                     expanding = false;
-                    break;
+                    return new <ContextItem>[this];
                 case TYPE_Group:
                     expanding = false;
                     return reduceGroup(refs);
+                default:
+                    expanding = false;
+                    throw new Error("Unknown ContextItem type was expanded");
             }
-
             return new <ContextItem>[this];
         }
 
@@ -171,7 +187,7 @@ package Bezel.Lattice.Assembly.serialization.context
                     var segments:Vector.<Segment> = new Vector.<Segment>();
                     for each (var context:ContextItem in reduceGroup(refs))
                     {
-                        segments.concat(context.toSegments(refs, filename));
+                        segments = segments.concat(context.toSegments(refs, filename));
                     }
                     return segments;
                 }
@@ -185,9 +201,11 @@ package Bezel.Lattice.Assembly.serialization.context
             function uninteresting(c:Vector.<ContextItem>):Boolean
             {
                 CONFIG::debug
-                for each (var item:ContextItem in c)
                 {
-                    if (item.type == TYPE_Group) throw new Error("Groups should be expanded by now");
+                    for each (var item:ContextItem in c)
+                    {
+                        if (item.type == TYPE_Group) throw new Error("Groups should be expanded by now");
+                    }
                 }
 
                 return (c.length == 1 && c[0].type == TYPE_String && c[0].str.indexOf("script_") == 0 && c[0].str.lastIndexOf("_sinit") == c[0].str.length - 6) ||
@@ -202,7 +220,7 @@ package Bezel.Lattice.Assembly.serialization.context
             while (c.length < c1.length && c.length < c2.length)
             {
                 var root:Vector.<ContextItem> = commonRoot(c1[c.length], c2[c.length]);
-                if (root.length > 1) throw new Error("root should not be larger than 1 element");
+                if (root.length > 1) throw new Error("Root should not be larger than 1 element");
                 if (root.length == 1)
                 {
                     c.push(root[0]);
@@ -340,7 +358,7 @@ package Bezel.Lattice.Assembly.serialization.context
         {
             var ret:ContextItem = new ContextItem();
             ret.type = TYPE_Group;
-            ret.group = g;
+            ret.group = g.slice();
             ret.groupFallback = groupFallback;
             return ret;
         }
@@ -366,10 +384,34 @@ package Bezel.Lattice.Assembly.serialization.context
                     if ((i1.multiname.subdata as ASQName).name != (i2.multiname.subdata as ASQName).name) return false;
                     return nsSimilar((i1.multiname.subdata as ASQName).ns, (i2.multiname.subdata as ASQName).ns);
                 case TYPE_Group:
-                    return i1.group == i2.group;
+                    if (i1.group.length != i2.group.length) return false;
+                    for (var i:int = 0; i < i1.group.length; i++)
+                    {
+                        if (!i1.group[i].equals(i2.group[i])) return false;
+                    }
+                    return true;
                 default:
                     throw new Error("ContextItem Type is not recognized");
             }
+        }
+
+        public function equals(other:ContextItem):Boolean
+        {
+            if (type != other.type) return false;
+            if (multiname != null && !multiname.equals(other.multiname)) return false;
+            if (str != other.str) return false;
+            if (filenameSuffix != other.filenameSuffix) return false;
+            if (group != null)
+            {
+                if (group.length != other.group.length) return false;
+                for (var i:int = 0; i < group.length; i++)
+                {
+                    if (!group[i].equals(other.group[i])) return false;
+                }
+            }
+            if (groupFallback != other.groupFallback) return false;
+
+            return true;
         }
     }
 }

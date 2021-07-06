@@ -6,5 +6,14 @@ package Bezel.Lattice.Assembly.multiname
 	 */
     public class ASRTQNameL
     {
+        public function toString():String
+        {
+            return "";
+        }
+
+        public function equals(other:ASRTQNameL):Boolean
+        {
+            return true;
+        }
     }
 }

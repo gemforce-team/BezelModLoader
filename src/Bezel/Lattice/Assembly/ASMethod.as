@@ -11,7 +11,7 @@ package Bezel.Lattice.Assembly
 		public var name:String;
 		public var flags:uint;
 		public var options:Vector.<ASValue>;
-		public var paramNames:String;
+		public var paramNames:Vector.<String>;
 
 		public var id:uint;
 

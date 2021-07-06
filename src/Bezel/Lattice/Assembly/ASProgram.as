@@ -71,10 +71,10 @@ package Bezel.Lattice.Assembly
                 switch (type)
                 {
                      case ABCType.Integer:
-                        ret.data = abc.integers[index]; // WARNING: discarding extra bits
+                        ret.data = abc.integers[index];
                         break;
                     case ABCType.UInteger:
-                        ret.data = abc.uintegers[index]; // WARNING: discarding extra bits
+                        ret.data = abc.uintegers[index];
                         break;
                     case ABCType.Double:
                         ret.data = abc.doubles[index];
@@ -285,6 +285,11 @@ package Bezel.Lattice.Assembly
                 for (j = 0; j < methods[i].options.length; j++)
                 {
                     methods[i].options[j] = convertValue(abc.methods[i].defaultOptions[j].type, abc.methods[i].defaultOptions[j].index);
+                }
+                methods[i].paramNames = new Vector.<String>(abc.methods[i].parameterNames.length, true);
+                for (j = 0; j < methods[i].paramNames.length; j++)
+                {
+                    methods[i].paramNames[j] = abc.strings[abc.methods[i].parameterNames[j]];
                 }
             }
 

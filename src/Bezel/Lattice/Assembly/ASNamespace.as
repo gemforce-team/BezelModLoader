@@ -13,6 +13,16 @@ package Bezel.Lattice.Assembly
 
         public var uniqueId:uint;
 
+        public function toString():String
+        {
+            return type.name + "(" + name + ")";
+        }
+
+        public function equals(other:ASNamespace):Boolean
+        {
+            return type == other.type && name == other.name && uniqueId == other.uniqueId;
+        }
+
         public function ASNamespace(type:ABCType, name:String, id:uint)
         {
             this.type = type;

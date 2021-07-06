@@ -13,6 +13,16 @@ package Bezel.Lattice.Assembly
         public var type:ABCType;
         public var subdata:*;
 
+        public function toString():String
+        {
+            return "{ type = " + type.name + subdata.toString() + " }";
+        }
+
+        public function equals(other:ASMultiname):Boolean
+        {
+            return type == other.type && typeof(subdata) == typeof(other.subdata) && subdata.equals(other.subdata);
+        }
+
         public function ASMultiname(type:ABCType, subdata:*)
         {
             this.type = type;

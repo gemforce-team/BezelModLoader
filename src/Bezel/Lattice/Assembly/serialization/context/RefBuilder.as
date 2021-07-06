@@ -22,6 +22,7 @@ package Bezel.Lattice.Assembly.serialization.context
     import Bezel.Lattice.Assembly.ASMethodBody;
     import Bezel.Lattice.Assembly.ASInstruction;
     import Bezel.Lattice.Assembly.OpcodeArgumentType;
+    import Bezel.Logger;
 
     /**
      * ...
@@ -29,7 +30,7 @@ package Bezel.Lattice.Assembly.serialization.context
      */
     public class RefBuilder extends ASTraitsVisitor
     {
-        // bool[uint][string][uint] -> Vector<Object[Vector<int>]>
+        // bool[uint][string][uint] -> Vector<Object[Vector<uint>]>
         // No good way to do an associative array on Objects
         private var homonyms:Vector.<Object>;
         CONFIG::debug
@@ -41,10 +42,10 @@ package Bezel.Lattice.Assembly.serialization.context
         public var objects:ContextSet;
         public var scripts:ContextSet;
 
-        // bool[void*] -> Array[void*], checked w/function
-        public var orphans:Array;
-        // bool[uint] -> Vector.<uint>
-        public var possibleOrphanPrivateNamespaces:Vector.<uint>;
+        // bool[void*] -> Dictionary of Booleans
+        public var orphans:Dictionary;
+        // bool[uint] -> Array of Booleans
+        public var possibleOrphanPrivateNamespaces:Array;
 
         public function RefBuilder(asp:ASProgram)
         {
@@ -63,49 +64,51 @@ package Bezel.Lattice.Assembly.serialization.context
             objects = new ContextSet(false);
             scripts = new ContextSet(false);
 
-            orphans = new Array();
+            orphans = new Dictionary();
 
             context = new <ContextItem>[];
-            possibleOrphanPrivateNamespaces = new <uint>[];
+            possibleOrphanPrivateNamespaces = new Array();
         }
 
         public function isOrphan(i:*):Boolean
         {
-            return orphans.some(function (item:*, index:int, array:Array):Boolean { return item == i; });
+            return i in orphans;
+        }
+
+        public function addOrphan(i:*):void
+        {
+            orphans[i] = true;
         }
 
         public function hasHomonyms(ns:ASNamespace):Boolean
         {
-            CONFIG::debug
-            if (!homonymsBuilt) throw new Error("Homonymns not built");
-            if (ns.name in homonyms[ns.type.val])
-            {
-                return homonyms[ns.type.val][ns.name].length > 1;
-            }
-            return false;
+            CONFIG::debug{if (!homonymsBuilt) throw new Error("Homonymns not built");}
+            return ns.name in homonyms[ns.type.val] && (homonyms[ns.type.val][ns.name] as Vector.<uint>).length > 1;
         }
 
         public function addHomonym(ns:ASNamespace):void
         {
-            CONFIG::debug
-            if (homonymsBuilt) throw new Error("Homonymns already built");
+            CONFIG::debug{if (homonymsBuilt) throw new Error("Homonymns already built");}
             if (!(ns.name in homonyms[ns.type.val]))
             {
-                homonyms[ns.type.val][ns.name] = new Vector.<int>();
+                homonyms[ns.type.val][ns.name] = new <uint>[];
             }
 
-            homonyms[ns.type.val][ns.name].push(ns.uniqueId);
+            if (!homonyms[ns.type.val][ns.name].some(function(argType:uint, index:int, array:Vector.<uint>):Boolean {return argType == ns.uniqueId;}))
+            {
+                homonyms[ns.type.val][ns.name].push(ns.uniqueId);
+            }
         }
 
         public override function run():void
         {
             for each (var clazz:ASClass in asp.orphanClasses)
             {
-                if (!isOrphan(clazz)) orphans.push(clazz);
+                addOrphan(clazz);
             }
             for each (var method:ASMethod in asp.orphanMethods)
             {
-                if (!isOrphan(method)) orphans.push(method);
+                addOrphan(method);
             }
 
             super.run();
@@ -179,8 +182,7 @@ package Bezel.Lattice.Assembly.serialization.context
                 }
             }
 
-            CONFIG::debug
-            this.homonymsBuilt = true;
+            CONFIG::debug{this.homonymsBuilt = true;}
 
             for each (var ns:ContextSet in namespaces)
             {
@@ -270,7 +272,7 @@ package Bezel.Lattice.Assembly.serialization.context
 
             if (ns.type == ABCType.PrivateNamespace && myPos == 0)
             {
-                possibleOrphanPrivateNamespaces.push(ns.uniqueId);
+                possibleOrphanPrivateNamespaces[ns.uniqueId] = true;
                 return;
             }
 
@@ -358,21 +360,31 @@ package Bezel.Lattice.Assembly.serialization.context
 
         public function contextToString(context:Vector.<ContextItem>, filename:Boolean):String
         {
-            context = ContextItem.expand(this, context);
-            if (context.length == 0) return "";
+            var log:Logger = Logger.getLogger("RefBuilder");
+            log.log("contextToString", "Original: " + context.toString());
+            var expanded:Vector.<ContextItem> = ContextItem.expand(this, context);
+            log.log("contextToString", "Expanded: " + expanded.toString());
+            if (expanded.length == 0) return "";
 
-            for (var i:int = context.length - 2; i >= 0; i--)
+            // NOT SURE BOUT THAT
+            for (var i:int = expanded.length - 2; i >= 0; i--)
             {
-                var root:Vector.<ContextItem> = ContextItem.deduplicate(context[i], context[i + 1]);
+                var root:Vector.<ContextItem> = ContextItem.deduplicate(expanded[i], expanded[i + 1]);
 
-                context = context.slice(0, i).concat(root).concat(context.slice(i + 2));
+                if (root.length > 0)
+                {
+                    expanded = expanded.slice(0, i).concat(root, expanded.slice(i + 2));
+                }
             }
+            log.log("contextToString", "Deduplicated: " + expanded.toString());
 
             var segments:Vector.<Segment> = new <Segment>[];
-            for each (var item:ContextItem in context)
+            for each (var item:ContextItem in expanded)
             {
-                segments.concat(item.toSegments(this, filename));
+                segments = segments.concat(item.toSegments(this, filename));
             }
+
+            log.log("contextToString", "Segments: " + segments.toString());
 
             function escape(s:String):String
             {
@@ -385,7 +397,12 @@ package Bezel.Lattice.Assembly.serialization.context
                         result += '/';
                     else if (s.charAt(i) == '\\' || s.charAt(i) == '*' || s.charAt(i) == '?' || s.charAt(i) == '"' || s.charAt(i) == '<' || s.charAt(i) == '>' || s.charAt(i) == '|' || s.charCodeAt(i) < 0x20 || s.charCodeAt(i) >= 0x7F || s.charAt(i) == ' ' || s.charAt(i) == '%')
                     {
-                        result += "%" + s.charCodeAt(i).toString(16).toUpperCase();
+                        var addMe:String = s.charCodeAt(i).toString(16).toUpperCase();
+                        if (addMe.length < 2)
+                        {
+                            addMe = "0" + addMe;
+                        }
+                        result += "%" + addMe;
                     }
                     else
                     {
@@ -409,7 +426,7 @@ package Bezel.Lattice.Assembly.serialization.context
                     var pathSegmentU:String = (pathSegments[i] as String).toUpperCase();
                     for each (var reservedName:String in reservedNames)
                     {
-                        if (pathSegmentU.indexOf(reservedName) == 0)
+                        if (pathSegmentU == reservedName || pathSegmentU.indexOf(reservedName + ".") == 0)
                         {
                             pathSegments[i] = "%" + pathSegments[i];
                         }

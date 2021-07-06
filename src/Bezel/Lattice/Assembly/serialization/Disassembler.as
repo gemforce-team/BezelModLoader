@@ -57,7 +57,7 @@ package Bezel.Lattice.Assembly.serialization
                 sb.save(strings);
 
                 mainsb.put("#include ");
-                mainsb.put(filename);
+                dumpString(mainsb, filename);
                 mainsb.newLine();
             }
             else
@@ -181,7 +181,7 @@ package Bezel.Lattice.Assembly.serialization
 
         private function dumpString(sb:StringBuilder, str:String):void
         {
-            if (str == null || str.length == 0)
+            if (str == null)
             {
                 sb.put("null");
             }
@@ -209,7 +209,12 @@ package Bezel.Lattice.Assembly.serialization
                     }
                     else if (str.charCodeAt(i) < 0x20)
                     {
-                        sb.put("\\x" + str.charCodeAt(i).toString(16));
+                        var addMe:String = str.charCodeAt(i).toString(16);
+                        if (addMe.length < 2)
+                        {
+                            addMe = "0" + addMe;
+                        }
+                        sb.put("\\x" + addMe);
                     }
                     else
                     {
@@ -235,7 +240,7 @@ package Bezel.Lattice.Assembly.serialization
                 if (refs.hasHomonyms(ns))
                 {
                     sb.put(", ");
-                    dumpString(sb, refs.namespaces[ns.type].getName(ns.uniqueId));
+                    dumpString(sb, refs.namespaces[ns.type.val].getName(ns.uniqueId));
                 }
                 sb.put(")");
             }
@@ -243,7 +248,7 @@ package Bezel.Lattice.Assembly.serialization
 
         private function dumpNamespaceSet(sb:StringBuilder, set:Vector.<ASNamespace>):void
         {
-            if (set == null || set.length == 0)
+            if (set == null)
             {
                 sb.put("null");
             }
@@ -484,6 +489,7 @@ package Bezel.Lattice.Assembly.serialization
                 case ABCType.StaticProtectedNs:
                 case ABCType.PrivateNamespace:
                     dumpNamespace(sb, value.data as ASNamespace);
+                    break;
                 case ABCType.True:
                 case ABCType.False:
                 case ABCType.Null:
@@ -679,7 +685,7 @@ package Bezel.Lattice.Assembly.serialization
                     {
                         case OpcodeArgumentType.JumpTarget:
                         case OpcodeArgumentType.SwitchDefaultTarget:
-                            labels[instruction.arguments[i].jumpTarget.index] = true;
+                            labels[(instruction.arguments[i] as InstructionLabel).index] = true;
                             break;
                         case OpcodeArgumentType.SwitchTargets:
                             for each (var label:InstructionLabel in (instruction.arguments[i] as Vector.<InstructionLabel>))
@@ -728,51 +734,51 @@ package Bezel.Lattice.Assembly.serialization
                                 throw new Error("Not known how to disassemble OP_" + instruction.opcode.name);
 
                             case OpcodeArgumentType.ByteLiteral:
-                                sb.put((instruction.arguments[i] as int).toString());
+                                sb.put((instruction.arguments[j] as int).toString());
                                 break;
                             case OpcodeArgumentType.UByteLiteral:
-                                sb.put((instruction.arguments[i] as uint).toString());
+                                sb.put((instruction.arguments[j] as uint).toString());
                                 break;
                             case OpcodeArgumentType.IntLiteral:
-                                sb.put((instruction.arguments[i] as int).toString());
+                                sb.put((instruction.arguments[j] as int).toString());
                                 break;
                             case OpcodeArgumentType.UIntLiteral:
-                                sb.put((instruction.arguments[i] as uint).toString());
+                                sb.put((instruction.arguments[j] as uint).toString());
                                 break;
                             
                             case OpcodeArgumentType.Int:
-                                dumpInt(sb, instruction.arguments[i]);
+                                dumpInt(sb, instruction.arguments[j]);
                                 break;
                             case OpcodeArgumentType.UInt:
-                                dumpUInt(sb, instruction.arguments[i]);
+                                dumpUInt(sb, instruction.arguments[j]);
                                 break;
                             case OpcodeArgumentType.Double:
-                                dumpDouble(sb, instruction.arguments[i]);
+                                dumpDouble(sb, instruction.arguments[j]);
                                 break;
                             case OpcodeArgumentType.String:
-                                dumpString(sb, instruction.arguments[i]);
+                                dumpString(sb, instruction.arguments[j]);
                                 break;
                             case OpcodeArgumentType.Namespace:
-                                dumpNamespace(sb, instruction.arguments[i]);
+                                dumpNamespace(sb, instruction.arguments[j]);
                                 break;
                             case OpcodeArgumentType.Multiname:
-                                dumpMultiname(sb, instruction.arguments[i]);
+                                dumpMultiname(sb, instruction.arguments[j]);
                                 break;
                             case OpcodeArgumentType.Class:
                             case OpcodeArgumentType.Method:
-                                if (instruction.arguments[i] == null)
+                                if (instruction.arguments[j] == null)
                                 {
                                     sb.put("null");
                                 }
                                 else
                                 {
-                                    dumpString(sb, refs.objects.getName(instruction.arguments[i]));
+                                    dumpString(sb, refs.objects.getName(instruction.arguments[j]));
                                 }
                                 break;
 
                             case OpcodeArgumentType.JumpTarget:
                             case OpcodeArgumentType.SwitchDefaultTarget:
-                                dumpLabel(sb, instruction.arguments[i]);
+                                dumpLabel(sb, instruction.arguments[j]);
                                 break;
                             
                             case OpcodeArgumentType.SwitchTargets:

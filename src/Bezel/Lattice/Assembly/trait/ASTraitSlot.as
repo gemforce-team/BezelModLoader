@@ -13,14 +13,12 @@ package Bezel.Lattice.Assembly.trait
         public var slotId:int;
         public var typeName:ASMultiname;
         public var value:ASValue;
-        public var valueType:ABCType;
 
-        public function ASTraitSlot(slotId:int = 0, typeName:ASMultiname = null, valueIndex:ASValue = null, valueType:ABCType = null)
+        public function ASTraitSlot(slotId:int = 0, typeName:ASMultiname = null, valueIndex:ASValue = null)
         {
             this.slotId = slotId;
             this.typeName = typeName;
             this.value = value;
-            this.valueType = valueType;
         }
     }
 }
