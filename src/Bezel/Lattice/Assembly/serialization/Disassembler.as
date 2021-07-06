@@ -149,7 +149,7 @@ package Bezel.Lattice.Assembly.serialization
         {
             if (isNaN(v))
             {
-                sb.put("null");
+                sb.put("nan");
             }
             else if (v == Number.NEGATIVE_INFINITY)
             {
