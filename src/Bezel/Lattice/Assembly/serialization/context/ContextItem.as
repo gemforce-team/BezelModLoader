@@ -370,7 +370,7 @@ package Bezel.Lattice.Assembly.serialization.context
             ret.multiname = this.multiname;
             ret.str = this.str;
             ret.filenameSuffix = this.filenameSuffix;
-            ret.group = this.group;
+            ret.group = ContextItem.clone(this.group);
             ret.groupFallback = this.groupFallback;
             ret.expanding = this.expanding;
             return ret;
@@ -378,6 +378,7 @@ package Bezel.Lattice.Assembly.serialization.context
 
         public static function clone(v:Vector.<ContextItem>):Vector.<ContextItem>
         {
+            if (v == null) return null;
             var ret:Vector.<ContextItem> = new <ContextItem>[];
             for each (var i:ContextItem in v)
             {
