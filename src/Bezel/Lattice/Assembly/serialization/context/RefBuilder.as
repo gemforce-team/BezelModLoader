@@ -146,7 +146,7 @@ package Bezel.Lattice.Assembly.serialization.context
                 {
                     this.context.push(ContextItem.fromString("orphan_class_" + i));
                     addClass(asp.orphanClasses[i], ContextSet.PRIORITY_Orphan);
-                    this.context.pop();
+                    this.context.pop(); // orphan_class_<i>
                 }
             }
             for (i = 0; i < asp.orphanMethods.length; i++)
@@ -155,7 +155,7 @@ package Bezel.Lattice.Assembly.serialization.context
                 {
                     this.context.push(ContextItem.fromString("orphan_method_" + i));
                     addMethod(asp.orphanMethods[i], ContextSet.PRIORITY_Orphan);
-                    this.context.pop();
+                    this.context.pop(); // orphan_method_<i>
                 }
             }
 
@@ -213,11 +213,11 @@ package Bezel.Lattice.Assembly.serialization.context
 
                     context.push(ContextItem.fromString("class", true));
                     visitTraits(classData.classv.traits);
-                    context.pop();
+                    context.pop(); // class
 
                     context.push(ContextItem.fromString("instance", true));
                     visitTraits(classData.classv.instance.traits);
-                    context.pop();
+                    context.pop(); // instance
                     break;
                 case TraitType.Function:
                     addMethod((trait.extraData as ASTraitFunction).functionv, ContextSet.PRIORITY_Declaration);
@@ -232,14 +232,14 @@ package Bezel.Lattice.Assembly.serialization.context
                 case TraitType.Getter:
                     context.push(ContextItem.fromString("getter"));
                     addMethod((trait.extraData as ASTraitMethod).method, ContextSet.PRIORITY_Declaration);
-                    context.pop();
+                    context.pop(); // getter
 
                     super.visitTrait(trait);
                     break;
                 case TraitType.Setter:
                     context.push(ContextItem.fromString("setter"));
                     addMethod((trait.extraData as ASTraitMethod).method, ContextSet.PRIORITY_Declaration);
-                    context.pop();
+                    context.pop(); // setter
 
                     super.visitTrait(trait);
                     break;
@@ -248,7 +248,7 @@ package Bezel.Lattice.Assembly.serialization.context
                     break;
             }
 
-            context.pop();
+            context.pop(); // trait.name
         }
 
         public function visitNamespace(ns:ASNamespace, priority:int):void
@@ -339,7 +339,7 @@ package Bezel.Lattice.Assembly.serialization.context
                             {
                                 addClass(instruction.arguments[i] as ASClass, ContextSet.PRIORITY_Usage);
                             }
-                            context.pop();
+                            context.pop(); // inline_class
                             break;
                         case OpcodeArgumentType.Method:
                             context.push(ContextItem.fromString("inline_method"));
@@ -347,7 +347,7 @@ package Bezel.Lattice.Assembly.serialization.context
                             {
                                 addMethod(instruction.arguments[i] as ASMethod, ContextSet.PRIORITY_Usage);
                             }
-                            context.pop();
+                            context.pop(); // inline_method
                             break;
                         default:
                             break;
@@ -459,13 +459,13 @@ package Bezel.Lattice.Assembly.serialization.context
             context.push(ContextItem.fromString("class", true));
             context.push(ContextItem.fromString("init", true));
             addMethod(clazz.cinit, ContextSet.PRIORITY_Declaration);
-            context.pop();
-            context.pop();
+            context.pop(); // init
+            context.pop(); // class
             
             context.push(ContextItem.fromString("instance", true));
             context.push(ContextItem.fromString("init", true));
             addMethod(clazz.instance.iinit, ContextSet.PRIORITY_Declaration);
-            context.pop();
+            context.pop(); // init
 
             visitMultiname(clazz.instance.name, ContextSet.PRIORITY_Declaration);
             visitMultiname(clazz.instance.superName, ContextSet.PRIORITY_Usage);
@@ -474,7 +474,7 @@ package Bezel.Lattice.Assembly.serialization.context
             {
                 visitMultiname(iface, ContextSet.PRIORITY_Usage);
             }
-            context.pop();
+            context.pop(); // instance
         }
 
         public function addMethod(method:ASMethod, priority:int):void

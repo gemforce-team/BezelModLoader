@@ -95,7 +95,7 @@ package Bezel.Lattice.Assembly.serialization.context
                     case TYPE_String:
                         throw new Error("Cannot expand a string");
                     case TYPE_Multiname:
-                        return new <ContextItem>[this];
+                        return new <ContextItem>[this.clone()];
                     case TYPE_Group:
                         return new <ContextItem>[fromString(groupFallback)];
                     default:
@@ -138,7 +138,7 @@ package Bezel.Lattice.Assembly.serialization.context
                 break;
                 case TYPE_String:
                     expanding = false;
-                    return new <ContextItem>[this];
+                    return new <ContextItem>[this.clone()];
                 case TYPE_Group:
                     expanding = false;
                     return reduceGroup(refs);
@@ -146,7 +146,7 @@ package Bezel.Lattice.Assembly.serialization.context
                     expanding = false;
                     throw new Error("Unknown ContextItem type was expanded");
             }
-            return new <ContextItem>[this];
+            return new <ContextItem>[this.clone()];
         }
 
         public function toSegments(refs:RefBuilder, filename:Boolean):Vector.<Segment>
@@ -212,8 +212,8 @@ package Bezel.Lattice.Assembly.serialization.context
                        (c.length == 1 && c[0].type == TYPE_String && c[0].str.indexOf("orphan_method_") == 0);
             }
 
-            if (uninteresting(c1)) return c2;
-            if (uninteresting(c2)) return c1;
+            if (uninteresting(c1)) return clone(c2);
+            if (uninteresting(c2)) return clone(c1);
 
             var c:Vector.<ContextItem> = new <ContextItem>[];
 
@@ -238,7 +238,7 @@ package Bezel.Lattice.Assembly.serialization.context
         {
             if (similar(c1,c2))
             {
-                return new <ContextItem>[c1];
+                return new <ContextItem>[c1.clone()];
             }
             if (c1.type != TYPE_Multiname || c2.type != TYPE_Multiname || c1.multiname.type != ABCType.QName || c2.multiname.type != ABCType.QName)
             {
@@ -279,7 +279,7 @@ package Bezel.Lattice.Assembly.serialization.context
                 }
                 else
                 {
-                    return new <ContextItem>[c2];
+                    return new <ContextItem>[c2.clone()];
                 }
             }
 
@@ -292,11 +292,11 @@ package Bezel.Lattice.Assembly.serialization.context
 
                     if (name2.length != 0)
                     {
-                        return new <ContextItem>[c1, fromString(name2)];
+                        return new <ContextItem>[c1.clone(), fromString(name2)];
                     }
                     else
                     {
-                        return new <ContextItem>[c1];
+                        return new <ContextItem>[c1.clone()];
                     }
                 }
 
@@ -320,7 +320,7 @@ package Bezel.Lattice.Assembly.serialization.context
                 var fullName2:String = ns2.name + (name2.length != 0 ? ":" + name2 : "");
                 if (fullName2.indexOf(fullName1 + ":") == 0)
                 {
-                    return new <ContextItem>[truncate ? c1 : c2];
+                    return new <ContextItem>[truncate ? c1.clone() : c2.clone()];
                 }
             }
 
@@ -358,8 +358,31 @@ package Bezel.Lattice.Assembly.serialization.context
         {
             var ret:ContextItem = new ContextItem();
             ret.type = TYPE_Group;
-            ret.group = g.slice();
+            ret.group = clone(g);
             ret.groupFallback = groupFallback;
+            return ret;
+        }
+
+        public function clone():ContextItem
+        {
+            var ret:ContextItem = new ContextItem();
+            ret.type = this.type;
+            ret.multiname = this.multiname;
+            ret.str = this.str;
+            ret.filenameSuffix = this.filenameSuffix;
+            ret.group = this.group;
+            ret.groupFallback = this.groupFallback;
+            ret.expanding = this.expanding;
+            return ret;
+        }
+
+        public static function clone(v:Vector.<ContextItem>):Vector.<ContextItem>
+        {
+            var ret:Vector.<ContextItem> = new <ContextItem>[];
+            for each (var i:ContextItem in v)
+            {
+                ret.push(i.clone());
+            }
             return ret;
         }
 

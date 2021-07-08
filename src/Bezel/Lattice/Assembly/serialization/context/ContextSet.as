@@ -3,6 +3,7 @@ package Bezel.Lattice.Assembly.serialization.context
     import flash.utils.Dictionary;
     import Bezel.Logger;
     import flash.utils.getQualifiedClassName;
+    import Bezel.Lattice.Assembly.ASClass;
 
     /**
      * ...
@@ -53,6 +54,10 @@ package Bezel.Lattice.Assembly.serialization.context
                 if (contextsSealed) throw new Error("ContextSet must not be sealed");
 
                 Logger.getLogger("ContextSet").log("add", "Adding a " + getQualifiedClassName(obj) + " with context " + context.toString());
+                if (obj is ASClass)
+                {
+                    Logger.getLogger("ContextSet").log("add", "This added class's instance name is " + (obj as ASClass).instance.name);
+                }
             }
 
             var set:Vector.<Vector.<Vector.<ContextItem>>> = contextSets[obj] as Vector.<Vector.<Vector.<ContextItem>>>;
@@ -60,7 +65,7 @@ package Bezel.Lattice.Assembly.serialization.context
             {
                 set = contextSets[obj] = new <Vector.<Vector.<ContextItem>>>[new <Vector.<ContextItem>>[], new <Vector.<ContextItem>>[], new <Vector.<ContextItem>>[]];
                 set.fixed = true;
-                set[priority].push(context.slice());
+                set[priority].push(ContextItem.clone(context));
                 return true;
             }
             else
@@ -76,7 +81,7 @@ package Bezel.Lattice.Assembly.serialization.context
                 }
                 if (set[priority].length == 0 || !rawEqual(set[priority][set[priority].length - 1], context))
                 {
-                    set[priority].push(context.slice());
+                    set[priority].push(ContextItem.clone(context));
                 }
                 return false;
             }
@@ -106,6 +111,10 @@ package Bezel.Lattice.Assembly.serialization.context
                     getContext(refs, obj);
                 }
                 Logger.getLogger("ContextSet").log("coagulate", "This " + getQualifiedClassName(obj) + "'s final context is " + contexts[obj]);
+                if (obj is ASClass)
+                {
+                    Logger.getLogger("ContextSet").log("coagulate", "Coagulate: This class's instance name is " + (obj as ASClass).instance.name);
+                }
             }
 
             for (obj in contexts)
