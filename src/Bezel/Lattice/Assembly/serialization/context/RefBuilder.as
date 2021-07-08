@@ -22,7 +22,6 @@ package Bezel.Lattice.Assembly.serialization.context
     import Bezel.Lattice.Assembly.ASMethodBody;
     import Bezel.Lattice.Assembly.ASInstruction;
     import Bezel.Lattice.Assembly.OpcodeArgumentType;
-    import Bezel.Logger;
 
     /**
      * ...
@@ -360,10 +359,7 @@ package Bezel.Lattice.Assembly.serialization.context
 
         public function contextToString(context:Vector.<ContextItem>, filename:Boolean):String
         {
-            var log:Logger = Logger.getLogger("RefBuilder");
-            log.log("contextToString", "Original: " + context.toString());
             var expanded:Vector.<ContextItem> = ContextItem.expand(this, context);
-            log.log("contextToString", "Expanded: " + expanded.toString());
             if (expanded.length == 0) return "";
 
             // NOT SURE BOUT THAT
@@ -376,15 +372,12 @@ package Bezel.Lattice.Assembly.serialization.context
                     expanded = expanded.slice(0, i).concat(root, expanded.slice(i + 2));
                 }
             }
-            log.log("contextToString", "Deduplicated: " + expanded.toString());
 
             var segments:Vector.<Segment> = new <Segment>[];
             for each (var item:ContextItem in expanded)
             {
                 segments = segments.concat(item.toSegments(this, filename));
             }
-
-            log.log("contextToString", "Segments: " + segments.toString());
 
             function escape(s:String):String
             {

@@ -67,7 +67,6 @@ package Bezel.Lattice.Assembly
 
             function convertValue(type:ABCType, index:int):ASValue
             {
-                CONFIG::debug{Logger.getLogger("ASProgram").log("convertValue", "Value being converted: " + type.name + " with index " + index);}
                 var ret:ASValue = new ASValue();
                 ret.type = type;
                 switch (type)
@@ -251,7 +250,7 @@ package Bezel.Lattice.Assembly
                         multinames[i] = new ASMultiname(abc.multinames[i].type, new ASMultinameL(namespaceSets[(abc.multinames[i].subdata as ABCMultinameL).ns_set]));
                         break;
                     case ABCType.TypeName:
-                        // Has to be handled in second pass
+                        multinames[i] = new ASMultiname(abc.multinames[i].type, null);
                         break;
                     default:
                         throw new Error("Unknown multiname type");
@@ -264,7 +263,7 @@ package Bezel.Lattice.Assembly
                 if (abc.multinames[i].type == ABCType.TypeName)
                 {
                     var tn:ABCTypeName = abc.multinames[i].subdata as ABCTypeName;
-                    multinames[i] = new ASMultiname(abc.multinames[i].type, new ASTypeName(multinames[tn.name], new Vector.<ASMultiname>(tn.params.length, true)));
+                    multinames[i].subdata = new ASTypeName(multinames[tn.name], new Vector.<ASMultiname>(tn.params.length, true));
                     for (j = 0; j < tn.params.length; j++)
                     {
                         (multinames[i].subdata as ASTypeName).params[j] = multinames[tn.params[j]];

@@ -1,9 +1,6 @@
 package Bezel.Lattice.Assembly.serialization.context
 {
     import flash.utils.Dictionary;
-    import Bezel.Logger;
-    import flash.utils.getQualifiedClassName;
-    import Bezel.Lattice.Assembly.ASClass;
 
     /**
      * ...
@@ -52,12 +49,6 @@ package Bezel.Lattice.Assembly.serialization.context
             CONFIG::debug {
                 if (coagulated) throw new Error("ContextSet must not be coagulated");
                 if (contextsSealed) throw new Error("ContextSet must not be sealed");
-
-                Logger.getLogger("ContextSet").log("add", "Adding a " + getQualifiedClassName(obj) + " with context " + context.toString());
-                if (obj is ASClass)
-                {
-                    Logger.getLogger("ContextSet").log("add", "This added class's instance name is " + (obj as ASClass).instance.name);
-                }
             }
 
             var set:Vector.<Vector.<Vector.<ContextItem>>> = contextSets[obj] as Vector.<Vector.<Vector.<ContextItem>>>;
@@ -110,18 +101,12 @@ package Bezel.Lattice.Assembly.serialization.context
                 {
                     getContext(refs, obj);
                 }
-                Logger.getLogger("ContextSet").log("coagulate", "This " + getQualifiedClassName(obj) + "'s final context is " + contexts[obj]);
-                if (obj is ASClass)
-                {
-                    Logger.getLogger("ContextSet").log("coagulate", "Coagulate: This class's instance name is " + (obj as ASClass).instance.name);
-                }
             }
 
             for (obj in contexts)
             {
                 var context:Vector.<ContextItem> = contexts[obj] as Vector.<ContextItem>;
                 var bname:String = refs.contextToString(context, false);
-                Logger.getLogger("ContextSet").log("coagulate", "This " + getQualifiedClassName(obj) + " has context name " + bname);
                 var bfilename:String = refs.contextToString(context, true);
                 var counter:int = (bname in collisionCounter) ? collisionCounter[bname] : 0;
                 if (counter == 1)
@@ -162,8 +147,6 @@ package Bezel.Lattice.Assembly.serialization.context
                     set = prioritySet;
                 }
             }
-
-            Logger.getLogger("ContextSet").log("getContext", "Context sets are " + set.toString());
 
             if (allowDuplicates)
             {

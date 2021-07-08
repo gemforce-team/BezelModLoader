@@ -31,7 +31,6 @@ package Bezel.Lattice.Assembly.serialization
     import Bezel.Lattice.Assembly.ASInstruction;
     import Bezel.Lattice.Assembly.OpcodeArgumentType;
     import Bezel.Lattice.Assembly.Opcode;
-    import Bezel.Logger;
 
     /**
      * ...
@@ -293,7 +292,7 @@ package Bezel.Lattice.Assembly.serialization
                         var typename:ASTypeName = multiname.subdata as ASTypeName;
                         dumpMultiname(sb, typename.name);
                         sb.put("<");
-                        for (var i:int = 0; i < typename.params; i++)
+                        for (var i:int = 0; i < typename.params.length; i++)
                         {
                             dumpMultiname(sb, typename.params[i]);
                             if (i < typename.params.length - 1)

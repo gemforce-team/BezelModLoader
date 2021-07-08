@@ -1,13 +1,10 @@
 package Bezel.Lattice.Assembly.serialization.context
 {
     import Bezel.Lattice.Assembly.ASMultiname;
-    import flash.text.engine.ContentElement;
     import Bezel.Lattice.Assembly.values.ABCType;
     import Bezel.Lattice.Assembly.multiname.ASQName;
     import Bezel.Lattice.Assembly.ASNamespace;
-    import Bezel.Lattice.Assembly.ASProgram;
     import Bezel.Lattice.Assembly.multiname.ASMultinameSubdata;
-    import Bezel.Logger;
 
     /**
      * ...
@@ -53,8 +50,6 @@ package Bezel.Lattice.Assembly.serialization.context
             {
                 contexts.push(ContextItem.expand(refs, new <ContextItem>[c]));
             }
-
-            Logger.getLogger("ContextItem").log("reduceGroup", "Group contexts after expanding are " + contexts.toString());
 
             var context:Vector.<ContextItem>;
             if (contexts.length != 0)
@@ -116,7 +111,7 @@ package Bezel.Lattice.Assembly.serialization.context
                             var ns:ASNamespace = (multiname.subdata as ASQName).ns;
                             if (ns.type == ABCType.PrivateNamespace)
                             {
-                                var context:Vector.<ContextItem> = refs.namespaces[ns.type.val].getContext(refs, ns.uniqueId);
+                                var context:Vector.<ContextItem> = ContextItem.clone(refs.namespaces[ns.type.val].getContext(refs, ns.uniqueId));
                                 expanding = false;
                                 if ((multiname.subdata as ASQName).name.length != 0)
                                 {
