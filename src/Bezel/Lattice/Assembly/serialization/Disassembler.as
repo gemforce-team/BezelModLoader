@@ -110,13 +110,13 @@ package Bezel.Lattice.Assembly.serialization
                 sb.newLine();
             }
 
-            if (asp.orphanClasses.length != 0)
+            if (asp.orphanMethods.length != 0)
             {
                 sb.put("; ============================= Orphan methods ==============================");
                 sb.newLine();
                 sb.newLine();
 
-                for (i = 0; i < asp.orphanMethods; i++)
+                for (i = 0; i < asp.orphanMethods.length; i++)
                 {
                     newInclude(sb, refs.objects.getFilename(asp.orphanMethods[i], "method"), function(sb:StringBuilder):void {
                         dumpMethod(sb, asp.orphanMethods[i], "method");
