@@ -1,4 +1,4 @@
-package Bezel.Lattice.Assembly.serialization.context
+package Bezel.Lattice.Assembly.conversion.context
 {
     import Bezel.Lattice.Assembly.ASMultiname;
     import Bezel.Lattice.Assembly.values.ABCType;

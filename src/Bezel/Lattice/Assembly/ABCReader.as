@@ -55,19 +55,7 @@ package Bezel.Lattice.Assembly
 		}
 		public function readS32():int
 		{
-			var ret:uint = data.readUnsignedByte();
-			if ((ret & 0x00000080) == 0)
-				return ret;
-			ret = (ret & 0x0000007f) | (data.readUnsignedByte() << 7);
-			if ((ret & 0x00004000) == 0)
-				return ret;
-			ret = (ret & 0x00003fff) | (data.readUnsignedByte() << 14);
-			if ((ret & 0x00200000) == 0)
-				return ret;
-			ret = (ret & 0x001fffff) | (data.readUnsignedByte() << 21);
-			if ((ret & 0x10000000) == 0)
-				return ret;
-			return (ret & 0x0fffffff) | (data.readUnsignedByte() << 28);
+			return readU32();
 		}
 		public function readU30():uint
 		{

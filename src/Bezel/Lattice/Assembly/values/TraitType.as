@@ -53,5 +53,28 @@ package Bezel.Lattice.Assembly.values
 
             return null;
         }
+
+        public static function fromString(val:String):TraitType
+        {
+            switch (val)
+            {
+                case "slot":
+                    return Slot;
+                case "method":
+                    return Method;
+                case "getter":
+                    return Getter;
+                case "setter":
+                    return Setter;
+                case "class":
+                    return Class;
+                case "function":
+                    return Function;
+                case "const":
+                    return Const;
+            }
+
+            return null;
+        }
     }
 }

@@ -117,5 +117,72 @@ package Bezel.Lattice.Assembly.values
 
             return null;
         }
+
+        public static function fromString(val:String):ABCType
+        {
+            switch (val)
+            {
+                case "Void":
+                    return Void;
+                case "Undefined":
+                    return Undefined;
+                case "Utf8":
+                    return Utf8;
+                case "Decimal":
+                    return Decimal;
+                case "Integer":
+                    return Integer;
+                case "UInteger":
+                    return UInteger;
+                case "PrivateNamespace":
+                    return PrivateNamespace;
+                case "Double":
+                    return Double;
+                case "QName":
+                    return QName;
+                case "Namespace":
+                    return Namespace;
+                case "Multiname":
+                    return Multiname;
+                case "False":
+                    return False;
+                case "True":
+                    return True;
+                case "Null":
+                    return Null;
+                case "QNameA":
+                    return QNameA;
+                case "MultinameA":
+                    return MultinameA;
+                case "RTQName":
+                    return RTQName;
+                case "RTQNameA":
+                    return RTQNameA;
+                case "RTQNameL":
+                    return RTQNameL;
+                case "RTQNameLA":
+                    return RTQNameLA;
+                case "Namespace_Set":
+                    return Namespace_Set;
+                case "PackageNamespace":
+                    return PackageNamespace;
+                case "PackageInternalNs":
+                    return PackageInternalNs;
+                case "ProtectedNamespace":
+                    return ProtectedNamespace;
+                case "ExplicitNamespace":
+                    return ExplicitNamespace;
+                case "StaticProtectedNs":
+                    return StaticProtectedNs;
+                case "MultinameL":
+                    return MultinameL;
+                case "MultinameLA":
+                    return MultinameLA;
+                case "TypeName":
+                    return TypeName;
+            }
+
+            return null;
+        }
     }
 }

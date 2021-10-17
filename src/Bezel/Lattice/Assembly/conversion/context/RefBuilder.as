@@ -1,8 +1,8 @@
-package Bezel.Lattice.Assembly.serialization.context
+package Bezel.Lattice.Assembly.conversion.context
 {
     import Bezel.Lattice.Assembly.ASProgram;
     import Bezel.Lattice.Assembly.ASNamespace;
-    import Bezel.Lattice.Assembly.serialization.ASTraitsVisitor;
+    import Bezel.Lattice.Assembly.conversion.ASTraitsVisitor;
     import Bezel.Lattice.Assembly.ASClass;
     import flash.utils.Dictionary;
     import Bezel.Lattice.Assembly.ASMethod;

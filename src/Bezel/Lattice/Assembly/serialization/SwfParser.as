@@ -6,6 +6,7 @@ package Bezel.Lattice.Assembly.serialization
 	import flash.utils.IDataInput;
 	import Bezel.Lattice.Assembly.serialization.ABCTagData;
 	import Bezel.Lattice.Assembly.ABCFile;
+	import Bezel.Lattice.Assembly.ABCWriter;
 	/**
 	 * ...
 	 * @author Chris
@@ -15,9 +16,11 @@ package Bezel.Lattice.Assembly.serialization
 		private var abcTag:ABCTagData;
 		private var _editedSwf:ByteArray;
 
+		private static const ABCTAG_WRITE_TYPE:uint = 0x14BF; // 82 << 6 | 0x3F
+
 		public function get abcFile():ABCFile { return abcTag.abc; }
 		
-		public function SwfParser(swf:IDataInput) 
+		public function SwfParser(swf:IDataInput)
 		{
 			_editedSwf = new ByteArray();
 			_editedSwf.endian = Endian.LITTLE_ENDIAN;
@@ -44,7 +47,7 @@ package Bezel.Lattice.Assembly.serialization
 			
 			_editedSwf.writeUTFBytes("FWS");
 			_editedSwf.writeByte(version);
-			// Placeholder
+			// Placeholder for number of bytes
 			_editedSwf.writeUnsignedInt(0);
 			
 			// Get data about the frame
@@ -115,6 +118,20 @@ package Bezel.Lattice.Assembly.serialization
 			}
 			
 			this.abcTag = new ABCTagData(abcData);
+		}
+
+		public function replaceABC(abc:ABCFile):ByteArray
+		{
+			var writer:ABCWriter = new ABCWriter(abc);
+			var newBytes:ByteArray = writer.data;
+			_editedSwf.position = _editedSwf.length;
+			_editedSwf.writeShort(ABCTAG_WRITE_TYPE);
+			_editedSwf.writeUnsignedInt(newBytes.length);
+			_editedSwf.writeBytes(newBytes);
+			_editedSwf.position = 4;
+			_editedSwf.writeUnsignedInt(_editedSwf.length);
+			_editedSwf.position = 0;
+			return _editedSwf;
 		}
 	}
 }

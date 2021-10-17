@@ -1,4 +1,4 @@
-package Bezel.Lattice.Assembly.serialization.context
+package Bezel.Lattice.Assembly.conversion.context
 {
     /**
      * ...

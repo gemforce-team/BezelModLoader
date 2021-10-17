@@ -1,4 +1,4 @@
-package Bezel.Lattice.Assembly.serialization
+package Bezel.Lattice.Assembly.conversion
 {
     import Bezel.Lattice.Assembly.ASProgram;
     import Bezel.Lattice.Assembly.ASScript;

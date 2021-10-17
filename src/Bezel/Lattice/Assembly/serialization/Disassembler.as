@@ -1,7 +1,7 @@
 package Bezel.Lattice.Assembly.serialization
 {
     import Bezel.Lattice.Assembly.ASProgram;
-    import Bezel.Lattice.Assembly.serialization.context.RefBuilder;
+    import Bezel.Lattice.Assembly.conversion.context.RefBuilder;
     import Bezel.Lattice.Assembly.ASNamespace;
     import Bezel.Lattice.Assembly.ASMultiname;
     import Bezel.Lattice.Assembly.values.ABCType;
