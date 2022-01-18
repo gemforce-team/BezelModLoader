@@ -31,7 +31,7 @@ package Bezel
 	// The loader also requires a parameterless constructor (AFAIK), so we also have a .bind method to bind our class to the game
 	public class Bezel extends MovieClip
 	{
-		public static const VERSION:String = "1.0.0";
+		public static const VERSION:String = "1.0.1";
 
 		// Game objects, populated by the MainLoader
 		private var gameObjects:Object;
