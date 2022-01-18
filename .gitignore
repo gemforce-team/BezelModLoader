@@ -16,9 +16,9 @@ automation/output/
 *.apk
 installer/*.exe
 installer/*.o
-assets/rabcdasm/splitter/*.exe
-assets/rabcdasm/splitter/*.o
+assets/splitter/*.o
 
+GameScripts/*
 GameScripts/scripts/*
 !GameScripts/scripts/.gitkeep
 
