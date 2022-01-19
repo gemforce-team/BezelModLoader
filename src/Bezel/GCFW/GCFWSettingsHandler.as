@@ -11,12 +11,12 @@ package Bezel.GCFW
      */
     public class GCFWSettingsHandler
     {
-        private static var _newSettings:Array;
-        private static function get newSettings():Array
+        private static var _newSettings:Vector.<Object>;
+        private static function get newSettings():Vector.<Object>
         {
             if (_newSettings == null)
             {
-                _newSettings = new Array();
+                _newSettings = new Vector.<Object>();
             }
             return _newSettings;
         }
@@ -41,7 +41,7 @@ package Bezel.GCFW
             {
                 if (newSettings[i-1].mod as String == mod && (name == null || newSettings[i-1].name as String == name))
                 {
-                    delete newSettings[i-1];
+                    newSettings.splice(i-1, 1);
                 }
             }
 		}
@@ -51,7 +51,17 @@ package Bezel.GCFW
             if (!currentlyShowing)
             {
                 var vY:int = 2720;
-                newSettings.sortOn(["mod", "name"]);
+                newSettings.sort(function(left:Object, right:Object):Number{
+                    if (left.mod < right.mod)
+                        return -1;
+                    if (left.mod > right.mod)
+                        return 1;
+                    if (left.name < right.name)
+                        return -1;
+                    if (left.name > right.name)
+                        return 1;
+                    return 0;
+                });
                 var currentName:String = null;
                 var McOptPanel:Class = getDefinitionByName("com.giab.games.gcfw.mcDyn.McOptPanel") as Class;
                 var McOptTitle:Class = getDefinitionByName("com.giab.games.gcfw.mcDyn.McOptTitle") as Class;
@@ -149,10 +159,6 @@ package Bezel.GCFW
 
         bezel_internal static function renderInfoPanel(vP:Object, vIp:Object):Boolean
         {
-            if (vP == null || vP.tf == null)
-            {
-                return false;
-            }
             var i:int = newMCs.indexOf(vP);
             if (i == -1)
             {
