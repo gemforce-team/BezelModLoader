@@ -161,13 +161,20 @@ package Bezel.GCFW
             {
                 for each (var setting:Object in newSettings)
                 {
-                    if (vP.tf.text == setting.name && setting.description != "" && setting.description != null)
+                    if (vP.tf.text == setting.name)
                     {
-                        vIp.addTextfield(15984813, setting.description, false, 12, null, 16777215)
-                    }
-                    if (vP.knob.parent == vP) // if it has a draggable field
-                    {
-                        vIp.addTextfield(15984813, "Current value: " + calculateValue(setting, vP.knob));
+                        var display:Boolean = false;
+                        if (setting.description != "" && setting.description != null)
+                        {
+                            vIp.addTextfield(15984813, setting.description, false, 12, null, 16777215);
+                            display = true;
+                        }
+                        if (vP.knob.parent == vP) // if it has a draggable field
+                        {
+                            vIp.addTextfield(15984813, "Current value: " + calculateValue(setting, vP.knob));
+                            display = true;
+                        }
+                        return display;
                     }
                 }
             }
