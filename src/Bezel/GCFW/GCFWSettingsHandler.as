@@ -115,7 +115,7 @@ package Bezel.GCFW
                                 currentKnobEditing = s;
                             };
                         }(setting);
-                        newMC.knob.addEventListener(MouseEvent.MOUSE_DOWN, scrOptions.ehKnobDown);
+                        newMC.knob.addEventListener(MouseEvent.MOUSE_DOWN, onNumberClicked);
                     }
                     else
                     {
