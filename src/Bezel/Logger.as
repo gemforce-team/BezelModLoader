@@ -28,6 +28,7 @@ package Bezel
 				_logStream.open(logFile, FileMode.WRITE);
 				NativeApplication.nativeApplication.addEventListener(Event.EXITING, onExit);
 			}
+			_logStream.open(logFile, FileMode.APPEND);
 			return _logStream;
 		}
 		
@@ -59,6 +60,7 @@ package Bezel
 			formattedId += "               ".substr(0, 20-formattedId.length);
 			//logStream.writeUTFBytes(df.format(new Date()) + "\t[" + formattedId + "][" + source + "]:\t" + message + "\r\n");
 			logStream.writeUTFBytes(df.format(new Date()) + "\t[" + formattedId + "]: " + message + "\r\n");
+			logStream.close();
 		}
 		
 		// Cannot be called

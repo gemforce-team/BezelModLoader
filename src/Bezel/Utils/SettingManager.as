@@ -1,6 +1,8 @@
 package Bezel.Utils
 {
 
+	import Bezel.GCFW.GCFWSettingsHandler;
+	import Bezel.Logger;
     import flash.errors.IllegalOperationError;
     import Bezel.Bezel;
     import flash.utils.Dictionary;
@@ -29,7 +31,7 @@ package Bezel.Utils
             if (_managers == null)
             {
                 _managers = new Dictionary();
-                NativeApplication.nativeApplication.addEventListener(Event.EXITING, unregisterAllManagers);
+                Bezel.Bezel.instance.addEventListener(Event.UNLOAD, unregisterAllManagers);
             }
             return _managers;
         }
@@ -37,7 +39,9 @@ package Bezel.Utils
         private var id:String;
 
         private var _settings:Object;
-
+		
+		private static var logger: Logger = Bezel.Bezel.instance.getLogger("SettingManager");
+		
         private function get file():File
         {
             return SETTINGS_FOLDER.resolvePath(id + ".json");
@@ -80,22 +84,41 @@ package Bezel.Utils
         // Used internally to save all configs
         bezel_internal static function unregisterAllManagers(... args):void
         {
+			logger.log("unregisterAllManagers", "Unregistering managers...");
             for each (var manager:SettingManager in _managers)
             {
-                if (manager._settings != null)
-                {
-                    manager.file.deleteFile();
-                    var stream:FileStream = new FileStream();
-                    stream.open(manager.file, FileMode.WRITE);
-                    stream.writeUTFBytes(JSON.stringify(manager._settings))
-                    stream.close();
-                }
+                manager.saveSettings();
+				manager.deregisterFromHandler();
             }
 
             _managers = null;
 
-            NativeApplication.nativeApplication.removeEventListener(Event.EXITING, unregisterAllManagers);
+			Bezel.Bezel.instance.removeEventListener(Event.UNLOAD, unregisterAllManagers);
         }
+		
+		bezel_internal function deregisterFromHandler():void
+		{
+			if (this._settings != null)
+			{
+				logger.log("saveSettings", "Deregistering " + this.id);
+				for (var setting in this._settings)
+				{
+					GCFWSettingsHandler.deregisterOption(this.id, setting);
+				}
+			}
+		}
+		
+		bezel_internal function saveSettings():void
+		{
+			if (this._settings != null)
+			{
+				logger.log("saveSettings", "Saving settings for " + this.id);
+				var stream:FileStream = new FileStream();
+				stream.open(this.file, FileMode.WRITE);
+				stream.writeUTFBytes(JSON.stringify(this._settings));
+				stream.close();
+			}
+		}
 		
 		/**
 		 * Get an instance of a setting manager that writes to the standardized Bezel settings
@@ -125,6 +148,7 @@ package Bezel.Utils
          */
         public function registerBoolean(name:String, onSet:Function, defaultVal:Boolean, description:String = null):void
         {
+			//var self = this;
             if (!(name in settings))
             {
                 settings[name] = defaultVal;
@@ -132,6 +156,7 @@ package Bezel.Utils
             var set:Function = function(newVal:Boolean):void
             {
                 settings[name] = newVal;
+				//self.saveSettings();
                 if (onSet != null)
                 {
                     onSet(newVal);
@@ -172,6 +197,7 @@ package Bezel.Utils
 		 */
 		public function registerFloatRange(name:String, min:Number, max:Number, step:Number, onSet:Function, defaultVal:Number, description:String = null):void
         {
+			//var self = this;
             if (!(name in settings))
             {
                 settings[name] = defaultVal;
@@ -179,6 +205,7 @@ package Bezel.Utils
             var set:Function = function(newVal:Number):void
             {
                 settings[name] = newVal;
+				//self.saveSettings();
                 if (onSet != null)
                 {
                     onSet(newVal);
