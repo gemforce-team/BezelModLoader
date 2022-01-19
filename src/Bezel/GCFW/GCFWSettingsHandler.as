@@ -134,6 +134,10 @@ package Bezel.GCFW
                     newMCs.push(newMC);
                     scrOptions.mc.arrCntContents.push(newMC);
                     scrOptions.mc.cnt.addChild(newMC);
+                    if (setting.type == Number)
+                    {
+                        newMC.knob.x = calculateX(setting);
+                    }
                 }
             }
             else
@@ -189,10 +193,11 @@ package Bezel.GCFW
             return false;
         }
 
+        private static var convertCoord:Function = getDefinitionByName("com.giab.common.utils.MathToolbox").convertCoord;
+
         private static function calculateValue(setting:Object, knob:Object):Number
         {
-            var MathToolbox:Object = getDefinitionByName("com.giab.common.utils.MathToolbox");
-            var result:Number = MathToolbox.convertCoord(507, 582, knob.x, setting.min, setting.max);
+            var result:Number = convertCoord(507, 582, knob.x, setting.min, setting.max);
             if (result == setting.max || result == setting.min)
             {
                 return result;
@@ -202,6 +207,11 @@ package Bezel.GCFW
                 return result - (result % setting.step);
             }
             return result;
+        }
+
+        private static function calculateX(setting:Object):Number
+        {
+            return convertCoord(setting.min, setting.max, setting.currentVal(), 507, 582);
         }
     }
 }
