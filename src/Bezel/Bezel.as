@@ -24,6 +24,7 @@ package Bezel
 	import flash.text.TextField;
 	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
+	import Bezel.Utils.SettingManager;
 	
 	use namespace bezel_internal;
 
@@ -110,10 +111,14 @@ package Bezel
 		private static const splitter:Object = {"name": "splitter.exe", "data":splitter_data};
 		private static const LICENSE:Object = {"name": "LICENSE", "data":LICENSE_data};
 
+		private static var _instance:Bezel;
+		public static function get instance():Bezel { return _instance; }
+
 		// Parameterless constructor for flash.display.Loader
 		public function Bezel()
 		{
 			super();
+			_instance = this;
 			prepareFolders();
 			
 			this._keybindManager = new KeybindManager();
@@ -431,9 +436,24 @@ package Bezel
 			}
 		}
 
+		/**
+		 * Gets a logger for the given mod ID
+		 * @param id Mod ID
+		 * @return Logger for the ID
+		 */
 		public function getLogger(id:String): Logger
 		{
 			return Logger.getLogger(id);
+		}
+
+		/**
+		 * Gets a setting manager for the given mod ID
+		 * @param id Mod ID
+		 * @return Manager for the ID
+		 */
+		public function getSettingManager(id:String): SettingManager
+		{
+			return SettingManager.getManager(id);
 		}
 
 		/**
@@ -464,6 +484,7 @@ package Bezel
 		{
 			logger.log("eh_keyboardKeyDown", "Reloading all mods!");
 			this._modsReloadedTimestamp = getTimer();
+			SettingManager.unregisterAllManagers();
 			if (!(this.mainLoader is GCFWBezel) && !(this.mainLoader is GCCSBezel))
 			{
 				this._mainLoader = null;

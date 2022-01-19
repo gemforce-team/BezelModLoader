@@ -263,6 +263,21 @@ package Bezel.GCFW
 				}
 			}
 		}
+
+		public function registerBooleanForDisplay(mod:String, name:String, onSet:Function, currentValue:Function, description:String = null):void
+		{
+			GCFWSettingsHandler.registerBooleanForDisplay(mod, name, onSet, currentValue, description);
+		}
+
+		public function registerFloatRangeForDisplay(mod:String, name:String, min:Number, max:Number, step:Number, onSet:Function, currentValue:Function, description:String = null):void
+		{
+			GCFWSettingsHandler.registerFloatRangeForDisplay(mod, name, min, max, step, onSet, currentValue, description);
+		}
+
+		public function deregisterOption(mod:String, name:String):void
+		{
+			GCFWSettingsHandler.deregisterOption(mod, name);
+		}
 	}
 
 }

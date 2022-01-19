@@ -275,6 +275,21 @@ package Bezel.GCCS
 			}
 		}
 		
+
+		public function registerBooleanForDisplay(mod:String, name:String, onSet:Function, currentValue:Function, description:String = null):void
+		{
+			throw new Error("Method not implemented.");
+		}
+
+		public function registerFloatRangeForDisplay(mod:String, name:String, min:Number, max:Number, step:Number, onSet:Function, currentValue:Function, description:String = null):void
+		{
+			throw new Error("Method not implemented.");
+		}
+
+		public function deregisterOption(mod:String, name:String):void
+		{
+			throw new Error("Method not implemented.");
+		}
 	}
 
 }

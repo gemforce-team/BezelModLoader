@@ -8,7 +8,7 @@ package Bezel.GCFW
 
     internal class GCFWCoreMod
     {
-        public static const VERSION:String = "6";
+        public static const VERSION:String = "7";
 
         private static const files:Array = [
             "com/giab/games/gcfw/Main.class.asasm",
@@ -16,7 +16,8 @@ package Bezel.GCFW
             "com/giab/games/gcfw/ingame/IngameInputHandler2.class.asasm",
             "com/giab/games/gcfw/ingame/IngameInfoPanelRenderer.class.asasm",
             "com/giab/games/gcfw/utils/LoaderSaver.class.asasm",
-            "com/giab/games/gcfw/ingame/IngameInitializer.class.asasm"];
+            "com/giab/games/gcfw/ingame/IngameInitializer.class.asasm",
+            "com/giab/games/gcfw/scr/ScrOptions.class.asasm"];
         private static const matches:Array = [
             [
                 "\".*an error has occured.*\"",
@@ -80,6 +81,17 @@ package Bezel.GCFW
                     "method.*setScene3Initiate",
                     "returnvoid"
                 ]
+            ],
+            [
+                [
+                    "method.*switchOptions",
+                    "pushscope"
+                ],
+                [
+                    "method.*renderPanelInfoPanel",
+                    "setlocal3",
+                    "setlocal3"
+                ]
             ]
         ];
         private static const replaceNums:Array = [
@@ -88,7 +100,8 @@ package Bezel.GCFW
             [ 0, 0, 0, 1 ],
             [ 0 ],
             [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-            [ 0 ]
+            [ 0 ],
+            [ 0, 1 ]
         ];
 		private static const offsetFromMatches:Array = [
             [ -1, -1, 20, 0, 0 ],
@@ -96,7 +109,8 @@ package Bezel.GCFW
             [ -5, 37, -5, 16 ],
             [ 5 ],
             [ 0, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
-            [ -1 ]
+            [ -1 ],
+            [ 0, -2 ]
         ];
         private static const contents:Array = [
             [
@@ -299,6 +313,19 @@ package Bezel.GCFW
                     getproperty         QName(PackageNamespace(""), "bezel") \n \
 					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "ingameNewScene"), 0 \n \
+                '
+            ],
+            [
+                ' \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWSettingsHandler") \n \
+                    getlocal0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "toggleCustomSettingsFromGame"), 1 \n \
+                ',
+                ' \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWSettingsHandler") \n \
+                    getlocal1 \n \
+                    getlocal2 \n \
+                    callproperty        QName(PackageInternalNs("Bezel:bezel_internal"), "renderInfoPanel"), 2 \n \
                 '
             ]
         ];
