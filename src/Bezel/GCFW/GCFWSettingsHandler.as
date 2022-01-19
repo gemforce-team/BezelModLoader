@@ -65,6 +65,7 @@ package Bezel.GCFW
                         newMCs.push(newMC);
                         scrOptions.mc.arrCntContents.push(newMC);
                         scrOptions.mc.cnt.addChild(newMC);
+                        currentName = setting.mod;
                     }
 
                     if (setting.type == Boolean)
