@@ -21,6 +21,10 @@ package Bezel
 		 */
 		function get coremodInfo():Object;
 		/**
+		 * Gets the fully qualified main class name of the game this MainLoader supports. Can be used for sanity checking and multi-game mods.
+		 */
+		function get gameClassFullyQualifiedName():String;
+		/**
 		 * Adds boolean options to be displayed on an in-game screen. Should very likely be called through SettingManager, not directly, and only during or after the bind phase.
 		 * @param	mod Origin mod name
 		 * @param	name Option name

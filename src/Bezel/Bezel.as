@@ -25,6 +25,7 @@ package Bezel
 	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
 	import Bezel.Utils.SettingManager;
+	import flash.utils.getQualifiedClassName;
 	
 	use namespace bezel_internal;
 
@@ -230,6 +231,18 @@ package Bezel
 		// Bind the game and Bezel to each other
 		private function gameLoadSuccess(game:SWFFile): void
 		{
+			var className:String = getQualifiedClassName(game.instance);
+			var wantedName:String = this.mainLoader.gameClassFullyQualifiedName;
+			if (wantedName.indexOf("::") == -1)
+			{
+				var components:Array = wantedName.split(".");
+				var finalName:String = components.pop();
+				wantedName = components.join(".") + "::" + finalName;
+			}
+			if (className != wantedName)
+			{
+				throw new TypeError("This game class (" + className + ") does not match the main loader's supported class name (" + wantedName + ")");
+			}
 			game.instance.bezel = this;
 			this.removeChild(this.loadingTextField);
 			this.addChild(DisplayObject(game.instance));

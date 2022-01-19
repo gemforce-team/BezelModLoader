@@ -39,7 +39,7 @@ package Bezel.GCFW
 		{
             for (var i:int = newSettings.length; i > 0; i--)
             {
-                if (newSettings[i-1].mod as String == mod && newSettings[i-1].name as String == name)
+                if (newSettings[i-1].mod as String == mod && (name == null || newSettings[i-1].name as String == name))
                 {
                     delete newSettings[i-1];
                 }
@@ -142,10 +142,16 @@ package Bezel.GCFW
             }
 
             scrOptions.renderViewport();
+
+            currentlyShowing = !currentlyShowing;
         }
 
         bezel_internal static function renderInfoPanel(vP:Object, vIp:Object):Boolean
         {
+            if (vP == null || vP.tf == null)
+            {
+                return false;
+            }
             var i:int = newMCs.indexOf(vP);
             if (i == -1)
             {
@@ -153,15 +159,15 @@ package Bezel.GCFW
             }
             else
             {
-                for (var j:int = 0; j < newSettings.length; j++)
+                for each (var setting:Object in newSettings)
                 {
-                    if (vP.tf.text == newSettings[j].name && newSettings[j].description != "" && newSettings[j].description != null)
+                    if (vP.tf.text == setting.name && setting.description != "" && setting.description != null)
                     {
-                        vIp.addTextfield(15984813, newSettings[j].description, false, 12, null, 16777215)
+                        vIp.addTextfield(15984813, setting.description, false, 12, null, 16777215)
                     }
                     if (vP.knob.parent == vP) // if it has a draggable field
                     {
-                        vIp.addTextfield(15984813, "Current value: " + calculateValue(newSettings[j], vP.knob));
+                        vIp.addTextfield(15984813, "Current value: " + calculateValue(setting, vP.knob));
                     }
                 }
             }

@@ -48,6 +48,7 @@ package Bezel.GCCS
 		{
 		}
 		
+		public function get gameClassFullyQualifiedName():String { return "com.giab.games.gccs.steam.Main"; }
 		public function get MOD_NAME():String { return "GCCS Bezel"; }
 		public function get VERSION():String { return Bezel.Bezel.VERSION; }
 		public function get BEZEL_VERSION():String { return Bezel.Bezel.VERSION; }

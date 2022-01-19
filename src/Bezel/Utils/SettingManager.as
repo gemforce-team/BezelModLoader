@@ -81,19 +81,16 @@ package Bezel.Utils
 			this.id = identifier;
 		}
 
-        // Used internally to save all configs
+        // Used internally on reload
         bezel_internal static function unregisterAllManagers(... args):void
         {
-			logger.log("unregisterAllManagers", "Unregistering managers...");
+            logger.log("unregisterAllManagers", "Unregistering managers...");
             for each (var manager:SettingManager in _managers)
             {
-                manager.saveSettings();
-				manager.deregisterFromHandler();
+                manager.deregisterFromHandler();
             }
 
-            _managers = null;
-
-			Bezel.Bezel.instance.removeEventListener(Event.UNLOAD, unregisterAllManagers);
+            _managers = new Dictionary();
         }
 		
 		bezel_internal function deregisterFromHandler():void
@@ -101,10 +98,7 @@ package Bezel.Utils
 			if (this._settings != null)
 			{
 				logger.log("saveSettings", "Deregistering " + this.id);
-				for (var setting in this._settings)
-				{
-					GCFWSettingsHandler.deregisterOption(this.id, setting);
-				}
+                GCFWSettingsHandler.deregisterOption(this.id, null);
 			}
 		}
 		
@@ -148,7 +142,6 @@ package Bezel.Utils
          */
         public function registerBoolean(name:String, onSet:Function, defaultVal:Boolean, description:String = null):void
         {
-			//var self = this;
             if (!(name in settings))
             {
                 settings[name] = defaultVal;
@@ -156,7 +149,7 @@ package Bezel.Utils
             var set:Function = function(newVal:Boolean):void
             {
                 settings[name] = newVal;
-				//self.saveSettings();
+				saveSettings();
                 if (onSet != null)
                 {
                     onSet(newVal);
@@ -197,7 +190,6 @@ package Bezel.Utils
 		 */
 		public function registerFloatRange(name:String, min:Number, max:Number, step:Number, onSet:Function, defaultVal:Number, description:String = null):void
         {
-			//var self = this;
             if (!(name in settings))
             {
                 settings[name] = defaultVal;
@@ -205,7 +197,7 @@ package Bezel.Utils
             var set:Function = function(newVal:Number):void
             {
                 settings[name] = newVal;
-				//self.saveSettings();
+				saveSettings();
                 if (onSet != null)
                 {
                     onSet(newVal);

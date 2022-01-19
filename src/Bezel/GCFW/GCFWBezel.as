@@ -44,6 +44,7 @@ package Bezel.GCFW
 		
 		private static const defaultHotkeys:Object = createDefaultKeyConfiguration();
 		
+		public function get gameClassFullyQualifiedName():String { return "com.giab.games.gcfw.Main"; }
 		public function get MOD_NAME():String { return "GCFW Bezel"; }
 		public function get VERSION():String { return Bezel.Bezel.VERSION; }
 		public function get BEZEL_VERSION():String { return Bezel.Bezel.VERSION; }
