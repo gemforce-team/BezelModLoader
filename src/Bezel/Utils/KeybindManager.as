@@ -81,7 +81,15 @@ package Bezel.Utils
 			try
 			{
 				stream.open(hotkeysFile, FileMode.WRITE);
-				stream.writeUTFBytes(JSON.stringify(this.configuredHotkeys, null, 2));
+				var data:String = JSON.stringify(this.configuredHotkeys, null, 2);
+				var lines:Array = data.split('\n').slice(1, -1);
+				for (var i:int = 0; i < lines.length - 1; i++)
+				{
+					lines[i] = (lines[i] as String).slice(0, -1);
+				}
+				lines.sort();
+
+				stream.writeUTFBytes("{\n" + lines.join(",\n") + "\n}");
 			}
 			catch (e:Error)
 			{
