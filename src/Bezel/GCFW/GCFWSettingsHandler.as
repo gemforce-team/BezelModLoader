@@ -171,7 +171,7 @@ package Bezel.GCFW
                     else if (setting.type == Keybind)
                     {
                         vY += 60;
-                        var newButton:Object = new SettingsButtonShim(scrOptions.mc.btnClose);
+                        var newButton:SettingsButtonShim = new SettingsButtonShim(scrOptions.mc.btnClose);
                         newButton.tf.text = (setting.currentVal()).toString().toUpperCase();
                         var onKeybindMouseover:Function = function(e:MouseEvent):void
                         {
