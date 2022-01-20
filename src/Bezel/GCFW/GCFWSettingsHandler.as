@@ -128,9 +128,9 @@ package Bezel.GCFW
                     {
                         vY += 60;
                         newMC = new McOptPanel(setting.name, 658, vY, true);
-                        var onNumberReleased:Function = function(s:Object):Function
+                        var onNumberClicked:Function = function(s:Object):Function
                         {
-                            return function(e:MouseEvent):void
+                            var onNumberReleased:Function = function(e:MouseEvent):void
                             {
                                 Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_UP, arguments.callee, true);
                                 scrOptions.isDragging = false;
@@ -143,9 +143,6 @@ package Bezel.GCFW
 
                                 s.onSet(calculateValue(s, newMC.knob));
                             };
-                        }(setting);
-                        var onNumberClicked:Function = function(s:Object):Function
-                        {
                             return function(e:MouseEvent):void
                             {
                                 scrOptions.draggedKnob = e.target.parent;
@@ -174,9 +171,9 @@ package Bezel.GCFW
                         {
                             e.stopImmediatePropagation();
                         }
-                        var onKeybindTyped:Function = function(s:Object):Function
+                        var onKeybindClick:Function = function(s:Object, b:Object):Function
                         {
-                            return function(e:KeyboardEvent):void
+                            var onKeybindTyped:Function = function(e:KeyboardEvent):void
                             {
                                 if (e.keyCode == 0 || e.keyCode == Keyboard.CONTROL || e.keyCode == Keyboard.SHIFT || e.keyCode == Keyboard.ALTERNATE)
                                     return;
@@ -187,11 +184,11 @@ package Bezel.GCFW
                                 Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_OVER, discardAllMouseInput, true);
                                 Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true);
                                 e.stopImmediatePropagation();
-                                newButton.plate.gotoAndStop(1);
+                                b.plate.gotoAndStop(1);
 
                                 if (e.keyCode == Keyboard.ESCAPE)
                                 {
-                                    newButton.tf.text = s.currentVal();
+                                    b.tf.text = s.currentVal();
                                     return;
                                 }
 
@@ -210,11 +207,8 @@ package Bezel.GCFW
 
                                 s.onSet(new Keybind(sequence));
 
-                                newButton.tf.text = sequence.toUpperCase();
+                                b.tf.text = sequence.toUpperCase();
                             };
-                        }(setting);
-                        var onKeybindClick:Function = function(s:Object):Function
-                        {
                             return function(e:MouseEvent):void
                             {
                                 Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeybindTyped, true, 10, false);
@@ -223,10 +217,10 @@ package Bezel.GCFW
                                 Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_UP, discardAllMouseInput, true, 10, false);
                                 Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_OVER, discardAllMouseInput, true, 10, false);
                                 Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true, 10, false);
-                                newButton.tf.text = "???";
-                                newButton.plate.gotoAndStop(4);
+                                b.tf.text = "???";
+                                b.plate.gotoAndStop(4);
                             };
-                        }(setting);
+                        }(setting, newButton);
                         newButton.addEventListener(MouseEvent.CLICK, onKeybindClick, true);
                         newButton.addEventListener(MouseEvent.MOUSE_OVER, onKeybindMouseover);
                         newButton.addEventListener(MouseEvent.MOUSE_OUT, onKeybindMouseout);
