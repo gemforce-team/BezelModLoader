@@ -291,6 +291,11 @@ package Bezel.GCCS
 		{
 			throw new Error("Method not implemented.");
 		}
+
+		public function registerKeybindForDisplay(name:String, onSet:Function, currentValue:Function, description:String = null):void
+		{
+			throw new Error("Method not implemented.");
+		}
 	}
 
 }

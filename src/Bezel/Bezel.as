@@ -36,7 +36,11 @@ package Bezel
 		public static const VERSION:String = "1.0.1";
 
 		// Game objects, populated by the MainLoader
-		private var gameObjects:Object;
+		private var _gameObjects:Object;
+		public function get gameObjects():Object
+		{
+			return _gameObjects;
+		}
 		private var lattice:Lattice;
 		private var _mainLoader:MainLoader;
 		/**
@@ -250,7 +254,7 @@ package Bezel
 			game.instance.initFromBezel();
 			if (this.mainLoader != null)
 			{
-				this.gameObjects = new Object();
+				this._gameObjects = new Object();
 				this.mainLoader.loaderBind(this, game.instance, gameObjects);
 			}
 			bindMods();
@@ -498,6 +502,7 @@ package Bezel
 			logger.log("eh_keyboardKeyDown", "Reloading all mods!");
 			this._modsReloadedTimestamp = getTimer();
 			SettingManager.unregisterAllManagers();
+			mainLoader.deregisterOption("Keybinds", null);
 			if (!(this.mainLoader is GCFWBezel) && !(this.mainLoader is GCCSBezel))
 			{
 				this._mainLoader = null;
@@ -508,7 +513,7 @@ package Bezel
 				mod.unload();
 				delete mods[name];
 			}
-			this.gameObjects = null;
+			this._gameObjects = null;
 			this.removeChildren();
 			this.addChild(DisplayObject(game.instance));
 			mods = new Array();

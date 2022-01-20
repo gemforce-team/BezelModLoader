@@ -114,6 +114,11 @@ package Bezel.Utils
 		{
 			return this._stringRep;
 		}
+
+		public function toString():String
+		{
+			return this._stringRep;
+		}
 	}
 
 }

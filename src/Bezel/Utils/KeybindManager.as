@@ -55,14 +55,25 @@ package Bezel.Utils
 		 * Registers a hotkey with this KeybindManager.
 		 * @param	name Name of the hotkey to register
 		 * @param	defaultVal Value to be returned from getHotkeyValue, if name is not already registered
+		 * @param	description Longer-form description of what the keybind does, if necessary
 		 */
-		public function registerHotkey(name:String, defaultVal:Keybind):void
+		public function registerHotkey(name:String, defaultVal:Keybind, description:String = null):void
 		{
 			if (!(name in this.configuredHotkeys))
 			{
 				this.configuredHotkeys[name] = defaultVal;
 				this.saveHotkeys();
 			}
+			var set:Function = function(val:Keybind):void
+			{
+				configuredHotkeys[name] = val;
+				saveHotkeys();
+			};
+			var get:Function = function():Keybind
+			{
+				return getHotkeyValue(name);
+			}
+			Bezel.Bezel.instance.mainLoader.registerKeybindForDisplay(name, set, get, description);
 		}
 		
 		/**

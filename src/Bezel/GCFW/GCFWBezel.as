@@ -279,6 +279,11 @@ package Bezel.GCFW
 		{
 			GCFWSettingsHandler.deregisterOption(mod, name);
 		}
+
+		public function registerKeybindForDisplay(name:String, onSet:Function, currentValue:Function, description:String = null):void
+		{
+			GCFWSettingsHandler.registerKeybindForDisplay(name, onSet, currentValue, description);
+		}
 	}
 
 }

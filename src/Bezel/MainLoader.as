@@ -25,7 +25,7 @@ package Bezel
 		 */
 		function get gameClassFullyQualifiedName():String;
 		/**
-		 * Adds boolean options to be displayed on an in-game screen. Should very likely be called through SettingManager, not directly, and only during or after the bind phase.
+		 * Adds boolean options to be displayed on an in-game screen. Should very likely be called through SettingManager, not directly.
 		 * @param	mod Origin mod name
 		 * @param	name Option name
 		 * @param	onSet Function to be called when an option is set. Takes the new value as a parameter.
@@ -34,7 +34,7 @@ package Bezel
 		 */
 		function registerBooleanForDisplay(mod:String, name:String, onSet:Function, currentValue:Function, description:String = null):void;
 		/**
-		 * Adds floating-point range options to be displayed on an in-game screen. Should very likely be called through SettingManager, not directly, and only during or after the bind phase.
+		 * Adds floating-point range options to be displayed on an in-game screen. Should very likely be called through SettingManager, not directly.
 		 * @param	mod Origin mod name
 		 * @param	name Option name
 		 * @param	min Option minimum value
@@ -45,6 +45,14 @@ package Bezel
 		 * @param	description If more text is able to be displayed than the option name, this will be displayed
 		 */
 		function registerFloatRangeForDisplay(mod:String, name:String, min:Number, max:Number, step:Number, onSet:Function, currentValue:Function, description:String = null):void;
+		/**
+		 * Adds keybind options to be displayed on an in-game screen. Should very likely be called through KeybindManager, not directly.
+		 * @param	name Keybind name
+		 * @param	onSet Function to be called when an option is set. Takes the new value (as a Bezel.Utils.Keybind) as a parameter.
+		 * @param	currentValue Function that gets the current value of the option. Must take no parameters and return a Keybind.
+		 * @param	description If more text is able to be displayed than the option name, this will be displayed
+		 */
+		function registerKeybindForDisplay(name:String, onSet:Function, currentValue:Function, description:String = null):void;
 		/**
 		 * Deregisters one or all options from a given mod from in-game display. Should very likely be called through SettingManager, not directly, and only during or after the bind phase.
 		 * @param	mod Mod origin name
