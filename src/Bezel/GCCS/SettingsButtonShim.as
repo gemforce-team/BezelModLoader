@@ -23,6 +23,7 @@ package Bezel.GCCS
             this.tf.setTextFormat(template.tf.getTextFormat());
             this.tf.defaultTextFormat = template.tf.getTextFormat();
             this.tf.y = template.tf.y;
+            this.tf.height = template.tf.height;
             this.tf.selectable = false;
 
             this.plate = new (getDefinitionByName("gc_cs_steam_fla.btnplate160x34_24") as Class)();
