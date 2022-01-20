@@ -7,6 +7,7 @@ package Bezel.GCFW
     import flash.events.KeyboardEvent;
     import flash.ui.Keyboard;
     import flash.utils.describeType;
+    import flash.text.TextFormat;
 
     /**
      * ...
@@ -32,17 +33,17 @@ package Bezel.GCFW
 
         bezel_internal static function registerBooleanForDisplay(mod:String, name:String, onSet:Function, currentValue:Function, description:String):void
 		{
-            newSettings.push({"type":Boolean, "mod":mod, "name":name, "onSet":onSet, "currentVal":currentValue, "description":description});
+            newSettings.push({"type":Boolean, "mod":mod, "name":name, "onSet":onSet, "currentVal":currentValue, "description":description, "panel":null});
 		}
 
 		bezel_internal static function registerFloatRangeForDisplay(mod:String, name:String, min:Number, max:Number, step:Number, onSet:Function, currentValue:Function, description:String):void
 		{
-			newSettings.push({"type":Number, "mod":mod, "name":name, "min":min, "max":max, "step":step, "onSet":onSet, "currentVal":currentValue, "description":description});
+			newSettings.push({"type":Number, "mod":mod, "name":name, "min":min, "max":max, "step":step, "onSet":onSet, "currentVal":currentValue, "description":description, "panel":null});
 		}
 
         bezel_internal static function registerKeybindForDisplay(name:String, onSet:Function, currentValue:Function, description:String):void
         {
-            newSettings.push({"type":Keybind, "mod":"Keybinds", "name":name, "onSet":onSet, "currentVal":currentValue, "description":description});
+            newSettings.push({"type":Keybind, "mod":"Keybinds", "name":name, "onSet":onSet, "currentVal":currentValue, "description":description, "panel":null, "button":null});
         }
 
 		bezel_internal static function deregisterOption(mod:String, name:String):void
@@ -123,6 +124,7 @@ package Bezel.GCFW
                         }(setting);
                         newMC.btn.gotoAndStop(setting.currentVal() ? 2 : 1);
                         newMC.plate.addEventListener(MouseEvent.CLICK, onBooleanClicked);
+                        setting.panel = newMC;
                     }
                     else if (setting.type == Number)
                     {
@@ -153,6 +155,7 @@ package Bezel.GCFW
                             };
                         }(setting);
                         newMC.knob.addEventListener(MouseEvent.MOUSE_DOWN, onNumberClicked);
+                        setting.panel = newMC;
                     }
                     else if (setting.type == Keybind)
                     {
@@ -208,6 +211,8 @@ package Bezel.GCFW
                                 s.onSet(new Keybind(sequence));
 
                                 b.tf.text = sequence.toUpperCase();
+
+                                updateButtonColors();
                             };
                             return function(e:MouseEvent):void
                             {
@@ -233,6 +238,9 @@ package Bezel.GCFW
 
                         newMC = new McOptPanel(setting.name, 250, vY, false);
                         newMC.btn.visible = false;
+
+                        setting.panel = newMC;
+                        setting.button = newButton;
                     }
                     else
                     {
@@ -246,6 +254,8 @@ package Bezel.GCFW
                         newMC.knob.x = calculateX(setting);
                     }
                 }
+
+                updateButtonColors();
             }
             else
             {
@@ -319,6 +329,33 @@ package Bezel.GCFW
         private static function calculateX(setting:Object):Number
         {
             return convertCoord(setting.min, setting.max, setting.currentVal(), 507, 582);
+        }
+
+        private static function updateButtonColors():void
+        {
+            for (var i:int = 0; i < newSettings.length; i++)
+            {
+                if (newSettings[i].type == Keybind)
+                {
+                    newSettings[i].button.tf.setTextFormat(new TextFormat(null, null, 0xFFFFFF));
+                }
+            }
+
+            for (i = 0; i < newSettings.length; i++)
+            {
+                if (newSettings[i].type == Keybind)
+                {
+                    var kb:Keybind = newSettings[i].currentVal();
+                    for (var j:int = i+1; j < newSettings.length; j++)
+                    {
+                        if (newSettings[j].type == Keybind && kb.matches(newSettings[j].currentVal()))
+                        {
+                            newSettings[j].button.tf.setTextFormat(new TextFormat(null, null, 0xFF0000));
+                            newSettings[i].button.tf.setTextFormat(new TextFormat(null, null, 0xFF0000));
+                        }
+                    }
+                }
+            }
         }
     }
 }
