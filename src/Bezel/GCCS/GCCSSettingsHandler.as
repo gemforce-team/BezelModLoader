@@ -8,6 +8,7 @@ package Bezel.GCCS
     import flash.ui.Keyboard;
     import flash.utils.describeType;
     import flash.text.TextFormat;
+    import flash.display.Sprite;
 
     /**
      * ...
@@ -27,7 +28,8 @@ package Bezel.GCCS
 
         private static var newMCs:Array = new Array();
         private static var currentlyShowing:Boolean = false;
-        private static var currentKnobEditing:Object;
+
+        bezel_internal static var IS_CHOOSING_KEYBIND:Boolean = false;
 
         private static var KeyboardConstants:XMLList = describeType(Keyboard).constant.(@type == "uint").@name;
 
@@ -125,6 +127,10 @@ package Bezel.GCCS
                         newMC.btn.gotoAndStop(setting.currentVal() ? 2 : 1);
                         newMC.plate.addEventListener(MouseEvent.CLICK, onBooleanClicked);
                         setting.panel = newMC;
+
+                        newMCs.push(newMC);
+                        scrOptions.mc.arrCntContents.push(newMC);
+                        scrOptions.mc.cnt.addChild(newMC);
                     }
                     else if (setting.type == Number)
                     {
@@ -143,7 +149,7 @@ package Bezel.GCCS
                                 }
                                 scrOptions.isVpDragging = false;
 
-                                s.onSet(calculateValue(s, newMC.knob));
+                                s.onSet(calculateValue(s, s.panel.knob));
                             };
                             return function(e:MouseEvent):void
                             {
@@ -151,11 +157,16 @@ package Bezel.GCCS
                                 scrOptions.draggedKnob.gotoAndStop(2);
                                 Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_UP, onNumberReleased, true, 0, false);
                                 scrOptions.isDragging = true;
-                                currentKnobEditing = s;
                             };
                         }(setting);
                         newMC.knob.addEventListener(MouseEvent.MOUSE_DOWN, onNumberClicked);
                         setting.panel = newMC;
+
+                        newMCs.push(newMC);
+                        scrOptions.mc.arrCntContents.push(newMC);
+                        scrOptions.mc.cnt.addChild(newMC);
+                        
+                        newMC.knob.x = calculateX(setting);
                     }
                     else if (setting.type == Keybind)
                     {
@@ -174,7 +185,7 @@ package Bezel.GCCS
                         {
                             e.stopImmediatePropagation();
                         }
-                        var onKeybindClick:Function = function(s:Object, b:Object):Function
+                        var onKeybindClick:Function = function(s:Object):Function
                         {
                             var onKeybindTyped:Function = function(e:KeyboardEvent):void
                             {
@@ -186,12 +197,16 @@ package Bezel.GCCS
                                 Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_UP, discardAllMouseInput, true);
                                 Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_OVER, discardAllMouseInput, true);
                                 Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true);
+                                Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, discardAllMouseInput, true);
                                 e.stopImmediatePropagation();
-                                b.plate.gotoAndStop(1);
+                                e.preventDefault();
+                                s.button.plate.gotoAndStop(1);
+
+                                bezel_internal::IS_CHOOSING_KEYBIND = false;
 
                                 if (e.keyCode == Keyboard.ESCAPE)
                                 {
-                                    b.tf.text = s.currentVal().toString().toUpperCase();
+                                    s.button.tf.text = s.currentVal().toString().toUpperCase();
                                     return;
                                 }
 
@@ -210,7 +225,7 @@ package Bezel.GCCS
 
                                 s.onSet(new Keybind(sequence));
 
-                                b.tf.text = sequence.toUpperCase();
+                                s.button.tf.text = sequence.toUpperCase();
 
                                 updateButtonColors();
                             };
@@ -222,36 +237,47 @@ package Bezel.GCCS
                                 Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_UP, discardAllMouseInput, true, 10, false);
                                 Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_OVER, discardAllMouseInput, true, 10, false);
                                 Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true, 10, false);
-                                b.tf.text = "???";
-                                b.plate.gotoAndStop(4);
+                                Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_WHEEL, discardAllMouseInput, true, 10, false);
+                                s.button.tf.text = "???";
+                                s.button.plate.gotoAndStop(4);
+
+                                bezel_internal::IS_CHOOSING_KEYBIND = true;
                             };
-                        }(setting, newButton);
+                        }(setting);
                         newButton.addEventListener(MouseEvent.CLICK, onKeybindClick, true);
                         newButton.addEventListener(MouseEvent.MOUSE_OVER, onKeybindMouseover);
                         newButton.addEventListener(MouseEvent.MOUSE_OUT, onKeybindMouseout);
 
                         newButton.yReal = vY - 3;
-                        newMCs.push(newButton);
-                        scrOptions.mc.arrCntContents.push(newButton);
-                        scrOptions.mc.cnt.addChild(newButton);
                         newButton.x = 625;
 
                         newMC = new McOptPanel(setting.name, 200, vY, false);
-                        newMC.btn.visible = false;
+                        newMC.removeChild(newMC.btn);
+
+                        var extraSizeSprite:Sprite = new Sprite();
+                        extraSizeSprite.graphics.beginFill(0,0);
+                        extraSizeSprite.graphics.drawRect(0,0,1,1);
+                        extraSizeSprite.graphics.endFill();
+                        extraSizeSprite.width = (newButton.x + newButton.width) - 200;
+                        extraSizeSprite.height = newButton.height;
+
+                        newMC.addChild(extraSizeSprite);
+                        extraSizeSprite.y = -3;
 
                         setting.panel = newMC;
                         setting.button = newButton;
+
+                        newMCs.push(newMC);
+                        scrOptions.mc.arrCntContents.push(newMC);
+                        scrOptions.mc.cnt.addChild(newMC);
+                        
+                        newMCs.push(newButton);
+                        scrOptions.mc.arrCntContents.push(newButton);
+                        scrOptions.mc.cnt.addChild(newButton);
                     }
                     else
                     {
                         throw new Error("Unrecognized option type when enabling settings");
-                    }
-                    newMCs.push(newMC);
-                    scrOptions.mc.arrCntContents.push(newMC);
-                    scrOptions.mc.cnt.addChild(newMC);
-                    if (setting.type == Number)
-                    {
-                        newMC.knob.x = calculateX(setting);
                     }
                 }
 
@@ -289,7 +315,7 @@ package Bezel.GCCS
             {
                 for each (var setting:Object in newSettings)
                 {
-                    if (vP.tf.text == setting.name)
+                    if (vP == setting.panel)
                     {
                         var display:Boolean = false;
                         if (setting.description != "" && setting.description != null)
@@ -314,7 +340,7 @@ package Bezel.GCCS
 
         private static function calculateValue(setting:Object, knob:Object):Number
         {
-            var result:Number = convertCoord(507, 582, knob.x, setting.min, setting.max);
+            var result:Number = convertCoord(338, 388, knob.x, setting.min, setting.max);
             if (result == setting.max || result == setting.min)
             {
                 return result;
@@ -328,7 +354,7 @@ package Bezel.GCCS
 
         private static function calculateX(setting:Object):Number
         {
-            return convertCoord(setting.min, setting.max, setting.currentVal(), 507, 582);
+            return convertCoord(setting.min, setting.max, setting.currentVal(), 338, 388);
         }
 
         private static function updateButtonColors():void

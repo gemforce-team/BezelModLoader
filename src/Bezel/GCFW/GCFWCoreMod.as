@@ -8,7 +8,7 @@ package Bezel.GCFW
 
     internal class GCFWCoreMod
     {
-        public static const VERSION:String = "7";
+        public static const VERSION:String = "8";
 
         private static const files:Array = [
             "com/giab/games/gcfw/Main.class.asasm",
@@ -91,7 +91,10 @@ package Bezel.GCFW
                     "method.*renderPanelInfoPanel",
                     "setlocal3",
                     "setlocal3"
-                ]
+                ],
+                "getproperty.*height",
+                "getproperty.*height",
+                "getproperty.*height"
             ]
         ];
         private static const replaceNums:Array = [
@@ -101,7 +104,7 @@ package Bezel.GCFW
             [ 0 ],
             [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
             [ 0 ],
-            [ 0, 1 ]
+            [ 0, 1, 0, 0, 0 ]
         ];
 		private static const offsetFromMatches:Array = [
             [ -1, -1, 20, 0, 0 ],
@@ -110,7 +113,7 @@ package Bezel.GCFW
             [ 5 ],
             [ 0, -1, -1, -1, -1, -1, -1, -1, -1, -1 ],
             [ -1 ],
-            [ 0, -2 ]
+            [ 0, -2, 3, 5, 14 ]
         ];
         private static const contents:Array = [
             [
@@ -326,7 +329,44 @@ package Bezel.GCFW
                     getlocal1 \n \
                     getlocal2 \n \
                     callproperty        QName(PackageInternalNs("Bezel:bezel_internal"), "renderInfoPanel"), 2 \n \
-                '
+                ',
+                ' \n \
+                    dup \n \
+                    iffalse AfterKeybindChoiceCheck \n \
+                    pop \n \
+                    getlex QName(PackageNamespace("Bezel.GCFW"), "GCFWSettingsHandler") \n \
+                    getproperty QName(PackageInternalNs("Bezel:bezel_internal"), "IS_CHOOSING_KEYBIND") \n \
+                    not \n \
+    AfterKeybindChoiceCheck: \n \
+                ',
+                ' \n \
+                    getlocal0 \n \
+                    getproperty QName(PackageNamespace(""),"mc") \n \
+                    getproperty QName(PackageNamespace(""),"arrCntContents") \n \
+                    getlocal1 \n \
+                    getproperty MultinameL([PrivateNamespace("com.giab.games.gcfw.scr:ScrOptions"),PackageNamespace(""),PrivateNamespace("ScrOptions.as$615"),PackageNamespace("com.giab.games.gcfw.scr"),PackageInternalNs("com.giab.games.gcfw.scr"),Namespace("http://adobe.com/AS3/2006/builtin"),ProtectedNamespace("com.giab.games.gcfw.scr:ScrOptions"),StaticProtectedNs("com.giab.games.gcfw.scr:ScrOptions")]) \n \
+                    getproperty Multiname("btn",[PrivateNamespace("com.giab.games.gcfw.scr:ScrOptions"),PackageNamespace(""),PrivateNamespace("ScrOptions.as$615"),PackageNamespace("com.giab.games.gcfw.scr"),PackageInternalNs("com.giab.games.gcfw.scr"),Namespace("http://adobe.com/AS3/2006/builtin"),ProtectedNamespace("com.giab.games.gcfw.scr:ScrOptions"),StaticProtectedNs("com.giab.games.gcfw.scr:ScrOptions")]) \n \
+                    getproperty Multiname("parent",[PrivateNamespace("com.giab.games.gcfw.scr:ScrOptions"),PackageNamespace(""),PrivateNamespace("ScrOptions.as$615"),PackageNamespace("com.giab.games.gcfw.scr"),PackageInternalNs("com.giab.games.gcfw.scr"),Namespace("http://adobe.com/AS3/2006/builtin"),ProtectedNamespace("com.giab.games.gcfw.scr:ScrOptions"),StaticProtectedNs("com.giab.games.gcfw.scr:ScrOptions")]) \n \
+                    pushnull \n \
+                    equals \n \
+                    not \n \
+                    dup \n \
+                    iftrue AfterFullVisibilityCheck \n \
+                    pop \n \
+                    getlocal0 \n \
+                    getproperty QName(PackageNamespace(""),"mc") \n \
+                    getproperty QName(PackageNamespace(""),"arrCntContents") \n \
+                    getlocal1 \n \
+                    getproperty MultinameL([PrivateNamespace("com.giab.games.gcfw.scr:ScrOptions"),PackageNamespace(""),PrivateNamespace("ScrOptions.as$615"),PackageNamespace("com.giab.games.gcfw.scr"),PackageInternalNs("com.giab.games.gcfw.scr"),Namespace("http://adobe.com/AS3/2006/builtin"),ProtectedNamespace("com.giab.games.gcfw.scr:ScrOptions"),StaticProtectedNs("com.giab.games.gcfw.scr:ScrOptions")]) \n \
+                    getproperty Multiname("knob",[PrivateNamespace("com.giab.games.gcfw.scr:ScrOptions"),PackageNamespace(""),PrivateNamespace("ScrOptions.as$615"),PackageNamespace("com.giab.games.gcfw.scr"),PackageInternalNs("com.giab.games.gcfw.scr"),Namespace("http://adobe.com/AS3/2006/builtin"),ProtectedNamespace("com.giab.games.gcfw.scr:ScrOptions"),StaticProtectedNs("com.giab.games.gcfw.scr:ScrOptions")]) \n \
+                    getproperty Multiname("parent",[PrivateNamespace("com.giab.games.gcfw.scr:ScrOptions"),PackageNamespace(""),PrivateNamespace("ScrOptions.as$615"),PackageNamespace("com.giab.games.gcfw.scr"),PackageInternalNs("com.giab.games.gcfw.scr"),Namespace("http://adobe.com/AS3/2006/builtin"),ProtectedNamespace("com.giab.games.gcfw.scr:ScrOptions"),StaticProtectedNs("com.giab.games.gcfw.scr:ScrOptions")]) \n \
+                    pushnull \n \
+                    equals \n \
+                    not \n \
+    AfterFullVisibilityCheck: \n \
+                    iffalse DoNotColorPlate \n \
+                ',
+                "DoNotColorPlate:"
             ]
         ];
 
