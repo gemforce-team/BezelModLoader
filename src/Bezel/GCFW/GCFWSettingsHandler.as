@@ -234,9 +234,9 @@ package Bezel.GCFW
                         newMCs.push(newButton);
                         scrOptions.mc.arrCntContents.push(newButton);
                         scrOptions.mc.cnt.addChild(newButton);
-                        newButton.x = 1000;
+                        newButton.x = 1150;
 
-                        newMC = new McOptPanel(setting.name, 250, vY, false);
+                        newMC = new McOptPanel(setting.name, 500, vY, false);
                         newMC.btn.visible = false;
 
                         setting.panel = newMC;
