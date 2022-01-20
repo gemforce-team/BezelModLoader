@@ -188,7 +188,7 @@ package Bezel.GCFW
 
                                 if (e.keyCode == Keyboard.ESCAPE)
                                 {
-                                    b.tf.text = s.currentVal();
+                                    b.tf.text = s.currentVal().toString().toUpperCase();
                                     return;
                                 }
 
