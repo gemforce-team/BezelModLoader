@@ -1,9 +1,10 @@
-package Bezel.GCFW
+package Bezel.GCCS
 {
     import flash.display.MovieClip;
     import flash.text.TextField;
     import flash.text.TextFormat;
     import flash.utils.getDefinitionByName;
+    import flash.text.TextFieldAutoSize;
 
     /**
      * ...
@@ -24,10 +25,9 @@ package Bezel.GCFW
             this.tf.y = template.tf.y;
             this.tf.selectable = false;
 
-            this.plate = new (getDefinitionByName("GemCraftFrostbornWrath_fla.btnplate160x34_24") as Class)();
+            this.plate = new (getDefinitionByName("gc_cs_steam_fla.btnplate160x34_24") as Class)();
 
             this.addChild(this.plate);
-            this.plate.scaleX = this.plate.scaleY = 1.5;
             this.addChild(this.tf);
             this.tf.width = this.plate.width;
             this.tf.visible = true;

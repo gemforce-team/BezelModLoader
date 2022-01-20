@@ -17,7 +17,8 @@ package Bezel.GCCS
             "com/giab/games/gccs/steam/ingame/IngameInfoPanelRenderer.class.asasm",
             "com/giab/games/gccs/steam/utils/LoaderSaver.class.asasm",
             "com/giab/games/gccs/steam/ingame/IngameInitializer.class.asasm",
-			"com/giab/games/gccs/steam/scr/ScrMainMenu.class.asasm"
+			"com/giab/games/gccs/steam/scr/ScrMainMenu.class.asasm",
+            "com/giab/games/gccs/steam/scr/ScrOptions.class.asasm"
 		];
 
         private static const matches:Array = [
@@ -144,7 +145,18 @@ package Bezel.GCCS
             ],
 			[
 				"initproperty.*mc"
-			]
+			],
+            [
+                [
+                    "method.*switchOptions",
+                    "pushscope"
+                ],
+                [
+                    "method.*renderPanelInfoPanel",
+                    "setlocal3",
+                    "setlocal3"
+                ]
+            ]
         ];
 
         private static const replaceNums:Array = [
@@ -154,7 +166,8 @@ package Bezel.GCCS
             [ 0 ],
             [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
             [ 0 ],
-			[ 0 ]
+			[ 0 ],
+            [ 0, 1 ]
         ]
 
         private static const offsetFromMatches:Array = [
@@ -164,7 +177,8 @@ package Bezel.GCCS
             [ 5 ],
             [ 0, -1, -1, -1, -1, -1, -1, -1, -1, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3 ],
             [ -1 ],
-			[ 0 ]
+			[ 0 ],
+            [ 0, -2 ]
         ];
 
         private static const contents:Array = [
@@ -499,7 +513,20 @@ package Bezel.GCCS
 					getlocal1 \n \
 					callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "setVersion"), 1 \n \
 				'
-			]
+			],
+            [
+                ' \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSSettingsHandler") \n \
+                    getlocal0 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "toggleCustomSettingsFromGame"), 1 \n \
+                ',
+                ' \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSSettingsHandler") \n \
+                    getlocal1 \n \
+                    getlocal2 \n \
+                    callproperty        QName(PackageInternalNs("Bezel:bezel_internal"), "renderInfoPanel"), 2 \n \
+                '
+            ]
         ];
 
         internal static function installHooks(lattice:Lattice): void
