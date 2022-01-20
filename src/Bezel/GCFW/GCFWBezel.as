@@ -51,14 +51,23 @@ package Bezel.GCFW
 		
 		public function bind(b:Bezel, o:Object):void
 		{
+			Bezel.Bezel.instance.gameObjects.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
+
 			for (var hotkey:String in defaultHotkeys)
 			{
 				b.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
 			}
 			
 			b.keybindManager.registerHotkey("GCFW Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
+			
+			var version:String = Bezel.Bezel.instance.gameObjects.GV.main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text;
+			version = version.slice(0, version.search(' ') + 1) + Bezel.Bezel.prettyVersion();
+			GV.main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text = version;
 		}
-		public function unload():void {}
+		public function unload():void
+		{
+			GV.main.stage.removeEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
+		}
 		
 		public function GCFWBezel()
 		{
@@ -118,12 +127,7 @@ package Bezel.GCFW
 			gameObjects.constants.wizLockType = getDefinitionByName("com.giab.games.gcfw.constants.WizLockType");
 			gameObjects.constants.wizStashStatus = getDefinitionByName("com.giab.games.gcfw.constants.WizStashStatus");
 
-			var version:String = GV.main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text;
-			version = version.slice(0, version.search(' ') + 1) + Bezel.Bezel.prettyVersion();
-			GV.main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text = version;
 			//checkForUpdates();
-
-			GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
 
 			this.logger.log("GCFW Bezel", "GCFW Bezel bound to game's objects!");
 		}

@@ -252,11 +252,6 @@ package Bezel
 			this.addChild(DisplayObject(game.instance));
 			// Base game's init (main.initFromBezel())
 			game.instance.initFromBezel();
-			if (this.mainLoader != null)
-			{
-				this._gameObjects = new Object();
-				this.mainLoader.loaderBind(this, game.instance, gameObjects);
-			}
 			bindMods();
 			this.initialLoad = false;
 		}
@@ -268,6 +263,11 @@ package Bezel
 
 		private function bindMods() : void
 		{
+			if (this.mainLoader != null)
+			{
+				this._gameObjects = new Object();
+				this.mainLoader.loaderBind(this, game.instance, gameObjects);
+			}
 			// Special case necessary
 			if (mainLoader is GCCSBezel || mainLoader is GCFWBezel)
 			{
@@ -506,6 +506,10 @@ package Bezel
 			if (!(this.mainLoader is GCFWBezel) && !(this.mainLoader is GCCSBezel))
 			{
 				this._mainLoader = null;
+			}
+			else
+			{
+				this.mainLoader.unload();
 			}
 			for each (var mod:SWFFile in mods)
 			{

@@ -55,6 +55,8 @@ package Bezel.GCCS
 		
 		public function bind(b:Bezel, o:Object):void
 		{
+			GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
+
 			for (var hotkey:String in defaultHotkeys)
 			{
 				b.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
@@ -62,7 +64,10 @@ package Bezel.GCCS
 			
 			b.keybindManager.registerHotkey("GCCS Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
 		}
-		public function unload():void {}
+		public function unload():void
+		{
+			GV.main.stage.removeEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
+		}
 		
 		public function loaderBind(bezel:Bezel, mainGame:Object, gameObjects:Object): void
 		{
@@ -114,8 +119,6 @@ package Bezel.GCCS
 			gameObjects.constants.wizLockType = getDefinitionByName("com.giab.games.gccs.steam.constants.WizLockType");
 
 			//checkForUpdates();
-
-			mainGame.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
 
 			this.logger.log("GCCS Bezel", "GCCS Bezel bound to game's objects!");
 		}
