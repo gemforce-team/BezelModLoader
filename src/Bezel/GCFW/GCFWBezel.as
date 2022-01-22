@@ -51,7 +51,7 @@ package Bezel.GCFW
 		
 		public function bind(b:Bezel, o:Object):void
 		{
-			Bezel.Bezel.instance.gameObjects.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
+			o.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
 
 			for (var hotkey:String in defaultHotkeys)
 			{
@@ -87,7 +87,6 @@ package Bezel.GCFW
 			this.SB = getDefinitionByName("com.giab.games.gcfw.SB") as Class;
 			this.prefs = getDefinitionByName("com.giab.games.gcfw.Prefs") as Class;
 			gameObjects.main = mainGame;
-			gameObjects.core = this.GV.ingameCore;
 			gameObjects.GV = this.GV;
 			gameObjects.SB = this.SB;
 			gameObjects.prefs = this.prefs;

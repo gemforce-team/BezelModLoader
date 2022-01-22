@@ -63,7 +63,7 @@ package Bezel.GCCS
         {
             if (!currentlyShowing)
             {
-                var vY:int = 1670;
+                var vY:int = 1630;
                 newSettings.sort(function(left:Object, right:Object):Number{
                     // Sort keybinds first
                     if (left.mod == "Keybinds")
@@ -103,7 +103,7 @@ package Bezel.GCCS
                     var newMC:Object = null;
                     if (currentName != setting.mod)
                     {
-                        vY += 40;
+                        vY += 80;
                         newMC = new McOptTitle(setting.mod, 127, vY);
                         newMCs.push(newMC);
                         scrOptions.mc.arrCntContents.push(newMC);

@@ -55,8 +55,7 @@ package Bezel.GCCS
 		
 		public function bind(b:Bezel, o:Object):void
 		{
-			GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
-
+			o.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
 			for (var hotkey:String in defaultHotkeys)
 			{
 				b.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
@@ -78,7 +77,6 @@ package Bezel.GCCS
 			this.SB = getDefinitionByName("com.giab.games.gccs.steam.SB") as Class;
 			this.prefs = getDefinitionByName("com.giab.games.gccs.steam.Prefs") as Class;
 			gameObjects.main = mainGame;
-			gameObjects.core = this.GV.ingameCore;
 			gameObjects.GV = this.GV;
 			gameObjects.SB = this.SB;
 			gameObjects.prefs = this.prefs;
