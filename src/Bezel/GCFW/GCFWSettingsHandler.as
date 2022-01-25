@@ -64,6 +64,7 @@ package Bezel.GCFW
             if (!currentlyShowing)
             {
                 var vY:int = 2720;
+                var currentPanelX:int = getNewPanelX(0);
                 newSettings.sort(function(left:Object, right:Object):Number{
                     // Sort keybinds first
                     if (left.mod == "Keybinds")
@@ -104,6 +105,7 @@ package Bezel.GCFW
                     if (currentName != setting.mod)
                     {
                         vY += 120;
+                        currentPanelX = getNewPanelX(0);
                         newMC = new McOptTitle(setting.mod, 536, vY);
                         newMCs.push(newMC);
                         scrOptions.mc.arrCntContents.push(newMC);
@@ -113,8 +115,9 @@ package Bezel.GCFW
 
                     if (setting.type == Boolean)
                     {
-                        vY += 60;
-                        newMC = new McOptPanel(setting.name, 658, vY, false);
+                        vY += getNewPanelYModifier(currentPanelX);
+                        newMC = new McOptPanel(setting.name, currentPanelX, vY, false);
+                        currentPanelX = getNewPanelX(currentPanelX);
                         var onBooleanClicked:Function = function(s:Object):Function
                         {
                             return function(e:MouseEvent):void
@@ -134,8 +137,9 @@ package Bezel.GCFW
                     }
                     else if (setting.type == Number)
                     {
-                        vY += 60;
-                        newMC = new McOptPanel(setting.name, 658, vY, true);
+                        vY += getNewPanelYModifier(currentPanelX);
+                        newMC = new McOptPanel(setting.name, currentPanelX, vY, true);
+                        currentPanelX = getNewPanelX(currentPanelX);
                         var onNumberClicked:Function = function(s:Object):Function
                         {
                             var onNumberReleased:Function = function(e:MouseEvent):void
@@ -171,6 +175,7 @@ package Bezel.GCFW
                     else if (setting.type == Keybind)
                     {
                         vY += 60;
+                        currentPanelX = getNewPanelX(0);
                         var newButton:SettingsButtonShim = new SettingsButtonShim(scrOptions.mc.btnClose);
                         newButton.tf.text = (setting.currentVal()).toString().toUpperCase();
                         var onKeybindMouseover:Function = function(e:MouseEvent):void
@@ -355,6 +360,30 @@ package Bezel.GCFW
         {
             var convertCoord:Function = getDefinitionByName("com.giab.common.utils.MathToolbox").convertCoord;
             return convertCoord(setting.min, setting.max, setting.currentVal(), 507, 582);
+        }
+
+        private static function getNewPanelX(currentPanelX:int):int
+        {
+            if (currentPanelX == 250)
+            {
+                return 1067;
+            }
+            else
+            {
+                return 250;
+            }
+        }
+
+        private static function getNewPanelYModifier(currentPanelX:int):int
+        {
+            if (currentPanelX == 250)
+            {
+                return 60;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         private static function updateButtonColors():void

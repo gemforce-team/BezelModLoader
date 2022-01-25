@@ -64,6 +64,7 @@ package Bezel.GCCS
             if (!currentlyShowing)
             {
                 var vY:int = 1630;
+                var currentPanelX:int = getNewPanelX(0);
                 newSettings.sort(function(left:Object, right:Object):Number{
                     // Sort keybinds first
                     if (left.mod == "Keybinds")
@@ -104,6 +105,7 @@ package Bezel.GCCS
                     if (currentName != setting.mod)
                     {
                         vY += 80;
+                        currentPanelX = getNewPanelX(0);
                         newMC = new McOptTitle(setting.mod, 127, vY);
                         newMCs.push(newMC);
                         scrOptions.mc.arrCntContents.push(newMC);
@@ -113,8 +115,9 @@ package Bezel.GCCS
 
                     if (setting.type == Boolean)
                     {
-                        vY += 40;
-                        newMC = new McOptPanel(setting.name, 330, vY, false);
+                        vY += getNewPanelYModifier(currentPanelX);
+                        newMC = new McOptPanel(setting.name, currentPanelX, vY, false);
+                        currentPanelX = getNewPanelX(currentPanelX);
                         var onBooleanClicked:Function = function(s:Object):Function
                         {
                             return function(e:MouseEvent):void
@@ -134,8 +137,9 @@ package Bezel.GCCS
                     }
                     else if (setting.type == Number)
                     {
-                        vY += 40;
-                        newMC = new McOptPanel(setting.name, 330, vY, true);
+                        vY += getNewPanelYModifier(currentPanelX);
+                        newMC = new McOptPanel(setting.name, currentPanelX, vY, true);
+                        currentPanelX = getNewPanelX(currentPanelX);
                         var onNumberClicked:Function = function(s:Object):Function
                         {
                             var onNumberReleased:Function = function(e:MouseEvent):void
@@ -171,6 +175,7 @@ package Bezel.GCCS
                     else if (setting.type == Keybind)
                     {
                         vY += 40;
+                        currentPanelX = getNewPanelX(0);
                         var newButton:SettingsButtonShim = new SettingsButtonShim(scrOptions.mc.btnClose);
                         newButton.tf.text = (setting.currentVal()).toString().toUpperCase();
                         var onKeybindMouseover:Function = function(e:MouseEvent):void
@@ -350,6 +355,30 @@ package Bezel.GCCS
                 return result - (result % setting.step);
             }
             return result;
+        }
+
+        private static function getNewPanelX(currentPanelX:int):int
+        {
+            if (currentPanelX == 89)
+            {
+                return 559;
+            }
+            else
+            {
+                return 89;
+            }
+        }
+
+        private static function getNewPanelYModifier(currentPanelX:int):int
+        {
+            if (currentPanelX == 89)
+            {
+                return 40;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         private static function calculateX(setting:Object):Number
