@@ -8,7 +8,7 @@ package Bezel.GCCS
      */
     internal class GCCSCoreMod
     {
-        public static const VERSION:String = "2";
+        public static const VERSION:String = "8";
 
         private static const files:Array = [
             "com/giab/games/gccs/steam/Main.class.asasm",

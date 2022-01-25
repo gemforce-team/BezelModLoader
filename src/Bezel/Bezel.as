@@ -377,6 +377,7 @@ package Bezel
 							{
 								this._mainLoader = mod as MainLoader;
 								this.coremods[this.coremods.length] = this.mainLoader.coremodInfo;
+								SettingManager.registerAllToMainLoader();
 							}
 						}
 

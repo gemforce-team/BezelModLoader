@@ -12,7 +12,7 @@ package Bezel.Utils
     import flash.filesystem.FileStream;
     import flash.filesystem.FileMode;
     import flash.events.Event;
-    import flash.desktop.NativeApplication;
+    import flash.utils.getQualifiedClassName;
 
     use namespace bezel_internal;
 
@@ -39,6 +39,8 @@ package Bezel.Utils
         private var id:String;
 
         private var _settings:Object;
+
+        private var notRegisteredWithMainLoader:Vector.<Object>;
 		
 		private static var logger: Logger = Bezel.Bezel.instance.getLogger("SettingManager");
 		
@@ -79,6 +81,8 @@ package Bezel.Utils
 			if (identifier in managers || _blocker == null)
 				throw new IllegalOperationError("Constructor should only be called by getLogger! Get your logger instance that way");
 			this.id = identifier;
+
+            this.notRegisteredWithMainLoader = new Vector.<Object>();
 		}
 
         // Used internally on reload
@@ -91,6 +95,37 @@ package Bezel.Utils
             }
 
             _managers = new Dictionary();
+        }
+
+        // Used internally if/when a mainLoader is found
+        bezel_internal static function registerAllToMainLoader():void
+        {
+            logger.log("registerToMainLoader", "Registering early settings to MainLoader");
+            for each (var manager:SettingManager in _managers)
+            {
+                manager.registerToMainLoader();
+            }
+        }
+
+        private function registerToMainLoader():void
+        {
+            for each (var unregistered:Object in notRegisteredWithMainLoader)
+            {
+                if (unregistered.type == Boolean)
+                {
+                    Bezel.Bezel.instance.mainLoader.registerBooleanForDisplay(id, unregistered.name, unregistered.set, unregistered.get, unregistered.description);
+                }
+                else if (unregistered.type == Number)
+                {
+                    Bezel.Bezel.instance.mainLoader.registerFloatRangeForDisplay(id, unregistered.name, unregistered.min, unregistered.max, unregistered.step, unregistered.set, unregistered.get, unregistered.description);
+                }
+                else
+                {
+                    throw new Error("Unknown setting type \"" + getQualifiedClassName(unregistered.type) + " not yet registered to MainLoader");
+                }
+            }
+
+            notRegisteredWithMainLoader.length = 0;
         }
 		
 		bezel_internal function deregisterFromHandler():void
@@ -159,7 +194,14 @@ package Bezel.Utils
             {
                 return settings[name];
             };
-            Bezel.Bezel.instance.mainLoader.registerBooleanForDisplay(id, name, set, get, description);
+            if (Bezel.Bezel.instance.mainLoader != null)
+            {
+                Bezel.Bezel.instance.mainLoader.registerBooleanForDisplay(id, name, set, get, description);
+            }
+            else
+            {
+                this.notRegisteredWithMainLoader.push({"type":JSON, "name":name, "set":set, "get":get, "description":description});
+            }
         }
 
         /**
@@ -207,7 +249,14 @@ package Bezel.Utils
             {
                 return settings[name];
             };
-            Bezel.Bezel.instance.mainLoader.registerFloatRangeForDisplay(id, name, min, max, step, set, get, description);
+            if (Bezel.Bezel.instance.mainLoader != null)
+            {
+                Bezel.Bezel.instance.mainLoader.registerFloatRangeForDisplay(id, name, min, max, step, set, get, description);
+            }
+            else
+            {
+                this.notRegisteredWithMainLoader.push({"type":Number, "name":name, "min":min, "max":max, "step":step, "set":set, "get":get, "description":description});
+            }
         }
 
         public function retrieveFloatRange(name:String):Number

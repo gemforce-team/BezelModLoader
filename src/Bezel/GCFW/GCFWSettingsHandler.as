@@ -336,10 +336,9 @@ package Bezel.GCFW
             return false;
         }
 
-        private static var convertCoord:Function = getDefinitionByName("com.giab.common.utils.MathToolbox").convertCoord;
-
         private static function calculateValue(setting:Object, knob:Object):Number
         {
+            var convertCoord:Function = getDefinitionByName("com.giab.common.utils.MathToolbox").convertCoord;
             var result:Number = convertCoord(507, 582, knob.x, setting.min, setting.max);
             if (result == setting.max || result == setting.min)
             {
@@ -354,6 +353,7 @@ package Bezel.GCFW
 
         private static function calculateX(setting:Object):Number
         {
+            var convertCoord:Function = getDefinitionByName("com.giab.common.utils.MathToolbox").convertCoord;
             return convertCoord(setting.min, setting.max, setting.currentVal(), 507, 582);
         }
 
