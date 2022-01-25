@@ -200,7 +200,7 @@ package Bezel.Utils
             }
             else
             {
-                this.notRegisteredWithMainLoader.push({"type":JSON, "name":name, "set":set, "get":get, "description":description});
+                this.notRegisteredWithMainLoader.push({"type":Boolean, "name":name, "set":set, "get":get, "description":description});
             }
         }
 
