@@ -249,7 +249,8 @@ package Bezel
 			}
 			game.instance.bezel = this;
 			this.removeChild(this.loadingTextField);
-			this.addChild(DisplayObject(game.instance));
+			this.stage.addChild(DisplayObject(game.instance));
+			game.instance.addChild(this);
 			// Base game's init (main.initFromBezel())
 			game.instance.initFromBezel();
 			bindMods();
