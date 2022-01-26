@@ -8,7 +8,7 @@ package Bezel.GCCS
      */
     internal class GCCSCoreMod
     {
-        public static const VERSION:String = "8";
+        public static const VERSION:String = "9";
 
         private static const files:Array = [
             "com/giab/games/gccs/steam/Main.class.asasm",
@@ -24,6 +24,7 @@ package Bezel.GCCS
         private static const matches:Array = [
             ["constructsuper",
              "initproperty .*steamworks",
+             "trait.*_cm",
              "trait.*_cm",
              "trait slot.*steamworks"
             ],
@@ -163,7 +164,7 @@ package Bezel.GCCS
         ];
 
         private static const replaceNums:Array = [
-            [2, 0, 0, 0],
+            [ 2, 0, 0, 0, 0],
 			[ 0 ],
             [ 0, 0, 0, 1 ],
             [ 0 ],
@@ -174,7 +175,7 @@ package Bezel.GCCS
         ]
 
         private static const offsetFromMatches:Array = [
-            [ -2, -4, 0, 0],
+            [ -2, -4, 0, -3, 0],
 			[ -15 ],
             [ -5, 37, -5, 16 ],
             [ 5 ],
@@ -212,6 +213,11 @@ package Bezel.GCCS
                    pushscope \n \
              ',
              'end',
+             ' \
+                getlocal0 \n \
+                pushnull \n \
+                callpropvoid QName(PackageNamespace(""),"doEnterFramePreloader"), 1 \n \
+             ',
              'trait slot QName(PackageNamespace(\"\"), \"bezel\") type QName(PackageNamespace(\"\"), \"Object\") end'
             ],
             [
