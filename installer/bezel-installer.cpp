@@ -170,7 +170,7 @@ int main()
         }
         else
         {
-            const std::filesystem::path bezelLibrary = bezelLibs / "Bezel Mod Loader.swc";
+            const std::filesystem::path bezelLibrary = bezelLibs / "BezelModLoader.swc";
             outFile = _wfopen(bezelLibrary.generic_wstring().c_str(), L"wb");
             fwrite(swcData, 1, swcSize, outFile);
             fclose(outFile);
