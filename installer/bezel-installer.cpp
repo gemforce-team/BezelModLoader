@@ -97,12 +97,17 @@ int main()
     metadata.replace(metadata.cbegin() + contentStart + 9, metadata.cbegin() + contentEnd, "Mods/BezelModLoader.swf");
 
     const std::filesystem::path bezelFile{"Mods/BezelModLoader.swf"};
-    const std::filesystem::path bezelLibrary{"Mods/BezelModLoader.swc"};
+    const std::filesystem::path oldBezelLibrary{"Mods/BezelModLoader.swc"};
 
-    std::filesystem::path appdata{getenv("APPDATA")};
+    if (!getenv("APPDATA"))
+    {
+        waitExit("%APPDATA% does not exist", -7);
+    }
+
+    const std::filesystem::path appdata{getenv("APPDATA")};
     if (std::filesystem::exists(appdata))
     {
-        std::filesystem::path gcfwData = appdata / gameID / "Local Store";
+        const std::filesystem::path gcfwData = appdata / gameID / "Local Store";
         if (std::filesystem::exists(gcfwData))
         {
             // Intentionally ignore these errors; if they don't exist there's no issue
@@ -137,6 +142,7 @@ int main()
 
     std::filesystem::remove("gcfw-modded.swf", ec);
     std::filesystem::remove(moddedPath, ec);
+    std::filesystem::remove(oldBezelLibrary, ec);
     std::filesystem::create_directory("Mods", ec);
 
     if (ec)
@@ -148,9 +154,28 @@ int main()
     fwrite(swfData, 1, swfSize, outFile);
     fclose(outFile);
 
-    outFile = _wfopen(bezelLibrary.generic_wstring().c_str(), L"wb");
-    fwrite(swcData, 1, swcSize, outFile);
-    fclose(outFile);
+    if (getenv("BezelLibs"))
+    {
+        const std::filesystem::path bezelLibs{getenv("BezelLibs")};
+        
+        ec.clear();
+        if (!std::filesystem::exists(bezelLibs))
+        {
+            std::filesystem::create_directories(bezelLibs, ec);
+        }
+
+        if (ec)
+        {
+            printf("Could not create BezelLibs with error code %i", ec.value());
+        }
+        else
+        {
+            const std::filesystem::path bezelLibrary = bezelLibs / "Bezel Mod Loader.swc";
+            outFile = _wfopen(bezelLibrary.generic_wstring().c_str(), L"wb");
+            fwrite(swcData, 1, swcSize, outFile);
+            fclose(outFile);
+        }
+    }
 
     outFile = _wfopen(metadataFile.generic_wstring().c_str(), L"wt");
     fwrite(metadata.data(), 1, metadata.size(), outFile);
