@@ -1,7 +1,6 @@
 package Bezel.Utils
 {
 
-	import Bezel.GCFW.GCFWSettingsHandler;
 	import Bezel.Logger;
     import flash.errors.IllegalOperationError;
     import Bezel.Bezel;
@@ -111,13 +110,21 @@ package Bezel.Utils
         {
             for each (var unregistered:Object in notRegisteredWithMainLoader)
             {
-                if (unregistered.type == Boolean)
+                if (unregistered.type == "bool")
                 {
                     Bezel.Bezel.instance.mainLoader.registerBooleanForDisplay(id, unregistered.name, unregistered.set, unregistered.get, unregistered.description);
                 }
-                else if (unregistered.type == Number)
+                else if (unregistered.type == "range")
                 {
                     Bezel.Bezel.instance.mainLoader.registerFloatRangeForDisplay(id, unregistered.name, unregistered.min, unregistered.max, unregistered.step, unregistered.set, unregistered.get, unregistered.description);
+                }
+                else if (unregistered.type == "number")
+                {
+                    Bezel.Bezel.instance.mainLoader.registerNumberForDisplay(id, unregistered.name, unregistered.min, unregistered.max, unregistered.set, unregistered.get, unregistered.description);
+                }
+                else if (unregistered.type == "string")
+                {
+                    Bezel.Bezel.instance.mainLoader.registerStringForDisplay(id, unregistered.name, unregistered.validator, unregistered.set, unregistered.get, unregistered.description);
                 }
                 else
                 {
@@ -133,7 +140,11 @@ package Bezel.Utils
 			if (this._settings != null)
 			{
 				logger.log("saveSettings", "Deregistering " + this.id);
-                GCFWSettingsHandler.deregisterOption(this.id, null);
+
+                if (Bezel.Bezel.instance.mainLoader != null)
+                {
+                    Bezel.Bezel.instance.mainLoader.deregisterOption(this.id, null);
+                }
 			}
 		}
 		
@@ -144,7 +155,15 @@ package Bezel.Utils
 				logger.log("saveSettings", "Saving settings for " + this.id);
 				var stream:FileStream = new FileStream();
 				stream.open(this.file, FileMode.WRITE);
-				stream.writeUTFBytes(JSON.stringify(this._settings));
+				var data:String = JSON.stringify(this._settings, null, 2);
+				var lines:Array = data.split('\n').slice(1, -1);
+				for (var i:int = 0; i < lines.length - 1; i++)
+				{
+					lines[i] = (lines[i] as String).slice(0, -1);
+				}
+				lines.sort();
+
+				stream.writeUTFBytes("{\n" + lines.join(",\n") + "\n}");
 				stream.close();
 			}
 		}
@@ -174,6 +193,7 @@ package Bezel.Utils
          * @param name Name of the setting
          * @param onSet Function to be called when an option is set. Takes the new value as a parameter.
          * @param defaultVal Default value of the setting
+         * @param description Extra description of setting to be displayed
          */
         public function registerBoolean(name:String, onSet:Function, defaultVal:Boolean, description:String = null):void
         {
@@ -200,7 +220,7 @@ package Bezel.Utils
             }
             else
             {
-                this.notRegisteredWithMainLoader.push({"type":Boolean, "name":name, "set":set, "get":get, "description":description});
+                this.notRegisteredWithMainLoader.push({"type":"bool", "name":name, "set":set, "get":get, "description":description});
             }
         }
 
@@ -229,6 +249,7 @@ package Bezel.Utils
 		 * @param	step Setting step value (can be used to limit values to integers with value 1). Must be positive and nonzero.
 		 * @param	onSet Function to be called when an setting is set. Takes the new value as a parameter.
 		 * @param	defaultVal Default value of the setting 
+         * @param   description Extra description of setting to be displayed
 		 */
 		public function registerFloatRange(name:String, min:Number, max:Number, step:Number, onSet:Function, defaultVal:Number, description:String = null):void
         {
@@ -255,10 +276,15 @@ package Bezel.Utils
             }
             else
             {
-                this.notRegisteredWithMainLoader.push({"type":Number, "name":name, "min":min, "max":max, "step":step, "set":set, "get":get, "description":description});
+                this.notRegisteredWithMainLoader.push({"type":"range", "name":name, "min":min, "max":max, "step":step, "set":set, "get":get, "description":description});
             }
         }
 
+        /**
+         * Retrieves the value of a float range setting managed by Bezel's standard settings
+         * @param name Name of the setting
+         * @return Value of the float range
+         */
         public function retrieveFloatRange(name:String):Number
         {
             if (!(name in settings))
@@ -268,6 +294,137 @@ package Bezel.Utils
             else
             {
                 return settings[name] as Number;
+            }
+        }
+        
+        /**
+		 * Adds a number setting to be managed by Bezel's standard settings
+		 * @param	name Setting name
+		 * @param	min Setting minimum value
+		 * @param	max Setting maximum value
+		 * @param	onSet Function to be called when an setting is set. Takes the new value as a parameter.
+		 * @param	defaultVal Default value of the setting 
+         * @param   description Extra description of setting to be displayed
+		 */
+        public function registerNumber(name:String, min:Number, max:Number, onSet:Function, defaultVal:Number, description:String = null):void
+        {
+            if (!(name in settings))
+            {
+                settings[name] = defaultVal;
+            }
+            var set:Function = function(newVal:Number):void
+            {
+                settings[name] = newVal;
+				saveSettings();
+                if (onSet != null)
+                {
+                    onSet(newVal);
+                }
+            };
+            var get:Function = function():Number
+            {
+                return settings[name];
+            };
+            if (Bezel.Bezel.instance.mainLoader != null)
+            {
+                Bezel.Bezel.instance.mainLoader.registerNumberForDisplay(id, name, min, max, set, get, description);
+            }
+            else
+            {
+                this.notRegisteredWithMainLoader.push({"type":"number", "name":name, "min":min, "max":max, "set":set, "get":get, "description":description});
+            }
+        }
+
+        /**
+         * Retrieves the value of an number setting managed by Bezel's standard settings
+         * @param name Name of the setting
+         * @return Value of the integer
+         */
+        public function retrieveNumber(name:String):Number
+        {
+            if (!(name in settings))
+            {
+                throw new ArgumentError("\"" + name + "\" is not a registered setting for mod " + id);
+            }
+            else
+            {
+                return settings[name] as Number;
+            }
+        }
+
+        /**
+		 * Adds a string setting to be managed by Bezel's standard settings
+		 * @param	name Setting name
+         * @param   validator Function to be called to validate input. Takes the new value as a parameter and returns a Boolean.
+		 * @param	onSet Function to be called when an setting is set. Takes the new value as a parameter.
+		 * @param	defaultVal Default value of the setting 
+         * @param   description Extra description of setting to be displayed
+		 */
+        public function registerString(name:String, validator:Function, onSet:Function, defaultVal:String, description:String = null):void
+        {
+            if (!(name in settings))
+            {
+                settings[name] = defaultVal;
+            }
+            var set:Function = function(newVal:String):void
+            {
+                settings[name] = newVal;
+				saveSettings();
+                if (onSet != null)
+                {
+                    onSet(newVal);
+                }
+            };
+            var get:Function = function():String
+            {
+                return settings[name];
+            };
+            if (Bezel.Bezel.instance.mainLoader != null)
+            {
+                Bezel.Bezel.instance.mainLoader.registerStringForDisplay(id, name, validator, set, get, description);
+            }
+            else
+            {
+                this.notRegisteredWithMainLoader.push({"type":"string", "name":name, "validator":validator, "set":set, "get":get, "description":description});
+            }
+        }
+
+        /**
+         * Deregisters a setting. Does not remove from the settings file!
+         * @param name Setting to deregister. Null for all
+         * @param del Whether to remove the setting from the save file or not
+         */
+        public function deregisterSetting(name:String, del:Boolean):void
+        {
+            if (name == null)
+            {
+                deregisterFromHandler();
+                if (del)
+                {
+                    _settings = new Object();
+                    saveSettings();
+                }
+                return;
+            }
+            if (Bezel.Bezel.instance.mainLoader != null)
+            {
+                Bezel.Bezel.instance.mainLoader.deregisterOption(id, name);
+            }
+            else
+            {
+                for (var i:int = 0; i < this.notRegisteredWithMainLoader.length; i++)
+                {
+                    if (this.notRegisteredWithMainLoader[i].name == name)
+                    {
+                        this.notRegisteredWithMainLoader.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+            if (del)
+            {
+                delete settings[name];
+                saveSettings();
             }
         }
     }

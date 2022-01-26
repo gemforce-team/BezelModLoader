@@ -297,6 +297,16 @@ package Bezel.GCCS
 		{
 			GCCSSettingsHandler.registerKeybindForDisplay(name, onSet, currentValue, description);
 		}
+
+		public function registerStringForDisplay(mod:String, name:String, validator:Function, onSet:Function, currentValue:Function, description:String = null):void
+		{
+			GCCSSettingsHandler.registerStringForDisplay(mod, name, validator, onSet, currentValue, description);
+		}
+
+		public function registerNumberForDisplay(mod:String, name:String, min:Number, max:Number, onSet:Function, currentValue:Function, description:String = null):void
+		{
+			GCCSSettingsHandler.registerNumberForDisplay(mod, name, min, max, onSet, currentValue, description);
+		}
 	}
 
 }

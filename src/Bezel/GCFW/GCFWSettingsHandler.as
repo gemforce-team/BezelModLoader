@@ -35,17 +35,27 @@ package Bezel.GCFW
 
         bezel_internal static function registerBooleanForDisplay(mod:String, name:String, onSet:Function, currentValue:Function, description:String):void
 		{
-            newSettings.push({"type":Boolean, "mod":mod, "name":name, "onSet":onSet, "currentVal":currentValue, "description":description, "panel":null});
+            newSettings.push({"type":"bool", "mod":mod, "name":name, "onSet":onSet, "currentVal":currentValue, "description":description, "panel":null});
 		}
 
 		bezel_internal static function registerFloatRangeForDisplay(mod:String, name:String, min:Number, max:Number, step:Number, onSet:Function, currentValue:Function, description:String):void
 		{
-			newSettings.push({"type":Number, "mod":mod, "name":name, "min":min, "max":max, "step":step, "onSet":onSet, "currentVal":currentValue, "description":description, "panel":null});
+			newSettings.push({"type":"range", "mod":mod, "name":name, "min":min, "max":max, "step":step, "onSet":onSet, "currentVal":currentValue, "description":description, "panel":null});
 		}
 
         bezel_internal static function registerKeybindForDisplay(name:String, onSet:Function, currentValue:Function, description:String):void
         {
-            newSettings.push({"type":Keybind, "mod":"Keybinds", "name":name, "onSet":onSet, "currentVal":currentValue, "description":description, "panel":null, "button":null});
+            newSettings.push({"type":"keybind", "mod":"Keybinds", "name":name, "onSet":onSet, "currentVal":currentValue, "description":description, "panel":null, "button":null});
+        }
+
+        bezel_internal static function registerNumberForDisplay(mod:String, name:String, min:Number, max:Number, onSet:Function, currentValue:Function, description:String = null):void
+        {
+            newSettings.push({"type":"number", "mod":mod, "name":name, "min":min, "max":max, "onSet":onSet, "currentVal":currentValue, "description":description, "panel":null, "button":null});
+        }
+
+        bezel_internal static function registerStringForDisplay(mod:String, name:String, validator:Function, onSet:Function, currentValue:Function, description:String = null):void
+        {
+            newSettings.push({"type":"string", "mod":mod, "name":name, "validator":validator, "onSet":onSet, "currentVal":currentValue, "description":description, "panel":null, "button":null});
         }
 
 		bezel_internal static function deregisterOption(mod:String, name:String):void
@@ -61,6 +71,18 @@ package Bezel.GCFW
 
         bezel_internal static function toggleCustomSettingsFromGame(scrOptions:Object):void
         {
+            var onButtonMouseover:Function = function(e:MouseEvent):void
+            {
+                e.target.parent.plate.gotoAndStop(2);
+            };
+            var onButtonMouseout:Function = function(e:MouseEvent):void
+            {
+                e.target.parent.plate.gotoAndStop(1);
+            };
+            var discardAllMouseInput:Function = function(e:MouseEvent):void
+            {
+                e.stopImmediatePropagation();
+            };
             if (!currentlyShowing)
             {
                 var vY:int = 2720;
@@ -113,7 +135,7 @@ package Bezel.GCFW
                         currentName = setting.mod;
                     }
 
-                    if (setting.type == Boolean)
+                    if (setting.type == "bool")
                     {
                         vY += getNewPanelYModifier(currentPanelX);
                         newMC = new McOptPanel(setting.name, currentPanelX, vY, false);
@@ -135,7 +157,7 @@ package Bezel.GCFW
                         scrOptions.mc.arrCntContents.push(newMC);
                         scrOptions.mc.cnt.addChild(newMC);
                     }
-                    else if (setting.type == Number)
+                    else if (setting.type == "range")
                     {
                         vY += getNewPanelYModifier(currentPanelX);
                         newMC = new McOptPanel(setting.name, currentPanelX, vY, true);
@@ -172,24 +194,12 @@ package Bezel.GCFW
 
                         newMC.knob.x = calculateX(setting);
                     }
-                    else if (setting.type == Keybind)
+                    else if (setting.type == "keybind")
                     {
                         vY += 60;
                         currentPanelX = getNewPanelX(0);
-                        var newButton:SettingsButtonShim = new SettingsButtonShim(scrOptions.mc.btnClose);
-                        newButton.tf.text = (setting.currentVal()).toString().toUpperCase();
-                        var onKeybindMouseover:Function = function(e:MouseEvent):void
-                        {
-                            e.target.parent.plate.gotoAndStop(2);
-                        };
-                        var onKeybindMouseout:Function = function(e:MouseEvent):void
-                        {
-                            e.target.parent.plate.gotoAndStop(1);
-                        }
-                        var discardAllMouseInput:Function = function(e:MouseEvent):void
-                        {
-                            e.stopImmediatePropagation();
-                        }
+                        var keybindButton:SettingsButtonShim = new SettingsButtonShim(scrOptions.mc.btnClose);
+                        keybindButton.tf.text = (setting.currentVal()).toString().toUpperCase();
                         var onKeybindClick:Function = function(s:Object):Function
                         {
                             var onKeybindTyped:Function = function(e:KeyboardEvent):void
@@ -249,36 +259,240 @@ package Bezel.GCFW
                                 bezel_internal::IS_CHOOSING_KEYBIND = true;
                             };
                         }(setting);
-                        newButton.addEventListener(MouseEvent.CLICK, onKeybindClick, true);
-                        newButton.addEventListener(MouseEvent.MOUSE_OVER, onKeybindMouseover);
-                        newButton.addEventListener(MouseEvent.MOUSE_OUT, onKeybindMouseout);
+                        keybindButton.addEventListener(MouseEvent.CLICK, onKeybindClick, true);
+                        keybindButton.addEventListener(MouseEvent.MOUSE_OVER, onButtonMouseover);
+                        keybindButton.addEventListener(MouseEvent.MOUSE_OUT, onButtonMouseout);
 
-                        newButton.yReal = vY - 6;
-                        newButton.x = 1150;
+                        keybindButton.yReal = vY - 6;
+                        keybindButton.x = 1150;
 
                         newMC = new McOptPanel(setting.name, 500, vY, false);
                         newMC.removeChild(newMC.btn);
 
-                        var extraSizeSprite:Sprite = new Sprite();
-                        extraSizeSprite.graphics.beginFill(0,0);
-                        extraSizeSprite.graphics.drawRect(0,0,1,1);
-                        extraSizeSprite.graphics.endFill();
-                        extraSizeSprite.width = (newButton.x + newButton.width) - 500;
-                        extraSizeSprite.height = newButton.height;
+                        var keybindExtraSize:Sprite = new Sprite();
+                        keybindExtraSize.graphics.beginFill(0,0);
+                        keybindExtraSize.graphics.drawRect(0,0,1,1);
+                        keybindExtraSize.graphics.endFill();
+                        keybindExtraSize.width = (keybindButton.x + keybindButton.width) - 500;
+                        keybindExtraSize.height = keybindButton.height;
 
-                        newMC.addChild(extraSizeSprite);
-                        extraSizeSprite.y = -6;
+                        newMC.addChild(keybindExtraSize);
+                        keybindExtraSize.y = -6;
 
                         setting.panel = newMC;
-                        setting.button = newButton;
+                        setting.button = keybindButton;
 
                         newMCs.push(newMC);
                         scrOptions.mc.arrCntContents.push(newMC);
                         scrOptions.mc.cnt.addChild(newMC);
                         
-                        newMCs.push(newButton);
-                        scrOptions.mc.arrCntContents.push(newButton);
-                        scrOptions.mc.cnt.addChild(newButton);
+                        newMCs.push(keybindButton);
+                        scrOptions.mc.arrCntContents.push(keybindButton);
+                        scrOptions.mc.cnt.addChild(keybindButton);
+                    }
+                    else if (setting.type == "number")
+                    {
+                        vY += 60;
+                        currentPanelX = getNewPanelX(0);
+                        var integerButton:SettingsButtonShim = new SettingsButtonShim(scrOptions.mc.btnClose);
+                        integerButton.tf.text = setting.currentVal().toString();
+                        var onIntegerClick:Function = function(s:Object):Function
+                        {
+                            var onIntegerTyped:Function = function(e:KeyboardEvent):void
+                            {
+                                if (e.keyCode == Keyboard.ESCAPE)
+                                {
+                                    s.button.tf.text = setting.currentVal().toString();
+                                    s.button.plate.gotoAndStop(1);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(KeyboardEvent.KEY_DOWN, arguments.callee, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.CLICK, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_DOWN, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_UP, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_OVER, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, discardAllMouseInput, true);
+                                }
+                                else if (e.keyCode == Keyboard.ENTER)
+                                {
+                                    if (s.button.tf.text.lastIndexOf("-") <= 0 && s.button.tf.text.indexOf(".") == s.button.tf.text.lastIndexOf("."))
+                                    {
+                                        var newValue:Number = parseFloat(s.button.tf.text);
+                                        if (!isNaN(newValue) && newValue > s.min && newValue < s.max)
+                                        {
+                                            s.onSet(newValue);
+                                        }
+                                    }
+                                    s.button.tf.text = s.currentVal().toString();
+                                    s.button.plate.gotoAndStop(1);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(KeyboardEvent.KEY_DOWN, arguments.callee, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.CLICK, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_DOWN, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_UP, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_OVER, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, discardAllMouseInput, true);
+                                }
+                                else if (e.keyCode == Keyboard.BACKSPACE)
+                                {
+                                    s.button.tf.text = s.button.tf.text.slice(0, -1);
+                                }
+                                else
+                                {
+                                    var newCharacter:String = String.fromCharCode(e.charCode);
+                                    if (newCharacter != null && newCharacter != "" && "1234567890-.e".indexOf(newCharacter.toLowerCase()) != -1 &&
+                                        (newCharacter != "-" || s.button.tf.text.length == 0 || s.button.tf.text.charAt(-1).toLowerCase() == "e") // Only the front or directly after an e may be a negative sign
+                                        && (newCharacter != "." || s.button.tf.text.indexOf(".") == -1) // Only one decimal allowed
+                                        && (newCharacter.toLowerCase() != "e" || s.button.tf.text.toLowerCase().indexOf("e") == -1) // Only one e allowed
+                                        )
+                                    {
+                                        s.button.tf.text = s.button.tf.text + newCharacter.toLowerCase();
+                                    }
+                                }
+                                e.stopImmediatePropagation();
+                                e.preventDefault();
+                            };
+                            return function(e:MouseEvent):void
+                            {
+                                Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, onIntegerTyped, true, 10, false);
+                                Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.CLICK, discardAllMouseInput, true, 10, false);
+                                Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_DOWN, discardAllMouseInput, true, 10, false);
+                                Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_UP, discardAllMouseInput, true, 10, false);
+                                Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_OVER, discardAllMouseInput, true, 10, false);
+                                Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true, 10, false);
+                                Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_WHEEL, discardAllMouseInput, true, 10, false);
+                                s.button.tf.text = "";
+                                s.button.plate.gotoAndStop(4);
+                            };
+                        }(setting);
+                        integerButton.addEventListener(MouseEvent.CLICK, onIntegerClick, true);
+                        integerButton.addEventListener(MouseEvent.MOUSE_OVER, onButtonMouseover);
+                        integerButton.addEventListener(MouseEvent.MOUSE_OUT, onButtonMouseout);
+
+                        integerButton.yReal = vY - 6;
+                        integerButton.x = 1150;
+
+                        newMC = new McOptPanel(setting.name, 500, vY, false);
+                        newMC.removeChild(newMC.btn);
+
+                        var integerExtraSize:Sprite = new Sprite();
+                        integerExtraSize.graphics.beginFill(0,0);
+                        integerExtraSize.graphics.drawRect(0,0,1,1);
+                        integerExtraSize.graphics.endFill();
+                        integerExtraSize.width = (integerButton.x + integerButton.width) - 500;
+                        integerExtraSize.height = integerButton.height;
+
+                        newMC.addChild(integerExtraSize);
+                        integerExtraSize.y = -6;
+
+                        setting.panel = newMC;
+                        setting.button = integerButton;
+
+                        newMCs.push(newMC);
+                        scrOptions.mc.arrCntContents.push(newMC);
+                        scrOptions.mc.cnt.addChild(newMC);
+                        
+                        newMCs.push(integerButton);
+                        scrOptions.mc.arrCntContents.push(integerButton);
+                        scrOptions.mc.cnt.addChild(integerButton);
+                    }
+                    else if (setting.type == "string")
+                    {
+                        vY += 60;
+                        currentPanelX = getNewPanelX(0);
+                        var stringButton:SettingsButtonShim = new SettingsButtonShim(scrOptions.mc.btnClose);
+                        stringButton.plate.scaleX = 4;
+                        stringButton.tf.width = stringButton.plate.width;
+                        stringButton.tf.text = setting.currentVal();
+                        var onStringClick:Function = function(s:Object):Function
+                        {
+                            var onStringTyped:Function = function(e:KeyboardEvent):void
+                            {
+                                if (e.keyCode == Keyboard.ESCAPE)
+                                {
+                                    s.button.tf.text = setting.currentVal().toString();
+                                    s.button.plate.gotoAndStop(1);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(KeyboardEvent.KEY_DOWN, arguments.callee, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.CLICK, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_DOWN, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_UP, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_OVER, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, discardAllMouseInput, true);
+                                }
+                                else if (e.keyCode == Keyboard.ENTER)
+                                {
+                                    if (s.validator(s.button.tf.text))
+                                    {
+                                        s.onSet(s.button.tf.text);
+                                    }
+                                    s.button.tf.text = s.currentVal().toString();
+                                    s.button.plate.gotoAndStop(1);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(KeyboardEvent.KEY_DOWN, arguments.callee, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.CLICK, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_DOWN, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_UP, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_OVER, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true);
+                                    Bezel.Bezel.instance.gameObjects.GV.main.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, discardAllMouseInput, true);
+                                }
+                                else if (e.keyCode == Keyboard.BACKSPACE)
+                                {
+                                    s.button.tf.text = s.button.tf.text.slice(0, -1);
+                                }
+                                else
+                                {
+                                    var newCharacter:String = String.fromCharCode(e.charCode);
+                                    if (newCharacter != null && newCharacter != "")
+                                    {
+                                        s.button.tf.text = s.button.tf.text + newCharacter;
+                                    }
+                                }
+                                e.stopImmediatePropagation();
+                                e.preventDefault();
+                            };
+                            return function(e:MouseEvent):void
+                            {
+                                Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, onStringTyped, true, 10, false);
+                                Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.CLICK, discardAllMouseInput, true, 10, false);
+                                Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_DOWN, discardAllMouseInput, true, 10, false);
+                                Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_UP, discardAllMouseInput, true, 10, false);
+                                Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_OVER, discardAllMouseInput, true, 10, false);
+                                Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true, 10, false);
+                                Bezel.Bezel.instance.gameObjects.GV.main.stage.addEventListener(MouseEvent.MOUSE_WHEEL, discardAllMouseInput, true, 10, false);
+                                s.button.tf.text = "";
+                                s.button.plate.gotoAndStop(4);
+                            };
+                        }(setting);
+                        stringButton.addEventListener(MouseEvent.CLICK, onStringClick, true);
+                        stringButton.addEventListener(MouseEvent.MOUSE_OVER, onButtonMouseover);
+                        stringButton.addEventListener(MouseEvent.MOUSE_OUT, onButtonMouseout);
+
+                        stringButton.yReal = vY - 6;
+                        stringButton.x = 950;
+
+                        newMC = new McOptPanel(setting.name, 300, vY, false);
+                        newMC.removeChild(newMC.btn);
+
+                        var stringExtraSize:Sprite = new Sprite();
+                        stringExtraSize.graphics.beginFill(0,0);
+                        stringExtraSize.graphics.drawRect(0,0,1,1);
+                        stringExtraSize.graphics.endFill();
+                        stringExtraSize.width = (stringButton.x + stringButton.width) - 400;
+                        stringExtraSize.height = stringButton.height;
+
+                        newMC.addChild(stringExtraSize);
+                        stringExtraSize.y = -6;
+
+                        setting.panel = newMC;
+                        setting.button = stringButton;
+
+                        newMCs.push(newMC);
+                        scrOptions.mc.arrCntContents.push(newMC);
+                        scrOptions.mc.cnt.addChild(newMC);
+                        
+                        newMCs.push(stringButton);
+                        scrOptions.mc.arrCntContents.push(stringButton);
+                        scrOptions.mc.cnt.addChild(stringButton);
                     }
                     else
                     {

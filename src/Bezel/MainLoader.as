@@ -46,6 +46,29 @@ package Bezel
 		 */
 		function registerFloatRangeForDisplay(mod:String, name:String, min:Number, max:Number, step:Number, onSet:Function, currentValue:Function, description:String = null):void;
 		/**
+		 * Adds floating-point range options to be displayed on an in-game screen. Should very likely be called through SettingManager, not directly.
+		 * @param	mod Origin mod name
+		 * @param	name Option name
+		 * @param	min Option minimum value
+		 * @param	max Option maximum value
+		 * @param	onSet Function to be called when an option is set. Takes the new value as a parameter.
+		 * @param	currentValue Function that gets the current value of the option. Must take no parameters and return a Number.
+		 * @param	description If more text is able to be displayed than the option name, this will be displayed
+		 */
+		function registerNumberForDisplay(mod:String, name:String, min:Number, max:Number, onSet:Function, currentValue:Function, description:String = null):void;
+		/**
+		 * Adds floating-point range options to be displayed on an in-game screen. Should very likely be called through SettingManager, not directly.
+		 * @param	mod Origin mod name
+		 * @param	name Option name
+		 * @param	min Option minimum value
+		 * @param	max Option maximum value
+		 * @param	step Option step value (can be used to limit values to integers with value 1). Must be positive and nonzero.
+		 * @param	onSet Function to be called when an option is set. Takes the new value as a parameter.
+		 * @param	currentValue Function that gets the current value of the option. Must take no parameters and return a Number.
+		 * @param	description If more text is able to be displayed than the option name, this will be displayed
+		 */
+		function registerStringForDisplay(mod:String, name:String, validator:Function, onSet:Function, currentValue:Function, description:String = null):void;
+		/**
 		 * Adds keybind options to be displayed on an in-game screen. Should very likely be called through KeybindManager, not directly.
 		 * @param	name Keybind name
 		 * @param	onSet Function to be called when an option is set. Takes the new value (as a Bezel.Utils.Keybind) as a parameter.
