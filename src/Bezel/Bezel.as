@@ -522,7 +522,6 @@ package Bezel
 			}
 			this._gameObjects = null;
 			this.removeChildren();
-			this.addChild(DisplayObject(game.instance));
 			mods = new Array();
 			loadMods();
 		}
