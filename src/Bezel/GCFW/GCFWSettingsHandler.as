@@ -604,7 +604,7 @@ package Bezel.GCFW
         {
             for (var i:int = 0; i < newSettings.length; i++)
             {
-                if (newSettings[i].type == Keybind)
+                if (newSettings[i].type == "keybind")
                 {
                     newSettings[i].button.tf.setTextFormat(new TextFormat(null, null, 0xFFFFFF));
                 }
@@ -612,12 +612,12 @@ package Bezel.GCFW
 
             for (i = 0; i < newSettings.length; i++)
             {
-                if (newSettings[i].type == Keybind)
+                if (newSettings[i].type == "keybind")
                 {
                     var kb:Keybind = newSettings[i].currentVal();
                     for (var j:int = i+1; j < newSettings.length; j++)
                     {
-                        if (newSettings[j].type == Keybind && kb.matches(newSettings[j].currentVal()))
+                        if (newSettings[j].type == "keybind" && kb.matches(newSettings[j].currentVal()))
                         {
                             newSettings[j].button.tf.setTextFormat(new TextFormat(null, null, 0xFF0000));
                             newSettings[i].button.tf.setTextFormat(new TextFormat(null, null, 0xFF0000));
