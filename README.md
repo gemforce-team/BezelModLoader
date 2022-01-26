@@ -108,6 +108,8 @@ Note that because mods are loaded *before* the game, you cannot use any of the g
 This include any accessibility of properties and arguments to functions.
 They can be used for local variables within bind and other functions called after it.
 
+GemCraft - Frostborn Wrath and GemCraft - Chasing Shadows both have stub SWCs provided for this purpose [here](https://github.com/gemforce-team/GemCraftTypeCheckReleases/releases/latest).
+
 # Disclaimer
 This is not an official modification.
 
