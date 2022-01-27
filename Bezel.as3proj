@@ -20,7 +20,7 @@
   <!-- Build options -->
   <build>
     <option accessible="False" />
-    <option advancedTelemetry="False" />
+    <option advancedTelemetry="True" />
     <option allowSourcePathOverlap="False" />
     <option benchmark="False" />
     <option es="False" />
@@ -38,7 +38,7 @@
     <option useNetwork="True" />
     <option useResourceBundleMetadata="True" />
     <option warnings="True" />
-    <option verboseStackTraces="False" />
+    <option verboseStackTraces="True" />
     <option linkReport="" />
     <option loadExterns="" />
     <option staticLinkRSL="True" />
@@ -56,7 +56,9 @@
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>
-    <!-- example: <element path="..." /> -->
+    <element path="%BezelLibs%\GemCraft.Frostborn.Wrath.swc" />
+    <element path="%BezelLibs%\gc-cs-steam.swc" />
+    <element path="%BezelLibs%\FRESteamWorks.swc" />
   </externalLibraryPaths>
   <!-- Runtime Shared Libraries -->
   <rslPaths>
@@ -81,7 +83,7 @@
   <!-- Executed before build -->
   <preBuildCommand />
   <!-- Executed after build -->
-  <postBuildCommand alwaysRun="False">"$(BaseDir)\Tools\swcbuild\swcbuild.exe" "BezelLibrary.as3proj" "-compiler=$(CompilerPath)" "-debug=$(BuildConfig)" "-library=$(BaseDir)\Library" -asdoc=true -keep-asdoc=true</postBuildCommand>
+  <postBuildCommand alwaysRun="False">"$(BaseDir)\Tools\swcbuild\swcbuild.exe" "BezelLibrary.as3proj" "-compiler=$(CompilerPath)" "-library=$(BaseDir)\Library" -asdoc=true -keep-asdoc=true</postBuildCommand>
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />

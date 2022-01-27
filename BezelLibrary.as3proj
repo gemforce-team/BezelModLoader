@@ -56,8 +56,9 @@
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>
-    <element path="obj\GCCS.swc" />
-    <element path="obj\GCFW.swc" />
+    <element path="%BezelLibs%\GemCraft.Frostborn.Wrath.swc" />
+    <element path="%BezelLibs%\gc-cs-steam.swc" />
+    <element path="%BezelLibs%\FRESteamWorks.swc" />
   </externalLibraryPaths>
   <!-- Runtime Shared Libraries -->
   <rslPaths>

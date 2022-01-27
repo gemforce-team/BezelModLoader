@@ -8,7 +8,7 @@ package Bezel.GCCS
      */
     internal class GCCSCoreMod
     {
-        public static const VERSION:String = "9";
+        public static const VERSION:String = "10";
 
         private static const files:Array = [
             "com/giab/games/gccs/steam/Main.class.asasm",
@@ -223,10 +223,7 @@ package Bezel.GCCS
             [
                 // renderInfoPanelGem
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     getlocal            6 \n \
                     getlocal            1 \n \
                     getlex              QName(PackageNamespace("com.giab.common.utils"), "NumberFormatter") \n \
@@ -236,10 +233,7 @@ package Bezel.GCCS
             [
                 // clickOnScene
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     getlocal1 \n \
                     getlocal            2 \n \
                     getlocal            3 \n \
@@ -254,10 +248,7 @@ package Bezel.GCCS
                 ',
                 // rightClickOnScene
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     getlocal1 \n \
                     getlocal            2 \n \
                     getlocal            3 \n \
@@ -272,10 +263,7 @@ package Bezel.GCCS
                 ',
                 // ehKeyDown
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     getlocal1 \n \
                     callproperty        QName(PackageInternalNs("Bezel:bezel_internal"), "ingameKeyDown"), 1 \n \
                     not \n \
@@ -288,10 +276,7 @@ package Bezel.GCCS
             [
                 // renderInfoPanel
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callproperty        QName(PackageInternalNs("Bezel:bezel_internal"), "ingamePreRenderInfoPanel"), 0 \n \
                     pushtrue \n \
                     ifeq                L160 \n \
@@ -303,222 +288,141 @@ package Bezel.GCCS
             [
                 // saveSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "saveSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 '
             ],
             [
                 // newScene
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "ingameNewScene"), 0 \n \
                 '
             ],
 			[
 				// Add Bezel version string
 				'\n \
-					getlex              QName(PackageNamespace("com.giab.games.gccs.steam"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+					getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
 					getlocal1 \n \
 					callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "setVersion"), 1 \n \
 				'
@@ -526,8 +430,7 @@ package Bezel.GCCS
             [
                 ' \n \
                     getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSSettingsHandler") \n \
-                    getlocal0 \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "toggleCustomSettingsFromGame"), 1 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "toggleCustomSettingsFromGame"), 0 \n \
                 ',
                 ' \n \
                     getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSSettingsHandler") \n \

@@ -1,9 +1,8 @@
 package Bezel.GCFW
 {
-    import flash.display.MovieClip;
-    import flash.text.TextField;
-    import flash.text.TextFormat;
-    import flash.utils.getDefinitionByName;
+	import GemCraftFrostbornWrath_fla.btnplate160x34_24;
+	import flash.display.MovieClip;
+	import flash.text.TextField;
 
     /**
      * ...
@@ -15,7 +14,7 @@ package Bezel.GCFW
         public var plate:MovieClip;
         public var yReal:Number;
 
-        public function SettingsButtonShim(template:Object)
+        public function SettingsButtonShim(template:MovieClip)
         {
             this.tf = new TextField();
             this.tf.text = "aaa";
@@ -25,7 +24,7 @@ package Bezel.GCFW
             this.tf.height = template.tf.height;
             this.tf.selectable = false;
 
-            this.plate = new (getDefinitionByName("GemCraftFrostbornWrath_fla.btnplate160x34_24") as Class)();
+            this.plate = new btnplate160x34_24();
 
             this.addChild(this.plate);
             this.plate.scaleX = this.plate.scaleY = 1.5;

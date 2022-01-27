@@ -2,9 +2,7 @@ package Bezel.GCCS
 {
     import flash.display.MovieClip;
     import flash.text.TextField;
-    import flash.text.TextFormat;
-    import flash.utils.getDefinitionByName;
-    import flash.text.TextFieldAutoSize;
+    import gc_cs_steam_fla.btnplate160x34_24;
 
     /**
      * ...
@@ -16,7 +14,7 @@ package Bezel.GCCS
         public var plate:MovieClip;
         public var yReal:Number;
 
-        public function SettingsButtonShim(template:Object)
+        public function SettingsButtonShim(template:MovieClip)
         {
             this.tf = new TextField();
             this.tf.text = "aaa";
@@ -26,7 +24,7 @@ package Bezel.GCCS
             this.tf.height = template.tf.height;
             this.tf.selectable = false;
 
-            this.plate = new (getDefinitionByName("gc_cs_steam_fla.btnplate160x34_24") as Class)();
+            this.plate = new btnplate160x34_24();
 
             this.addChild(this.plate);
             this.addChild(this.tf);

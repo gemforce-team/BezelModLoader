@@ -8,7 +8,7 @@ package Bezel.GCFW
 
     internal class GCFWCoreMod
     {
-        public static const VERSION:String = "8";
+        public static const VERSION:String = "9";
 
         private static const files:Array = [
             "com/giab/games/gcfw/Main.class.asasm",
@@ -149,10 +149,7 @@ package Bezel.GCFW
             [
                 // renderInfoPanelGem
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWEventHandlers") \n \
                     getlocal            8 \n \
                     getlocal            1 \n \
                     getlex              QName(PackageNamespace("com.giab.common.utils"), "NumberFormatter") \n \
@@ -162,10 +159,7 @@ package Bezel.GCFW
             [
                 // clickOnScene
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWEventHandlers") \n \
                     getlocal1 \n \
                     getlocal            2 \n \
                     getlocal            3 \n \
@@ -180,10 +174,7 @@ package Bezel.GCFW
                 ',
                 // rightClickOnScene
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWEventHandlers") \n \
                     getlocal1 \n \
                     getlocal            2 \n \
                     getlocal            3 \n \
@@ -198,10 +189,7 @@ package Bezel.GCFW
                 ',
                 // ehKeyDown
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWEventHandlers") \n \
                     getlocal1 \n \
                     callproperty        QName(PackageInternalNs("Bezel:bezel_internal"), "ingameKeyDown"), 1 \n \
                     not \n \
@@ -214,10 +202,7 @@ package Bezel.GCFW
             [
                 // renderInfoPanel
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWEventHandlers") \n \
                     callproperty        QName(PackageInternalNs("Bezel:bezel_internal"), "ingamePreRenderInfoPanel"), 0 \n \
                     pushtrue \n \
                     ifeq                L160 \n \
@@ -229,100 +214,66 @@ package Bezel.GCFW
             [
                 // saveSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "saveSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
                 '
             ],
             [
                 // newScene
                 ' \n \
-                    getlex              QName(PackageNamespace("com.giab.games.gcfw"), "GV") \n \
-                    getproperty         QName(PackageNamespace(""), "main") \n \
-                    getproperty         QName(PackageNamespace(""), "bezel") \n \
-					getproperty			QName(PackageNamespace(""), "mainLoader") \n \
+                    getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWEventHandlers") \n \
                     callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "ingameNewScene"), 0 \n \
                 '
             ],
             [
                 ' \n \
                     getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWSettingsHandler") \n \
-                    getlocal0 \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "toggleCustomSettingsFromGame"), 1 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "toggleCustomSettingsFromGame"), 0 \n \
                 ',
                 ' \n \
                     getlex              QName(PackageNamespace("Bezel.GCFW"), "GCFWSettingsHandler") \n \

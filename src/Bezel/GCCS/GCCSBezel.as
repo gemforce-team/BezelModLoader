@@ -1,31 +1,48 @@
 package Bezel.GCCS 
 {
 	import Bezel.Bezel;
-	import Bezel.Utils.Keybind;
-	import Bezel.bezel_internal;
-	import Bezel.Events.EventTypes;
-	import Bezel.Events.IngameClickOnSceneEvent;
-	import Bezel.Events.IngameGemInfoPanelFormedEvent;
-	import Bezel.Events.IngameKeyDownEvent;
-	import Bezel.Events.IngameNewSceneEvent;
-	import Bezel.Events.IngamePreRenderInfoPanelEvent;
-	import Bezel.Events.IngameRightClickOnSceneEvent;
-	import Bezel.Events.LoadSaveEvent;
-	import Bezel.Events.Persistence.IngameClickOnSceneEventArgs;
-	import Bezel.Events.Persistence.IngameGemInfoPanelFormedEventArgs;
-	import Bezel.Events.Persistence.IngameKeyDownEventArgs;
-	import Bezel.Events.Persistence.IngamePreRenderInfoPanelEventArgs;
-	import Bezel.Events.SaveSaveEvent;
 	import Bezel.Logger;
 	import Bezel.MainLoader;
-
-	import flash.events.KeyboardEvent;
-	import flash.events.MouseEvent;
-	import flash.text.TextField;
-	import flash.text.TextFormat;
-	import flash.utils.getDefinitionByName;
-	import flash.utils.getTimer;
+	import Bezel.Utils.Keybind;
+	import Bezel.bezel_internal;
 	
+	import com.giab.games.gccs.steam.GV;
+	import com.giab.games.gccs.steam.Mods;
+	import com.giab.games.gccs.steam.Prefs;
+	import com.giab.games.gccs.steam.SB;
+	import com.giab.games.gccs.steam.constants.AchievementIngameStatus;
+	import com.giab.games.gccs.steam.constants.ActionStatus;
+	import com.giab.games.gccs.steam.constants.BattleDifficulty;
+	import com.giab.games.gccs.steam.constants.BattleOutcome;
+	import com.giab.games.gccs.steam.constants.BattleTraitId;
+	import com.giab.games.gccs.steam.constants.BeaconType;
+	import com.giab.games.gccs.steam.constants.BuildingType;
+	import com.giab.games.gccs.steam.constants.DropType;
+	import com.giab.games.gccs.steam.constants.GameMode;
+	import com.giab.games.gccs.steam.constants.GemComponentType;
+	import com.giab.games.gccs.steam.constants.GemEnhancementId;
+	import com.giab.games.gccs.steam.constants.IngameStatus;
+	import com.giab.games.gccs.steam.constants.MonsterBodyPartType;
+	import com.giab.games.gccs.steam.constants.MonsterBuffId;
+	import com.giab.games.gccs.steam.constants.MonsterType;
+	import com.giab.games.gccs.steam.constants.PauseType;
+	import com.giab.games.gccs.steam.constants.ScreenId;
+	import com.giab.games.gccs.steam.constants.SelectorScreenStatus;
+	import com.giab.games.gccs.steam.constants.ShrineType;
+	import com.giab.games.gccs.steam.constants.SkillId;
+	import com.giab.games.gccs.steam.constants.SkillType;
+	import com.giab.games.gccs.steam.constants.SparkType;
+	import com.giab.games.gccs.steam.constants.StageType;
+	import com.giab.games.gccs.steam.constants.StatId;
+	import com.giab.games.gccs.steam.constants.StrikeSpellId;
+	import com.giab.games.gccs.steam.constants.TalismanFragmentType;
+	import com.giab.games.gccs.steam.constants.TalismanPropertyId;
+	import com.giab.games.gccs.steam.constants.TargetPriorityId;
+	import com.giab.games.gccs.steam.constants.TutorialId;
+	import com.giab.games.gccs.steam.constants.Url;
+	import com.giab.games.gccs.steam.constants.WaveFormation;
+	import com.giab.games.gccs.steam.constants.WizLockType;
+
 	use namespace bezel_internal;
 	
 	/*
@@ -34,19 +51,9 @@ package Bezel.GCCS
 	 */
 	public class GCCSBezel implements MainLoader
 	{
-		// Shortcuts to gameObjects
-		private var GV:Object;/*GV*/
-		private var SB:Object;/*SB*/
-		private var prefs:Object;/*Prefs*/
-		
-		private var bezel:Bezel;
 		private var logger:Logger;
 
-		private static const defaultHotkeys:Object = createDefaultKeyConfiguration();
-		
-		public function GCCSBezel() 
-		{
-		}
+		internal static const defaultHotkeys:Object = createDefaultKeyConfiguration();
 		
 		public function get gameClassFullyQualifiedName():String { return "com.giab.games.gccs.steam.Main"; }
 		public function get MOD_NAME():String { return "GCCS Bezel"; }
@@ -55,7 +62,8 @@ package Bezel.GCCS
 		
 		public function bind(b:Bezel, o:Object):void
 		{
-			o.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
+			GCCSEventHandlers.register();
+			
 			for (var hotkey:String in defaultHotkeys)
 			{
 				b.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
@@ -63,62 +71,10 @@ package Bezel.GCCS
 			
 			b.keybindManager.registerHotkey("GCCS Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
 		}
+
 		public function unload():void
 		{
-			GV.main.stage.removeEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
-		}
-		
-		public function loaderBind(bezel:Bezel, mainGame:Object, gameObjects:Object): void
-		{
-			this.logger = bezel.getLogger("GCCS Bezel");
-			this.bezel = bezel;
-			
-			this.GV = getDefinitionByName("com.giab.games.gccs.steam.GV") as Class;
-			this.SB = getDefinitionByName("com.giab.games.gccs.steam.SB") as Class;
-			this.prefs = getDefinitionByName("com.giab.games.gccs.steam.Prefs") as Class;
-			gameObjects.main = mainGame;
-			gameObjects.GV = this.GV;
-			gameObjects.SB = this.SB;
-			gameObjects.prefs = this.prefs;
-			gameObjects.mods = getDefinitionByName("com.giab.games.gccs.steam.Mods");
-
-			gameObjects.constants = new Object();
-			gameObjects.constants.achievementIngameStatus = getDefinitionByName("com.giab.games.gccs.steam.constants.AchievementIngameStatus");
-			gameObjects.constants.actionStatus = getDefinitionByName("com.giab.games.gccs.steam.constants.ActionStatus");
-			gameObjects.constants.battleDifficulty = getDefinitionByName("com.giab.games.gccs.steam.constants.BattleDifficulty");
-			gameObjects.constants.battleOutcome = getDefinitionByName("com.giab.games.gccs.steam.constants.BattleOutcome");
-			gameObjects.constants.battleTraitId = getDefinitionByName("com.giab.games.gccs.steam.constants.BattleTraitId");
-			gameObjects.constants.beaconType = getDefinitionByName("com.giab.games.gccs.steam.constants.BeaconType");
-			gameObjects.constants.buildingType = getDefinitionByName("com.giab.games.gccs.steam.constants.BuildingType");
-			gameObjects.constants.dropType = getDefinitionByName("com.giab.games.gccs.steam.constants.DropType");
-			gameObjects.constants.gameMode = getDefinitionByName("com.giab.games.gccs.steam.constants.GameMode");
-			gameObjects.constants.gemComponentType = getDefinitionByName("com.giab.games.gccs.steam.constants.GemComponentType");
-			gameObjects.constants.gemEnhancementId = getDefinitionByName("com.giab.games.gccs.steam.constants.GemEnhancementId");
-			gameObjects.constants.ingameStatus = getDefinitionByName("com.giab.games.gccs.steam.constants.IngameStatus");
-			gameObjects.constants.monsterBodyPartType = getDefinitionByName("com.giab.games.gccs.steam.constants.MonsterBodyPartType");
-			gameObjects.constants.monsterBuffId = getDefinitionByName("com.giab.games.gccs.steam.constants.MonsterBuffId");
-			gameObjects.constants.monsterType = getDefinitionByName("com.giab.games.gccs.steam.constants.MonsterType");
-			gameObjects.constants.pauseType = getDefinitionByName("com.giab.games.gccs.steam.constants.PauseType");
-			gameObjects.constants.screenId = getDefinitionByName("com.giab.games.gccs.steam.constants.ScreenId");
-			gameObjects.constants.selectorScreenStatus = getDefinitionByName("com.giab.games.gccs.steam.constants.SelectorScreenStatus");
-			gameObjects.constants.shrineType = getDefinitionByName("com.giab.games.gccs.steam.constants.ShrineType");
-			gameObjects.constants.skillId = getDefinitionByName("com.giab.games.gccs.steam.constants.SkillId");
-			gameObjects.constants.skillType = getDefinitionByName("com.giab.games.gccs.steam.constants.SkillType");
-			gameObjects.constants.sparkType = getDefinitionByName("com.giab.games.gccs.steam.constants.SparkType");
-			gameObjects.constants.stageType = getDefinitionByName("com.giab.games.gccs.steam.constants.StageType");
-			gameObjects.constants.statId = getDefinitionByName("com.giab.games.gccs.steam.constants.StatId");
-			gameObjects.constants.strikeSpellId = getDefinitionByName("com.giab.games.gccs.steam.constants.StrikeSpellId");
-			gameObjects.constants.talismanFragmentType = getDefinitionByName("com.giab.games.gccs.steam.constants.TalismanFragmentType");
-			gameObjects.constants.talismanPropertyId = getDefinitionByName("com.giab.games.gccs.steam.constants.TalismanPropertyId");
-			gameObjects.constants.targetPriorityId = getDefinitionByName("com.giab.games.gccs.steam.constants.TargetPriorityId");
-			gameObjects.constants.tutorialId = getDefinitionByName("com.giab.games.gccs.steam.constants.TutorialId");
-			gameObjects.constants.url = getDefinitionByName("com.giab.games.gccs.steam.constants.Url");
-			gameObjects.constants.waveFormation = getDefinitionByName("com.giab.games.gccs.steam.constants.WaveFormation");
-			gameObjects.constants.wizLockType = getDefinitionByName("com.giab.games.gccs.steam.constants.WizLockType");
-
-			//checkForUpdates();
-
-			this.logger.log("GCCS Bezel", "GCCS Bezel bound to game's objects!");
+			GCCSEventHandlers.unregister();
 		}
 		
 		public function get coremodInfo():Object 
@@ -126,95 +82,54 @@ package Bezel.GCCS
 			return {"name": "GCCS_BEZEL_MOD_LOADER", "version": GCCSCoreMod.VERSION, "load": GCCSCoreMod.installHooks};
 		}
 		
-		bezel_internal function setVersion(mcmainmenu:Object): void
+		// mainGame cannot be the proper type, for consistency with MainLoader interface
+		public function loaderBind(bezel:Bezel, mainGame:Object, gameObjects:Object): void
 		{
-			var versionText:TextField = new TextField();
-			versionText.selectable = false;
-			versionText.text = Bezel.Bezel.prettyVersion();
-			versionText.setTextFormat(new TextFormat("Celtic Garamond for GemCraft", 10, 0xFFFFFF, null, null, null, null, null, "center"));
-			mcmainmenu.mcBottomTexts.addChild(versionText);
-			versionText.width = versionText.parent.width;
-			//var version:String = GV.main.scrMainMenu.mc.mcBottomTexts.getChildAt(0).text;
-			//version = version.slice(0, version.search(' ') + 1) + Bezel.Bezel.prettyVersion();
-			//GV.main.scrMainMenu.mc.mcBottomTexts.getChildAt(0).text = version;
-		}
+			this.logger = bezel.getLogger("GCCS Bezel");
+			
+			gameObjects.main = mainGame;
+			gameObjects.GV = GV;
+			gameObjects.SB = SB;
+			gameObjects.prefs = Prefs;
+			gameObjects.mods = Mods;
 
-		// Called after the gem's info panel has been formed but before it's returned to the game for rendering
-		bezel_internal function ingameGemInfoPanelFormed(infoPanel:Object, gem:Object, numberFormatter:Object): void
-		{
-			bezel.dispatchEvent(new IngameGemInfoPanelFormedEvent(EventTypes.INGAME_GEM_INFO_PANEL_FORMED, new IngameGemInfoPanelFormedEventArgs(infoPanel, gem, numberFormatter)));
-		}
+			gameObjects.constants = new Object();
+			gameObjects.constants.achievementIngameStatus = AchievementIngameStatus;
+			gameObjects.constants.actionStatus = ActionStatus;
+			gameObjects.constants.battleDifficulty = BattleDifficulty;
+			gameObjects.constants.battleOutcome = BattleOutcome;
+			gameObjects.constants.battleTraitId = BattleTraitId;
+			gameObjects.constants.beaconType = BeaconType;
+			gameObjects.constants.buildingType = BuildingType;
+			gameObjects.constants.dropType = DropType;
+			gameObjects.constants.gameMode = GameMode;
+			gameObjects.constants.gemComponentType = GemComponentType;
+			gameObjects.constants.gemEnhancementId = GemEnhancementId;
+			gameObjects.constants.ingameStatus = IngameStatus;
+			gameObjects.constants.monsterBodyPartType = MonsterBodyPartType;
+			gameObjects.constants.monsterBuffId = MonsterBuffId;
+			gameObjects.constants.monsterType = MonsterType;
+			gameObjects.constants.pauseType = PauseType;
+			gameObjects.constants.screenId = ScreenId;
+			gameObjects.constants.selectorScreenStatus = SelectorScreenStatus;
+			gameObjects.constants.shrineType = ShrineType;
+			gameObjects.constants.skillId = SkillId;
+			gameObjects.constants.skillType = SkillType;
+			gameObjects.constants.sparkType = SparkType;
+			gameObjects.constants.stageType = StageType;
+			gameObjects.constants.statId = StatId;
+			gameObjects.constants.strikeSpellId = StrikeSpellId;
+			gameObjects.constants.talismanFragmentType = TalismanFragmentType;
+			gameObjects.constants.talismanPropertyId = TalismanPropertyId;
+			gameObjects.constants.targetPriorityId = TargetPriorityId;
+			gameObjects.constants.tutorialId = TutorialId;
+			gameObjects.constants.url = Url;
+			gameObjects.constants.waveFormation = WaveFormation;
+			gameObjects.constants.wizLockType = WizLockType;
 
-		// Called before any of the game's logic runs when starting to form an infopanel
-		// This method is called before infoPanelFormed (which should be renamed to ingameGemInfoPanelFormed)
-		bezel_internal function ingamePreRenderInfoPanel(): Boolean
-		{
-			var eventArgs:IngamePreRenderInfoPanelEventArgs = new IngamePreRenderInfoPanelEventArgs(true);
-			bezel.dispatchEvent(new IngamePreRenderInfoPanelEvent(EventTypes.INGAME_PRE_RENDER_INFO_PANEL, eventArgs));
-			//logger.log("ingamePreRenderInfoPanel", "Dispatched event!");
-			return eventArgs.continueDefault;
-		}
+			//checkForUpdates();
 
-		// Called immediately as a click event is fired by the base game
-		// set continueDefault to false to prevent the base game's handler from running
-		bezel_internal function ingameClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
-		{
-			var eventArgs:IngameClickOnSceneEventArgs = new IngameClickOnSceneEventArgs(true, event, mouseX, mouseY, buildingX, buildingY);
-			bezel.dispatchEvent(new IngameClickOnSceneEvent(EventTypes.INGAME_CLICK_ON_SCENE, eventArgs));
-			return eventArgs.continueDefault;
-		}
-
-		// Called immediately as a right click event is fired by the base game
-		// set continueDefault to false to prevent the base game's handler from running
-		bezel_internal function ingameRightClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number): Boolean
-		{
-			var eventArgs:IngameClickOnSceneEventArgs = new IngameClickOnSceneEventArgs(true, event, mouseX, mouseY, buildingX, buildingY);
-			bezel.dispatchEvent(new IngameRightClickOnSceneEvent(EventTypes.INGAME_RIGHT_CLICK_ON_SCENE, eventArgs));
-			return eventArgs.continueDefault;
-		}
-
-		// Called after the game checks that a key should be handled, but before any of the actual handling logic
-		// Set continueDefault to false to prevent the base game's handler from running
-		bezel_internal function ingameKeyDown(e:KeyboardEvent): Boolean
-		{
-			var eventArgs:IngameKeyDownEventArgs = new IngameKeyDownEventArgs(e, true);
-			var keyDownEvent:IngameKeyDownEvent = new IngameKeyDownEvent(EventTypes.INGAME_KEY_DOWN, eventArgs);
-			bezel.dispatchEvent(keyDownEvent);
-			doHotkeyTransformation(keyDownEvent);
-			return eventArgs.continueDefault;
-		}
-
-		bezel_internal function stageKeyDown(e: KeyboardEvent): void
-		{
-			if (this.bezel.keybindManager.getHotkeyValue("GCCS Bezel: Reload all mods").matches(e))
-			{
-				if (bezel.modsReloadedTimestamp + 10*1000 > getTimer())
-				{
-					GV.vfxEngine.createFloatingText(GV.main.mouseX,GV.main.mouseY < 60?Number(GV.main.mouseY + 30):Number(GV.main.mouseY - 20),"Please wait 10 secods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
-					return;
-				}
-				SB.playSound("sndalert");
-				GV.vfxEngine.createFloatingText(GV.main.mouseX,GV.main.mouseY < 60?Number(GV.main.mouseY + 30):Number(GV.main.mouseY - 20),"Reloading mods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
-				bezel.reloadAllMods();
-			}
-		}
-
-		// Called after the game is done loading its data
-		bezel_internal function loadSave(): void
-		{
-			bezel.dispatchEvent(new LoadSaveEvent(GV.ppd, EventTypes.LOAD_SAVE));
-		}
-
-		// Called after the game is done saving its data
-		bezel_internal function saveSave(): void
-		{
-			bezel.dispatchEvent(new SaveSaveEvent(GV.ppd, EventTypes.SAVE_SAVE));
-		}
-
-		// Called when a level is loaded or reloaded
-		bezel_internal function ingameNewScene(): void
-		{
-			bezel.dispatchEvent(new IngameNewSceneEvent(EventTypes.INGAME_NEW_SCENE));
+			this.logger.log("GCCS Bezel", "GCCS Bezel bound to game's objects!");
 		}
 		
 		private static function createDefaultKeyConfiguration():Object
@@ -255,28 +170,6 @@ package Bezel.GCCS
 
 			return config;
 		}
-		
-		private function doHotkeyTransformation(e:IngameKeyDownEvent):void
-		{
-			var origDefault:Boolean = e.eventArgs.continueDefault;
-			for(var name:String in defaultHotkeys)
-			{
-				if(this.bezel.keybindManager.getHotkeyValue(name).matches(e))
-				{
-					e.eventArgs.event.keyCode = defaultHotkeys[name].key;
-					e.eventArgs.event.altKey = defaultHotkeys[name].alt;
-					e.eventArgs.event.ctrlKey = defaultHotkeys[name].ctrl;
-					e.eventArgs.event.shiftKey = defaultHotkeys[name].shift;
-					e.eventArgs.continueDefault = origDefault;
-					return;
-				}
-				else if (defaultHotkeys[name].matches(e))
-				{
-					e.eventArgs.continueDefault = false;
-				}
-			}
-		}
-		
 
 		public function registerBooleanForDisplay(mod:String, name:String, onSet:Function, currentValue:Function, description:String = null):void
 		{
