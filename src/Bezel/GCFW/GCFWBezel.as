@@ -52,6 +52,7 @@ package Bezel.GCFW
 	import flash.desktop.NativeApplication;
 	import flash.events.Event;
 	import flash.events.UncaughtErrorEvent;
+	import com.giab.games.gcfw.Main;
 	
 	use namespace bezel_internal;
 
@@ -208,7 +209,11 @@ package Bezel.GCFW
 			GCFWEventHandlers.unregister();
 			NativeApplication.nativeApplication.removeEventListener(Event.EXITING, GV.main.ehExit);
 			// Made public by coremod
-			GV.main.loaderInfo.uncaughtErrorEvents.removeEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, GV.main["uncaughtErrorHandler"])
+			GV.main.loaderInfo.uncaughtErrorEvents.removeEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, GV.main["uncaughtErrorHandler"]);
+			if (GV.main.isSteamworksInitiated)
+			{
+				Main.steamworks.dispose();
+			}
 		}
 	}
 
