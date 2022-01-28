@@ -108,11 +108,13 @@ package Bezel
         [Embed(source = "../../assets/rabcdasm/rabcdasm.exe", mimeType = "application/octet-stream")] private static const disassemble_data:Class;
         [Embed(source = "../../assets/rabcdasm/rabcasm.exe", mimeType = "application/octet-stream")] private static const reassemble_data:Class;
 		[Embed(source = "../../assets/splitter/splitter.exe", mimeType = "application/octet-stream")] private static const splitter_data:Class;
+		[Embed(source = "../../assets/rabcdasm/liblzma.dll", mimeType = "application/octet-stream")] private static const liblzma_data:Class;
 		[Embed(source = "../../assets/rabcdasm/COPYING", mimeType = "application/octet-stream")] private static const LICENSE_data:Class;
 		
 		private static const disassemble:Object = {"name": "disassemble.exe", "data":disassemble_data};
 		private static const reassemble:Object = {"name": "reassemble.exe", "data":reassemble_data};
 		private static const splitter:Object = {"name": "splitter.exe", "data":splitter_data};
+		private static const liblzma:Object = {"name": "liblzma.dll", "data":liblzma_data};
 		private static const LICENSE:Object = {"name": "LICENSE", "data":LICENSE_data};
 
 		private static var _instance:Bezel;
@@ -163,7 +165,7 @@ package Bezel
 				toolsFolder.createDirectory();
 			}
 			
-			for each (var tool:Object in [disassemble, reassemble, splitter, LICENSE])
+			for each (var tool:Object in [disassemble, reassemble, splitter, liblzma, LICENSE])
 			{
 				var file:File = toolsFolder.resolvePath(tool.name);
 				if (!file.exists)
