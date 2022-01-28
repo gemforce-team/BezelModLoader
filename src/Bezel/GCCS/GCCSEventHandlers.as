@@ -38,12 +38,12 @@ package Bezel.GCCS
     {
         internal static function register():void
         {
-            GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
+            Bezel.Bezel.instance.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
         }
     
         internal static function unregister():void
         {
-            GV.main.stage.removeEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
+            Bezel.Bezel.instance.stage.removeEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
         }
 
 		// Called after the gem's info panel has been formed but before it's returned to the game for rendering
@@ -103,6 +103,10 @@ package Bezel.GCCS
 				SB.playSound("sndalert");
 				GV.vfxEngine.createFloatingText(GV.main.mouseX,GV.main.mouseY < 60?Number(GV.main.mouseY + 30):Number(GV.main.mouseY - 20),"Reloading mods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
 				Bezel.Bezel.instance.reloadAllMods();
+			}
+			else if (Bezel.Bezel.instance.keybindManager.getHotkeyValue("GCCS Bezel: Hard reload").matches(e))
+			{
+				Bezel.Bezel.instance.triggerFullReload();
 			}
 		}
 

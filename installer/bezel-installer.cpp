@@ -10,6 +10,10 @@ extern "C"
     extern int swfSize;
     extern unsigned char swcData[];
     extern int swcSize;
+    extern unsigned char gccsLoaderData[];
+    extern int gccsLoaderSize;
+    extern unsigned char gcfwLoaderData[];
+    extern int gcfwLoaderSize;
 }
 
 [[noreturn]] void waitExit(const char *exitMessage, int exitCode)
@@ -91,13 +95,17 @@ int main()
         waitExit("No SWF content tag within the metadata XML.", -6);
     }
 
-    const std::filesystem::path contentPath{sanitizeContentsPath(metadata.substr(contentStart + 9, contentEnd - contentStart - 9))};
+    const std::string contentName = sanitizeContentsPath(metadata.substr(contentStart + 9, contentEnd - contentStart - 9));
+
+    const std::filesystem::path contentPath{contentName};
     const std::filesystem::path moddedPath{contentPath.stem().generic_wstring() + L"-modded" + contentPath.extension().generic_wstring()};
 
-    metadata.replace(metadata.cbegin() + contentStart + 9, metadata.cbegin() + contentEnd, "Mods/BezelModLoader.swf");
+    metadata.replace(metadata.cbegin() + contentStart + 9, metadata.cbegin() + contentEnd, "Bezel/BezelModLoader.swf");
 
-    const std::filesystem::path bezelFile{"Mods/BezelModLoader.swf"};
+    const std::filesystem::path oldBezelFile{"Mods/BezelModLoader.swf"};
     const std::filesystem::path oldBezelLibrary{"Mods/BezelModLoader.swc"};
+    const std::filesystem::path bezelFile{"Bezel/BezelModLoader.swf"};
+    const std::filesystem::path mainLoaderPath{"Bezel/MainLoader.swf"};
 
     if (!getenv("APPDATA"))
     {
@@ -143,11 +151,19 @@ int main()
     std::filesystem::remove("gcfw-modded.swf", ec);
     std::filesystem::remove(moddedPath, ec);
     std::filesystem::remove(oldBezelLibrary, ec);
+    std::filesystem::remove(oldBezelFile, ec);
     std::filesystem::create_directory("Mods", ec);
 
     if (ec)
     {
-        waitExit("Could not create directory for Bezel and mods. No changes have been made.", ec.value());
+        waitExit("Could not create directory for mods. No changes have been made.", ec.value());
+    }
+
+    std::filesystem::create_directory("Bezel", ec);
+
+    if (ec)
+    {
+        waitExit("Could not create directory for Bezel. No changes have been made.", ec.value());
     }
 
     FILE *outFile = _wfopen(bezelFile.generic_wstring().c_str(), L"wb");
@@ -166,7 +182,7 @@ int main()
 
         if (ec)
         {
-            printf("Could not create BezelLibs with error code %i", ec.value());
+            printf("Could not create BezelLibs with error code %i\n", ec.value());
         }
         else
         {
@@ -175,6 +191,21 @@ int main()
             fwrite(swcData, 1, swcSize, outFile);
             fclose(outFile);
         }
+    }
+
+    if (contentName == "GemCraft Frostborn Wrath.swf")
+    {
+        printf("Found GemCraft Frostborn Wrath. Exporting its MainLoader\n");
+        outFile = _wfopen(mainLoaderPath.generic_wstring().c_str(), L"wb");
+        fwrite(gcfwLoaderData, 1, gcfwLoaderSize, outFile);
+        fclose(outFile);
+    }
+    else if (contentName == "gc-cs-steam.swf")
+    {
+        printf("Found GemCraft Chasing Shadows. Exporting its MainLoader\n");
+        outFile = _wfopen(mainLoaderPath.generic_wstring().c_str(), L"wb");
+        fwrite(gccsLoaderData, 1, gccsLoaderSize, outFile);
+        fclose(outFile);
     }
 
     outFile = _wfopen(metadataFile.generic_wstring().c_str(), L"wt");

@@ -11,7 +11,6 @@ package Bezel.Utils
     import flash.filesystem.FileStream;
     import flash.filesystem.FileMode;
     import flash.events.Event;
-    import flash.utils.getQualifiedClassName;
 
     use namespace bezel_internal;
 
@@ -38,8 +37,6 @@ package Bezel.Utils
         private var id:String;
 
         private var _settings:Object;
-
-        private var notRegisteredWithMainLoader:Vector.<Object>;
 		
 		private static var logger: Logger = Bezel.Bezel.instance.getLogger("SettingManager");
 		
@@ -78,10 +75,8 @@ package Bezel.Utils
 			if (identifier == null || identifier == "")
 				throw new ArgumentError("SettingManager identifier can't be null or empty");
 			if (identifier in managers || _blocker == null)
-				throw new IllegalOperationError("Constructor should only be called by getLogger! Get your logger instance that way");
+				throw new IllegalOperationError("Constructor should only be called by getManager! Get your settingmanager instance that way");
 			this.id = identifier;
-
-            this.notRegisteredWithMainLoader = new Vector.<Object>();
 		}
 
         // Used internally on reload
@@ -90,52 +85,16 @@ package Bezel.Utils
             logger.log("unregisterAllManagers", "Unregistering managers...");
             for each (var manager:SettingManager in _managers)
             {
-                manager.deregisterFromHandler();
+                manager.deregisterFromMainLoader();
             }
 
             _managers = new Dictionary();
         }
-
-        // Used internally if/when a mainLoader is found
-        bezel_internal static function registerAllToMainLoader():void
-        {
-            logger.log("registerToMainLoader", "Registering early settings to MainLoader");
-            for each (var manager:SettingManager in _managers)
-            {
-                manager.registerToMainLoader();
-            }
-        }
-
-        private function registerToMainLoader():void
-        {
-            for each (var unregistered:Object in notRegisteredWithMainLoader)
-            {
-                if (unregistered.type == "bool")
-                {
-                    Bezel.Bezel.instance.mainLoader.registerBooleanForDisplay(id, unregistered.name, unregistered.set, unregistered.get, unregistered.description);
-                }
-                else if (unregistered.type == "range")
-                {
-                    Bezel.Bezel.instance.mainLoader.registerFloatRangeForDisplay(id, unregistered.name, unregistered.min, unregistered.max, unregistered.step, unregistered.set, unregistered.get, unregistered.description);
-                }
-                else if (unregistered.type == "number")
-                {
-                    Bezel.Bezel.instance.mainLoader.registerNumberForDisplay(id, unregistered.name, unregistered.min, unregistered.max, unregistered.set, unregistered.get, unregistered.description);
-                }
-                else if (unregistered.type == "string")
-                {
-                    Bezel.Bezel.instance.mainLoader.registerStringForDisplay(id, unregistered.name, unregistered.validator, unregistered.set, unregistered.get, unregistered.description);
-                }
-                else
-                {
-                    throw new Error("Unknown setting type \"" + getQualifiedClassName(unregistered.type) + " not yet registered to MainLoader");
-                }
-            }
-
-            notRegisteredWithMainLoader.length = 0;
-        }
 		
-		bezel_internal function deregisterFromHandler():void
+        /**
+         * Removes all of this SettingManager's settings from the MainLoader's display.
+         */
+		public function deregisterFromMainLoader():void
 		{
 			if (this._settings != null)
 			{
@@ -218,10 +177,6 @@ package Bezel.Utils
             {
                 Bezel.Bezel.instance.mainLoader.registerBooleanForDisplay(id, name, set, get, description);
             }
-            else
-            {
-                this.notRegisteredWithMainLoader.push({"type":"bool", "name":name, "set":set, "get":get, "description":description});
-            }
         }
 
         /**
@@ -274,10 +229,6 @@ package Bezel.Utils
             {
                 Bezel.Bezel.instance.mainLoader.registerFloatRangeForDisplay(id, name, min, max, step, set, get, description);
             }
-            else
-            {
-                this.notRegisteredWithMainLoader.push({"type":"range", "name":name, "min":min, "max":max, "step":step, "set":set, "get":get, "description":description});
-            }
         }
 
         /**
@@ -329,10 +280,6 @@ package Bezel.Utils
             {
                 Bezel.Bezel.instance.mainLoader.registerNumberForDisplay(id, name, min, max, set, get, description);
             }
-            else
-            {
-                this.notRegisteredWithMainLoader.push({"type":"number", "name":name, "min":min, "max":max, "set":set, "get":get, "description":description});
-            }
         }
 
         /**
@@ -383,14 +330,10 @@ package Bezel.Utils
             {
                 Bezel.Bezel.instance.mainLoader.registerStringForDisplay(id, name, validator, set, get, description);
             }
-            else
-            {
-                this.notRegisteredWithMainLoader.push({"type":"string", "name":name, "validator":validator, "set":set, "get":get, "description":description});
-            }
         }
 
         /**
-         * Deregisters a setting. Does not remove from the settings file!
+         * Deregisters a setting.
          * @param name Setting to deregister. Null for all
          * @param del Whether to remove the setting from the save file or not
          */
@@ -398,7 +341,7 @@ package Bezel.Utils
         {
             if (name == null)
             {
-                deregisterFromHandler();
+                deregisterFromMainLoader();
                 if (del)
                 {
                     _settings = new Object();
@@ -409,17 +352,6 @@ package Bezel.Utils
             if (Bezel.Bezel.instance.mainLoader != null)
             {
                 Bezel.Bezel.instance.mainLoader.deregisterOption(id, name);
-            }
-            else
-            {
-                for (var i:int = 0; i < this.notRegisteredWithMainLoader.length; i++)
-                {
-                    if (this.notRegisteredWithMainLoader[i].name == name)
-                    {
-                        this.notRegisteredWithMainLoader.splice(i, 1);
-                        break;
-                    }
-                }
             }
             if (del)
             {

@@ -1,13 +1,16 @@
 package Bezel 
 {
 	/**
-	 * Defines the interface of a main loader mod. Only one of these may be present per game. Having more is a hard error
+	 * Defines the interface of a main loader mod. Only one of these may be present per game, enforced by the filesystem.
+	 * The MainLoader must be at <game executable folder>/Bezel/MainLoader.swf
+	 * The MainLoader is only unloaded on full reloads, which also reload the game and may be triggered by the MainLoader calling
+	 * Bezel.Bezel.triggerFullReload. All necessary cleanup should happen in cleanupForFullReload.
 	 * @author Chris
 	 */
-	public interface MainLoader extends BezelMod
+	public interface MainLoader
 	{
 		/**
-		 * Fills out gameObjects with data from the game
+		 * Fills out gameObjects with data from the game. Will only be called on initial load
 		 * @param	bezel The bezel instance loading the mod
 		 * @param   mainGame The object loaded and instantiated from the game's SWF
 		 * @param	gameObjects The object to fill with game object data
@@ -78,9 +81,13 @@ package Bezel
 		function registerKeybindForDisplay(name:String, onSet:Function, currentValue:Function, description:String = null):void;
 		/**
 		 * Deregisters one or all options from a given mod from in-game display. Should very likely be called through SettingManager, not directly, and only during or after the bind phase.
-		 * @param	mod Mod origin name
+		 * @param	mod Mod origin name, or "Keybinds" for a keybind
 		 * @param	name Option name (or null to deregister all)
 		 */
 		function deregisterOption(mod:String, name:String):void;
+		/**
+		 * Cleans up anything necessary for a full reload. This may need to include changing game state, as the game is unloaded too!
+		 */
+		function cleanupForFullReload():void;
 	}
 }

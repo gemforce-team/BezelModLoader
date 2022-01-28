@@ -15,8 +15,6 @@ package Bezel.Utils
 		protected static const hotkeysFile:File = Bezel.Bezel.bezelFolder.resolvePath("hotkeys.json");
 		
 		private var _configuredHotkeys:Object;
-
-		private var notRegisteredWithMainLoader:Vector.<Object>;
 		
 		private function get configuredHotkeys():Object
 		{
@@ -51,7 +49,6 @@ package Bezel.Utils
 		
 		public function KeybindManager() 
 		{
-			this.notRegisteredWithMainLoader = new Vector.<Object>();
 		}
 		
 		/**
@@ -79,10 +76,6 @@ package Bezel.Utils
 			if (Bezel.Bezel.instance.mainLoader != null)
 			{
 				Bezel.Bezel.instance.mainLoader.registerKeybindForDisplay(name, set, get, description);
-			}
-			else
-			{
-				this.notRegisteredWithMainLoader.push({"name":name, "set":set, "get":get, "description":description});
 			}
 		}
 		
@@ -152,16 +145,6 @@ package Bezel.Utils
 			}
 			
 			return v;
-		}
-
-		bezel_internal function registerToMainLoader():void
-		{
-			for each (var unregistered:Object in notRegisteredWithMainLoader)
-            {
-				Bezel.Bezel.instance.mainLoader.registerKeybindForDisplay(unregistered.name, unregistered.set, unregistered.get, unregistered.description);
-            }
-
-            notRegisteredWithMainLoader.length = 0;
 		}
 	}
 

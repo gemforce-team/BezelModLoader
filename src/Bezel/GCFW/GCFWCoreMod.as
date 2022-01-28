@@ -24,7 +24,10 @@ package Bezel.GCFW
                 "\".*Could you please copy this message.*\"",
                 "trait.*method.*com.giab.games.gcfw.*frame3",
                 "constructsuper",
-                "trait.*_cm"
+                "trait.*_cm",
+                "trait method.*uncaughtErrorHandler",
+                "name.*uncaughtErrorHandler",
+                "getproperty.*uncaughtErrorHandler"
             ],
             ["trait.*method.*renderMonsterInfoPanel"],
             [
@@ -98,7 +101,7 @@ package Bezel.GCFW
             ]
         ];
         private static const replaceNums:Array = [
-            [ 1, 1, 0, 0, 0 ],
+            [ 1, 1, 0, 0, 0, 1, 1, 1 ],
             [ 0 ],
             [ 0, 0, 0, 1 ],
             [ 0 ],
@@ -107,7 +110,7 @@ package Bezel.GCFW
             [ 0, 1, 0, 0, 0 ]
         ];
 		private static const offsetFromMatches:Array = [
-            [ -1, -1, 20, 0, 0 ],
+            [ -1, -1, 20, 0, 0, -1, -1, -1 ],
             [ -15 ],
             [ -5, 37, -5, 16 ],
             [ 5 ],
@@ -144,7 +147,10 @@ package Bezel.GCFW
                                 setlocal 1 \n \
                                 pushscope \n \
                 ',
-                'end'
+                'end',
+                'trait method QName(PackageNamespace(""),"uncaughtErrorHandler")',
+                'name "com.giab.games.gcfw:Main/uncaughtErrorHandler"',
+                'getproperty         QName(PackageNamespace(""),"uncaughtErrorHandler")'
             ],
             [
                 // renderInfoPanelGem

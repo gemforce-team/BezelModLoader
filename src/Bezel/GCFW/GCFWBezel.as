@@ -47,10 +47,15 @@ package Bezel.GCFW
 	import com.giab.games.gcfw.constants.WaveFormation;
 	import com.giab.games.gcfw.constants.WizLockType;
 	import com.giab.games.gcfw.constants.WizStashStatus;
+
+	import flash.display.MovieClip;
+	import flash.desktop.NativeApplication;
+	import flash.events.Event;
+	import flash.events.UncaughtErrorEvent;
 	
 	use namespace bezel_internal;
 
-	public class GCFWBezel implements MainLoader
+	public class GCFWBezel extends MovieClip implements MainLoader
 	{
 		private var logger:Logger;
 		
@@ -60,27 +65,6 @@ package Bezel.GCFW
 		public function get MOD_NAME():String { return "GCFW Bezel"; }
 		public function get VERSION():String { return Bezel.Bezel.VERSION; }
 		public function get BEZEL_VERSION():String { return Bezel.Bezel.VERSION; }
-		
-		public function bind(b:Bezel, o:Object):void
-		{
-			GCFWEventHandlers.register();
-
-			for (var hotkey:String in defaultHotkeys)
-			{
-				b.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
-			}
-			
-			b.keybindManager.registerHotkey("GCFW Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
-			
-			var version:String = GV.main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text;
-			version = version.slice(0, version.search(' ') + 1) + Bezel.Bezel.prettyVersion();
-			GV.main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text = version;
-		}
-
-		public function unload():void
-		{
-			GCFWEventHandlers.unregister();
-		}
 		
 		public function get coremodInfo(): Object
 		{
@@ -135,6 +119,20 @@ package Bezel.GCFW
 			//checkForUpdates();
 
 			this.logger.log("GCFW Bezel", "GCFW Bezel bound to game's objects!");
+
+			GCFWEventHandlers.register();
+
+			for (var hotkey:String in defaultHotkeys)
+			{
+				bezel.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
+			}
+			
+			bezel.keybindManager.registerHotkey("GCFW Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
+			bezel.keybindManager.registerHotkey("GCFW Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
+			
+			var version:String = GV.main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text;
+			version = version.slice(0, version.search(' ') + 1) + Bezel.Bezel.prettyVersion();
+			GV.main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text = version;
 		}
 		
 		private static function createDefaultKeyConfiguration():Object
@@ -203,6 +201,14 @@ package Bezel.GCFW
 		public function registerNumberForDisplay(mod:String, name:String, min:Number, max:Number, onSet:Function, currentValue:Function, description:String = null):void
 		{
 			GCFWSettingsHandler.registerNumberForDisplay(mod, name, min, max, onSet, currentValue, description);
+		}
+
+		public function cleanupForFullReload():void
+		{
+			GCFWEventHandlers.unregister();
+			NativeApplication.nativeApplication.removeEventListener(Event.EXITING, GV.main.ehExit);
+			// Made public by coremod
+			GV.main.loaderInfo.uncaughtErrorEvents.removeEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, GV.main["uncaughtErrorHandler"])
 		}
 	}
 

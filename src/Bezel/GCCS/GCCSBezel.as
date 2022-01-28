@@ -43,13 +43,15 @@ package Bezel.GCCS
 	import com.giab.games.gccs.steam.constants.WaveFormation;
 	import com.giab.games.gccs.steam.constants.WizLockType;
 
+	import flash.display.MovieClip;
+
 	use namespace bezel_internal;
 	
 	/*
 	 * ...
 	 * @author piepie62
 	 */
-	public class GCCSBezel implements MainLoader
+	public class GCCSBezel extends MovieClip implements MainLoader
 	{
 		private var logger:Logger;
 
@@ -59,23 +61,6 @@ package Bezel.GCCS
 		public function get MOD_NAME():String { return "GCCS Bezel"; }
 		public function get VERSION():String { return Bezel.Bezel.VERSION; }
 		public function get BEZEL_VERSION():String { return Bezel.Bezel.VERSION; }
-		
-		public function bind(b:Bezel, o:Object):void
-		{
-			GCCSEventHandlers.register();
-			
-			for (var hotkey:String in defaultHotkeys)
-			{
-				b.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
-			}
-			
-			b.keybindManager.registerHotkey("GCCS Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
-		}
-
-		public function unload():void
-		{
-			GCCSEventHandlers.unregister();
-		}
 		
 		public function get coremodInfo():Object 
 		{
@@ -130,6 +115,16 @@ package Bezel.GCCS
 			//checkForUpdates();
 
 			this.logger.log("GCCS Bezel", "GCCS Bezel bound to game's objects!");
+
+			GCCSEventHandlers.register();
+			
+			for (var hotkey:String in defaultHotkeys)
+			{
+				bezel.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
+			}
+			
+			bezel.keybindManager.registerHotkey("GCCS Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
+			bezel.keybindManager.registerHotkey("GCFW Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
 		}
 		
 		private static function createDefaultKeyConfiguration():Object
@@ -199,6 +194,11 @@ package Bezel.GCCS
 		public function registerNumberForDisplay(mod:String, name:String, min:Number, max:Number, onSet:Function, currentValue:Function, description:String = null):void
 		{
 			GCCSSettingsHandler.registerNumberForDisplay(mod, name, min, max, onSet, currentValue, description);
+		}
+
+		public function cleanupForFullReload():void
+		{
+			GCCSEventHandlers.unregister();
 		}
 	}
 

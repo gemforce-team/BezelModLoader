@@ -56,7 +56,7 @@ package Bezel.Lattice
         private var processInfo:NativeProcessStartupInfo;
         private var processError:String;
 
-        internal static var logger:Logger;
+        internal static const logger:Logger = Logger.getLogger("Lattice");
 		internal var bezel:Bezel;
 
         private var doneDisassembling:Boolean = false;
@@ -67,7 +67,6 @@ package Bezel.Lattice
 
         public function Lattice(bezel:Bezel)
         {
-            logger = bezel.getLogger("Lattice");
 			this.bezel = bezel;
 
             this.patches = new Vector.<LatticePatch>();
@@ -129,7 +128,7 @@ package Bezel.Lattice
         {
             var ret:Boolean = false;
 
-            if (!asm.exists || !cleanAsm.exists || !coremods.exists || !bezel.moddedSwf.exists || bezel.moddedSwf.modificationDate.getTime() < bezel.gameSwf.modificationDate.getTime())
+            if (!asm.exists || !cleanAsm.exists || !coremods.exists || !Bezel.Bezel.moddedSwf.exists || Bezel.Bezel.moddedSwf.modificationDate.getTime() < Bezel.Bezel.gameSwf.modificationDate.getTime())
             {
                 if (asm.exists)
                 {
@@ -144,7 +143,7 @@ package Bezel.Lattice
                     coremods.deleteFile();
                 }
 
-                callTool("disassemble", new <String>[bezel.gameSwf.nativePath, cleanAsm.nativePath]);
+                callTool("disassemble", new <String>[Bezel.Bezel.gameSwf.nativePath, cleanAsm.nativePath]);
                 ret = true;
             }
 
@@ -250,7 +249,7 @@ package Bezel.Lattice
 
                 checkConflicts();
                 doPatch();
-                callTool("reassemble", new <String>[bezel.gameSwf.nativePath, asm.nativePath, bezel.moddedSwf.nativePath]);
+                callTool("reassemble", new <String>[Bezel.Bezel.gameSwf.nativePath, asm.nativePath, Bezel.Bezel.moddedSwf.nativePath]);
             }
             else
             {

@@ -22,6 +22,8 @@ GameScripts/*
 GameScripts/scripts/*
 !GameScripts/scripts/.gitkeep
 
+Bezel-base.linkreport.xml
+
 libs/
 
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`

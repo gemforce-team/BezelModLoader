@@ -4,7 +4,7 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="obj\BezelModLoader.swf" />
+    <movie path="obj\GCFWMainLoader.swf" />
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />
@@ -39,8 +39,8 @@
     <option useResourceBundleMetadata="True" />
     <option warnings="True" />
     <option verboseStackTraces="True" />
-    <option linkReport="Bezel-base.linkreport.xml" />
-    <option loadExterns="" />
+    <option linkReport="" />
+    <option loadExterns="Bezel-base.linkreport.xml" />
     <option staticLinkRSL="True" />
     <option additional="" />
     <option compilerConstants="" />
@@ -74,7 +74,7 @@
   </library>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
-    <compile path="src\Bezel\Bezel.as" />
+    <compile path="src\Bezel\GCFW\GCFWBezel.as" />
   </compileTargets>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
@@ -83,7 +83,7 @@
   <!-- Executed before build -->
   <preBuildCommand />
   <!-- Executed after build -->
-  <postBuildCommand alwaysRun="False">"$(BaseDir)\Tools\swcbuild\swcbuild.exe" "BezelLibrary.as3proj" "-compiler=$(CompilerPath)" "-library=$(BaseDir)\Library"</postBuildCommand>
+  <postBuildCommand alwaysRun="False" />
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />
