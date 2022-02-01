@@ -44,11 +44,13 @@ package Bezel.GCCS
 	import com.giab.games.gccs.steam.constants.WizLockType;
 
 	import flash.display.MovieClip;
+	import flash.desktop.NativeApplication;
+	import flash.events.Event;
 
 	use namespace bezel_internal;
 	
 	/*
-	 * ...
+	 * The MainLoader for GemCraft: Chasing Shadows.
 	 * @author piepie62
 	 */
 	public class GCCSBezel extends MovieClip implements MainLoader
@@ -124,7 +126,7 @@ package Bezel.GCCS
 			}
 			
 			bezel.keybindManager.registerHotkey("GCCS Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
-			bezel.keybindManager.registerHotkey("GCFW Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
+			bezel.keybindManager.registerHotkey("GCCS Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
 		}
 		
 		private static function createDefaultKeyConfiguration():Object
@@ -199,6 +201,11 @@ package Bezel.GCCS
 		public function cleanupForFullReload():void
 		{
 			GCCSEventHandlers.unregister();
+			NativeApplication.nativeApplication.removeEventListener(Event.EXITING, GV.main.ehExit);
+			if (GV.main.isSteamworksInitiated)
+			{
+				GV.main.steamworks.dispose();
+			}
 		}
 	}
 
