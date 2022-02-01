@@ -119,17 +119,22 @@ package Bezel.GCFW
 
 			GCFWEventHandlers.register();
 
-			for (var hotkey:String in defaultHotkeys)
-			{
-				bezel.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
-			}
-			
-			bezel.keybindManager.registerHotkey("GCFW Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
-			bezel.keybindManager.registerHotkey("GCFW Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
+			registerHotkeys();
 			
 			var version:String = GV.main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text;
 			version = version.slice(0, version.search(' ') + 1) + Bezel.Bezel.prettyVersion();
 			GV.main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text = version;
+		}
+
+		internal static function registerHotkeys():void
+		{
+			for (var hotkey:String in defaultHotkeys)
+			{
+				Bezel.Bezel.instance.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
+			}
+			
+			Bezel.Bezel.instance.keybindManager.registerHotkey("GCFW Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
+			Bezel.Bezel.instance.keybindManager.registerHotkey("GCFW Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
 		}
 		
 		private static function createDefaultKeyConfiguration():Object

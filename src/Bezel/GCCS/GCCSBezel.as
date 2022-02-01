@@ -116,14 +116,19 @@ package Bezel.GCCS
 			this.logger.log("GCCS Bezel", "GCCS Bezel bound to game's objects!");
 
 			GCCSEventHandlers.register();
-			
+
+			registerHotkeys();
+		}
+
+		internal static function registerHotkeys():void
+		{
 			for (var hotkey:String in defaultHotkeys)
 			{
-				bezel.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
+				Bezel.Bezel.instance.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
 			}
 			
-			bezel.keybindManager.registerHotkey("GCCS Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
-			bezel.keybindManager.registerHotkey("GCCS Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
+			Bezel.Bezel.instance.keybindManager.registerHotkey("GCCS Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
+			Bezel.Bezel.instance.keybindManager.registerHotkey("GCCS Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
 		}
 		
 		private static function createDefaultKeyConfiguration():Object

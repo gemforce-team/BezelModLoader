@@ -102,6 +102,7 @@ package Bezel.GCFW
 				SB.playSound("sndalert");
 				GV.vfxEngine.createFloatingText4(GV.main.mouseX,GV.main.mouseY < 60?Number(GV.main.mouseY + 30):Number(GV.main.mouseY - 20),"Reloading mods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
 				Bezel.Bezel.instance.reloadAllMods();
+				GCFWBezel.registerHotkeys();
 			}
 			else if (Bezel.Bezel.instance.keybindManager.getHotkeyValue("GCFW Bezel: Hard reload").matches(e))
 			{
