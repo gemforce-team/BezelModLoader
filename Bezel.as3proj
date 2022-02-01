@@ -81,9 +81,9 @@
     <hidden path="obj" />
   </hiddenPaths>
   <!-- Executed before build -->
-  <preBuildCommand>"$(FDBuild)" "BothMainLoaders.as3proj" -compiler "$(CompilerPath)" -notrace -library "$(ToolsDir)/../Library" -target ""</preBuildCommand>
+  <preBuildCommand>"$(BaseDir)\Tools\swcbuild\swcbuild.exe" "BezelLibrary.as3proj" "-compiler=$(CompilerPath)" "-library=$(BaseDir)\Library"</preBuildCommand>
   <!-- Executed after build -->
-  <postBuildCommand alwaysRun="False">"$(BaseDir)\Tools\swcbuild\swcbuild.exe" "BezelLibrary.as3proj" "-compiler=$(CompilerPath)" "-library=$(BaseDir)\Library"</postBuildCommand>
+  <postBuildCommand alwaysRun="False">"$(FDBuild)" "BothMainLoaders.as3proj" -compiler "$(CompilerPath)" -notrace -library "$(ToolsDir)/../Library" -target ""</postBuildCommand>
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />
