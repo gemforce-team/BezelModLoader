@@ -223,23 +223,23 @@ package Bezel.GCCS
             [
                 // renderInfoPanelGem
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     getlocal            6 \n \
                     getlocal            1 \n \
                     getlex              QName(PackageNamespace("com.giab.common.utils"), "NumberFormatter") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "ingameGemInfoPanelFormed"), 3 \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "ingameGemInfoPanelFormed"), 3 \n \
                 '
             ],
             [
                 // clickOnScene
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     getlocal1 \n \
                     getlocal            2 \n \
                     getlocal            3 \n \
                     getlocal            4 \n \
                     getlocal            5 \n \
-                    callproperty        QName(PackageInternalNs("Bezel:bezel_internal"), "ingameClickOnScene"), 5 \n \
+                    callproperty        QName(PackageInternalNs("Bezel.GCCS"), "ingameClickOnScene"), 5 \n \
                     not \n \
                     iffalse             L86 \n \
                         returnvoid \n \
@@ -248,13 +248,13 @@ package Bezel.GCCS
                 ',
                 // rightClickOnScene
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     getlocal1 \n \
                     getlocal            2 \n \
                     getlocal            3 \n \
                     getlocal            4 \n \
                     getlocal            5 \n \
-                    callproperty        QName(PackageInternalNs("Bezel:bezel_internal"), "ingameRightClickOnScene"), 5 \n \
+                    callproperty        QName(PackageInternalNs("Bezel.GCCS"), "ingameRightClickOnScene"), 5 \n \
                     not \n \
                     iffalse             L28 \n \
                         returnvoid \n \
@@ -263,9 +263,9 @@ package Bezel.GCCS
                 ',
                 // ehKeyDown
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                     getlocal1 \n \
-                    callproperty        QName(PackageInternalNs("Bezel:bezel_internal"), "ingameKeyDown"), 1 \n \
+                    callproperty        QName(PackageInternalNs("Bezel.GCCS"), "ingameKeyDown"), 1 \n \
                     not \n \
                     iffalse             L55 \n \
                         returnvoid \n \
@@ -276,8 +276,8 @@ package Bezel.GCCS
             [
                 // renderInfoPanel
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callproperty        QName(PackageInternalNs("Bezel:bezel_internal"), "ingamePreRenderInfoPanel"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callproperty        QName(PackageInternalNs("Bezel.GCCS"), "ingamePreRenderInfoPanel"), 0 \n \
                     pushtrue \n \
                     ifeq                L160 \n \
                         returnvoid \n \
@@ -288,162 +288,162 @@ package Bezel.GCCS
             [
                 // saveSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "saveSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "saveSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 ',
                 // loadSave
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "loadSave"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
                 '
             ],
             [
                 // newScene
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "ingameNewScene"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "ingameNewScene"), 0 \n \
                 '
             ],
 			[
 				// Add Bezel version string
 				'\n \
-					getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSEventHandlers") \n \
+					getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
 					getlocal1 \n \
-					callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "setVersion"), 1 \n \
+					callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "setVersion"), 1 \n \
 				'
 			],
             [
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSSettingsHandler") \n \
-                    callpropvoid        QName(PackageInternalNs("Bezel:bezel_internal"), "toggleCustomSettingsFromGame"), 0 \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSSettingsHandler") \n \
+                    callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "toggleCustomSettingsFromGame"), 0 \n \
                 ',
                 ' \n \
-                    getlex              QName(PackageNamespace("Bezel.GCCS"), "GCCSSettingsHandler") \n \
+                    getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSSettingsHandler") \n \
                     getlocal1 \n \
                     getlocal2 \n \
-                    callproperty        QName(PackageInternalNs("Bezel:bezel_internal"), "renderInfoPanel"), 2 \n \
+                    callproperty        QName(PackageInternalNs("Bezel.GCCS"), "renderInfoPanel"), 2 \n \
                 ',
                 ' \n \
                     dup \n \
                     iffalse AfterKeybindChoiceCheck \n \
                     pop \n \
-                    getlex QName(PackageNamespace("Bezel.GCCS"), "GCCSSettingsHandler") \n \
-                    getproperty QName(PackageInternalNs("Bezel:bezel_internal"), "IS_CHOOSING_KEYBIND") \n \
+                    getlex QName(PackageInternalNs("Bezel.GCCS"), "GCCSSettingsHandler") \n \
+                    getproperty QName(PackageInternalNs("Bezel.GCCS"), "IS_CHOOSING_KEYBIND") \n \
                     not \n \
     AfterKeybindChoiceCheck: \n \
                 ',

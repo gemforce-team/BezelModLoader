@@ -4,7 +4,6 @@ package Bezel.GCCS
 	import Bezel.Logger;
 	import Bezel.MainLoader;
 	import Bezel.Utils.Keybind;
-	import Bezel.bezel_internal;
 	
 	import com.giab.games.gccs.steam.GV;
 	import com.giab.games.gccs.steam.Mods;
@@ -46,8 +45,6 @@ package Bezel.GCCS
 	import flash.display.MovieClip;
 	import flash.desktop.NativeApplication;
 	import flash.events.Event;
-
-	use namespace bezel_internal;
 	
 	/*
 	 * The MainLoader for GemCraft: Chasing Shadows.

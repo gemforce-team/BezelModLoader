@@ -1,4 +1,4 @@
-package Bezel.Events.Persistence 
+package Bezel.GCFW.Events.Persistence 
 {
 	import flash.events.MouseEvent;
 	/**

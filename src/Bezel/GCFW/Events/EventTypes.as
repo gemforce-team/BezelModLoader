@@ -1,4 +1,4 @@
-package Bezel.Events
+package Bezel.GCFW.Events
 {
 	import flash.errors.IllegalOperationError;
 	/**

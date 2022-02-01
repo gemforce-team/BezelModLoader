@@ -15,7 +15,7 @@ package Bezel
 	import flash.system.LoaderContext;
 	import flash.utils.ByteArray;
 	 
-	internal class SWFFile 
+	public class SWFFile
 	{
 		private static var mainLoaderDomain:ApplicationDomain = new ApplicationDomain(ApplicationDomain.currentDomain);
 		private var loader:Loader;
@@ -37,11 +37,10 @@ package Bezel
 			this.file = file;
 		}
 		
-		public function load(successCallback:Function, failureCallback:Function, intoMainLoaderDomain: Boolean = false): void
+		public function load(successCallback:Function, failureCallback:Function, intoMainLoaderDomain:Boolean = false): void
 		{
 			if (!file.exists)
 				throw new Error("SWF " + file.nativePath + " does not exist");
-
 
 			this.loader = new Loader();
 

@@ -1,11 +1,11 @@
-package Bezel.Events 
+package Bezel.GCCS.Events 
 {
 	/**
 	 * ...
 	 * @author Hellrage
 	 */
 	
-	import Bezel.Events.Persistence.IngameKeyDownEventArgs;
+	import Bezel.GCCS.Events.Persistence.IngameKeyDownEventArgs;
 	import flash.events.Event;
 
 	public class IngameKeyDownEvent extends Event

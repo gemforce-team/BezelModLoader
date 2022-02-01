@@ -1,17 +1,12 @@
 package Bezel.GCFW 
 {
-	/**
-	 * ...
-	 * @author piepie62
-	 */
-	
 	import Bezel.Bezel;
 	import Bezel.Logger;
 	import Bezel.MainLoader;
 	import Bezel.Utils.Keybind;
-	import Bezel.bezel_internal;
 	
 	import com.giab.games.gcfw.GV;
+	import com.giab.games.gcfw.Main;
 	import com.giab.games.gcfw.Mods;
 	import com.giab.games.gcfw.Prefs;
 	import com.giab.games.gcfw.SB;
@@ -52,10 +47,11 @@ package Bezel.GCFW
 	import flash.desktop.NativeApplication;
 	import flash.events.Event;
 	import flash.events.UncaughtErrorEvent;
-	import com.giab.games.gcfw.Main;
 	
-	use namespace bezel_internal;
-
+	/**
+	 * The MainLoader for GemCraft: Frostborn Wrath.
+	 * @author piepie62
+	 */
 	public class GCFWBezel extends MovieClip implements MainLoader
 	{
 		private var logger:Logger;

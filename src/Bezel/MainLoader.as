@@ -87,6 +87,7 @@ package Bezel
 		function deregisterOption(mod:String, name:String):void;
 		/**
 		 * Cleans up anything necessary for a full reload. This may need to include changing game state, as the game is unloaded too!
+		 * Note that this should only ever be called if Bezel.Bezel.reloadAllMods is called; any mod that calls this is asking for things to break.
 		 */
 		function cleanupForFullReload():void;
 	}

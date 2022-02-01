@@ -12,15 +12,13 @@ package Bezel.Utils
     import flash.filesystem.FileMode;
     import flash.events.Event;
 
-    use namespace bezel_internal;
-
     /**
      * Manages settings for Bezel mods. Currently only works for numerical and boolean settings
      * @author Chris
      */
     public class SettingManager
     {
-        public static const SETTINGS_FOLDER:File = Bezel.Bezel.bezelFolder.resolvePath("Mod Settings");
+        public static const SETTINGS_FOLDER:File = Bezel.Bezel.BEZEL_FOLDER.resolvePath("Mod Settings");
      
         private static var _managers:Dictionary;
 
@@ -29,7 +27,7 @@ package Bezel.Utils
             if (_managers == null)
             {
                 _managers = new Dictionary();
-                Bezel.Bezel.instance.addEventListener(Event.UNLOAD, unregisterAllManagers);
+                Bezel.Bezel.instance.addEventListener(Event.UNLOAD, bezel_internal::unregisterAllManagers);
             }
             return _managers;
         }
@@ -40,7 +38,7 @@ package Bezel.Utils
 		
 		private static var logger: Logger = Bezel.Bezel.instance.getLogger("SettingManager");
 		
-        private function get file():File
+        private function get SETTINGS_FILE():File
         {
             return SETTINGS_FOLDER.resolvePath(id + ".json");
         }
@@ -49,10 +47,10 @@ package Bezel.Utils
         {
             if (_settings == null)
             {
-                if (file.exists)
+                if (SETTINGS_FILE.exists)
                 {
                     var stream:FileStream = new FileStream();
-                    stream.open(this.file, FileMode.READ);
+                    stream.open(this.SETTINGS_FILE, FileMode.READ);
                     var data:String = stream.readUTFBytes(stream.bytesAvailable);
                     stream.close();
                     _settings = JSON.parse(data);
@@ -107,13 +105,13 @@ package Bezel.Utils
 			}
 		}
 		
-		bezel_internal function saveSettings():void
+		private function saveSettings():void
 		{
 			if (this._settings != null)
 			{
 				logger.log("saveSettings", "Saving settings for " + this.id);
 				var stream:FileStream = new FileStream();
-				stream.open(this.file, FileMode.WRITE);
+				stream.open(this.SETTINGS_FILE, FileMode.WRITE);
 				var data:String = JSON.stringify(this._settings, null, 2);
 				var lines:Array = data.split('\n').slice(1, -1);
 				for (var i:int = 0; i < lines.length - 1; i++)
@@ -129,7 +127,7 @@ package Bezel.Utils
 		
 		/**
 		 * Get an instance of a setting manager that writes to the standardized Bezel settings
-		 * @param	identifier Name to use in the log file
+		 * @param	identifier Name to use in the log SETTINGS_FILE
 		 * @return SettingManager for the given identifier
 		 */
 		public static function getManager(identifier:String): SettingManager
@@ -335,7 +333,7 @@ package Bezel.Utils
         /**
          * Deregisters a setting.
          * @param name Setting to deregister. Null for all
-         * @param del Whether to remove the setting from the save file or not
+         * @param del Whether to remove the setting from the save SETTINGS_FILE or not
          */
         public function deregisterSetting(name:String, del:Boolean):void
         {

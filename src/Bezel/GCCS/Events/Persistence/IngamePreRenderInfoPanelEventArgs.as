@@ -1,4 +1,4 @@
-package Bezel.Events.Persistence 
+package Bezel.GCCS.Events.Persistence 
 {
 	/**
 	 * ...

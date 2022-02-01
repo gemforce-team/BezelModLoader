@@ -16,40 +16,21 @@ package Bezel
 	
 	public class Logger
 	{
-		private static const logFile:File = Bezel.Bezel.bezelFolder.resolvePath("Bezel_log.log");
-		private static var _logStream:FileStream;
-		private static var _loggers:Dictionary;
+		private static const LOG_FILE:File = Bezel.Bezel.BEZEL_FOLDER.resolvePath("Bezel_log.log");
+		private static const _logStream:FileStream = new FileStream();
+		private static const loggers:Dictionary = new Dictionary();
 		
 		private static function get logStream(): FileStream
 		{
-			if (_logStream == null)
-			{
-				_logStream = new FileStream();
-				_logStream.open(logFile, FileMode.WRITE);
-				NativeApplication.nativeApplication.addEventListener(Event.EXITING, onExit);
-			}
-			_logStream.open(logFile, FileMode.APPEND);
+			_logStream.open(LOG_FILE, FileMode.APPEND);
 			return _logStream;
-		}
-		
-		private static function get loggers(): Dictionary
-		{
-			if (_loggers == null)
-			{
-				_loggers = new Dictionary();
-			}
-			return _loggers;
 		}
 		
 		private var id:String;
 		
 		private static function onExit(e:Event): void
 		{
-			if (_logStream != null)
-			{
-				_logStream.close();
-				_logStream = null;
-			}
+			_logStream.close();
 		}
 
 		private static function writeLog(id:String, source:String, message:String): void
@@ -68,7 +49,7 @@ package Bezel
 		{
 			if (identifier == null || identifier == "")
 				throw new ArgumentError("Logger identifier can't be null or empty");
-			if (loggers[identifier] || _blocker == null)
+			if (identifier in loggers || _blocker == null)
 				throw new IllegalOperationError("Constructor should only be called by getLogger! Get your logger instance that way");
 			this.id = identifier;
 		}

@@ -5,14 +5,13 @@ package Bezel.Utils
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
-	import Bezel.bezel_internal;
 	/**
 	 * Manages hotkeys for Bezel mods
 	 * @author Chris
 	 */
 	public class KeybindManager 
 	{
-		protected static const hotkeysFile:File = Bezel.Bezel.bezelFolder.resolvePath("hotkeys.json");
+		private static const HOTKEYS_FILE:File = Bezel.Bezel.BEZEL_FOLDER.resolvePath("hotkeys.json");
 		
 		private var _configuredHotkeys:Object;
 		
@@ -21,11 +20,11 @@ package Bezel.Utils
 			if (_configuredHotkeys == null)
 			{
 				var hotkeysStream:FileStream = new FileStream();
-				if (hotkeysFile.exists)
+				if (HOTKEYS_FILE.exists)
 				{
 					try
 					{
-						hotkeysStream.open(hotkeysFile, FileMode.READ);
+						hotkeysStream.open(HOTKEYS_FILE, FileMode.READ);
 						_configuredHotkeys = JSON.parse(hotkeysStream.readUTFBytes(hotkeysStream.bytesAvailable), reviver);
 					}
 					catch (e:Error)
@@ -94,7 +93,7 @@ package Bezel.Utils
 			var stream:FileStream = new FileStream();
 			try
 			{
-				stream.open(hotkeysFile, FileMode.WRITE);
+				stream.open(HOTKEYS_FILE, FileMode.WRITE);
 				var data:String = JSON.stringify(this.configuredHotkeys, null, 2);
 				var lines:Array = data.split('\n').slice(1, -1);
 				for (var i:int = 0; i < lines.length - 1; i++)

@@ -1,7 +1,6 @@
 package Bezel.GCCS
 {
 	import Bezel.Utils.Keybind;
-	import Bezel.bezel_internal;
 	
 	import com.giab.common.utils.MathToolbox;
 	import com.giab.games.gccs.steam.GV;
@@ -21,43 +20,43 @@ package Bezel.GCCS
      * ...
      * @author Chris
      */
-    public class GCCSSettingsHandler
+    internal class GCCSSettingsHandler
     {
         private static const newSettings:Vector.<GCCSSetting> = new Vector.<GCCSSetting>();
 
         private static var newMCs:Vector.<MovieClip> = new Vector.<MovieClip>();
         private static var currentlyShowing:Boolean = false;
 
-        bezel_internal static var IS_CHOOSING_KEYBIND:Boolean = false;
+        internal static var IS_CHOOSING_KEYBIND:Boolean = false;
 
         private static var KeyboardConstants:XMLList = describeType(Keyboard).constant.(@type == "uint").@name;
 
-        bezel_internal static function registerBooleanForDisplay(mod:String, name:String, onSet:Function, currentValue:Function, description:String):void
+        internal static function registerBooleanForDisplay(mod:String, name:String, onSet:Function, currentValue:Function, description:String):void
 		{
             newSettings[newSettings.length] = GCCSSetting.makeBool(mod, name, onSet, currentValue, description);
 		}
 
-		bezel_internal static function registerFloatRangeForDisplay(mod:String, name:String, min:Number, max:Number, step:Number, onSet:Function, currentValue:Function, description:String):void
+		internal static function registerFloatRangeForDisplay(mod:String, name:String, min:Number, max:Number, step:Number, onSet:Function, currentValue:Function, description:String):void
 		{
 			newSettings[newSettings.length] = GCCSSetting.makeRange(mod, name, min, max, step, onSet, currentValue, description);
 		}
 
-        bezel_internal static function registerKeybindForDisplay(name:String, onSet:Function, currentValue:Function, description:String):void
+        internal static function registerKeybindForDisplay(name:String, onSet:Function, currentValue:Function, description:String):void
         {
             newSettings[newSettings.length] = GCCSSetting.makeKeybind(name, onSet, currentValue, description);
         }
 
-        bezel_internal static function registerNumberForDisplay(mod:String, name:String, min:Number, max:Number, onSet:Function, currentValue:Function, description:String = null):void
+        internal static function registerNumberForDisplay(mod:String, name:String, min:Number, max:Number, onSet:Function, currentValue:Function, description:String = null):void
         {
             newSettings[newSettings.length] = GCCSSetting.makeNumber(mod, name, min, max, onSet, currentValue, description);
         }
 
-        bezel_internal static function registerStringForDisplay(mod:String, name:String, validator:Function, onSet:Function, currentValue:Function, description:String = null):void
+        internal static function registerStringForDisplay(mod:String, name:String, validator:Function, onSet:Function, currentValue:Function, description:String = null):void
         {
             newSettings[newSettings.length] = GCCSSetting.makeString(mod, name, validator, onSet, currentValue, description);
         }
 
-		bezel_internal static function deregisterOption(mod:String, name:String):void
+		internal static function deregisterOption(mod:String, name:String):void
 		{
             for (var i:int = newSettings.length; i > 0; i--)
             {
@@ -68,7 +67,7 @@ package Bezel.GCCS
             }
 		}
 
-        bezel_internal static function toggleCustomSettingsFromGame():void
+        internal static function toggleCustomSettingsFromGame():void
         {
             if (!currentlyShowing)
             {
@@ -194,7 +193,7 @@ package Bezel.GCCS
                                 e.preventDefault();
                                 s.button.plate.gotoAndStop(1);
 
-                                bezel_internal::IS_CHOOSING_KEYBIND = false;
+                                IS_CHOOSING_KEYBIND = false;
 
                                 if (e.keyCode == Keyboard.ESCAPE)
                                 {
@@ -233,7 +232,7 @@ package Bezel.GCCS
                                 s.button.tf.text = "???";
                                 s.button.plate.gotoAndStop(4);
 
-                                bezel_internal::IS_CHOOSING_KEYBIND = true;
+                                IS_CHOOSING_KEYBIND = true;
                             };
                         }(setting);
                         keybindButton.addEventListener(MouseEvent.CLICK, onKeybindClick, true);
@@ -485,7 +484,7 @@ package Bezel.GCCS
             currentlyShowing = !currentlyShowing;
         }
 
-        bezel_internal static function renderInfoPanel(vP:Object, vIp:Object):Boolean
+        internal static function renderInfoPanel(vP:Object, vIp:Object):Boolean
         {
             var optPanel:McOptPanel = vP as McOptPanel;
             var infoPanel:McInfoPanel = vIp as McInfoPanel;

@@ -6,7 +6,6 @@ package Bezel.Lattice
 	 */
 
     import Bezel.Bezel;
-	import Bezel.bezel_internal;
     import Bezel.Logger;
 
     import flash.desktop.NativeProcess;
@@ -19,8 +18,7 @@ package Bezel.Lattice
     import flash.filesystem.FileStream;
     import flash.utils.ByteArray;
     import flash.utils.Dictionary;
-	
-	use namespace bezel_internal;
+    import flash.events.ProgressEvent;
 
     public class Lattice extends EventDispatcher
     {
@@ -56,18 +54,30 @@ package Bezel.Lattice
         private var processInfo:NativeProcessStartupInfo;
         private var processError:String;
 
-        internal static const logger:Logger = Logger.getLogger("Lattice");
-		internal var bezel:Bezel;
+        private static const logger:Logger = Logger.getLogger("Lattice");
 
         private var doneDisassembling:Boolean = false;
 
-        public static const asm:File = Bezel.Bezel.latticeFolder.resolvePath("game.basasm");
-        public static const cleanAsm:File = Bezel.Bezel.latticeFolder.resolvePath("game-clean.basasm");
-        public static const coremods:File = Bezel.Bezel.latticeFolder.resolvePath("coremods.lttc");
+        private var origSwf:File;
+        private var newSwf:File;
+        private var asm:File;
+        private var cleanAsm:File;
+        private var coremods:File;
 
-        public function Lattice(bezel:Bezel)
+        public function Lattice(origSwf:File, newSwf:File, asm:File, cleanAsm:File, coremods:File)
         {
-			this.bezel = bezel;
+            if (origSwf == null || newSwf == null || asm == null || cleanAsm == null || coremods == null)
+            {
+                throw new ArgumentError("All arguments to Lattice::Lattice must be non-null.");
+            }
+            else
+            {
+                this.origSwf = origSwf;
+                this.newSwf = newSwf;
+                this.asm = asm;
+                this.cleanAsm = cleanAsm;
+                this.coremods = coremods;
+            }
 
             this.patches = new Vector.<LatticePatch>();
             this.expectedPatches = new Vector.<LatticePatch>();
@@ -79,15 +89,15 @@ package Bezel.Lattice
             this.process = new NativeProcess();
             this.processInfo = new NativeProcessStartupInfo();
             this.currentTool = tool;
-            processInfo.executable = Bezel.Bezel.toolsFolder.resolvePath(tool + ".exe");
+            processInfo.executable = Bezel.Bezel.TOOLS_FOLDER.resolvePath(tool + ".exe");
             if (!processInfo.executable.exists)
             {
-                processInfo.executable = Bezel.Bezel.toolsFolder.resolvePath(tool);
+                processInfo.executable = Bezel.Bezel.TOOLS_FOLDER.resolvePath(tool);
             }
             processInfo.arguments = argument;
             processInfo.workingDirectory = File.applicationStorageDirectory;
             process.addEventListener(NativeProcessExitEvent.EXIT, this.toolFinished);
-            process.addEventListener("standardErrorData", this.onToolError);
+            process.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, this.onToolError);
             process.start(processInfo);
         }
 
@@ -100,7 +110,7 @@ package Bezel.Lattice
 				{
 					coremods.deleteFile();
 				}
-                throw new Error("Lattice patch tool " + currentTool + " failed. Check the log file for details");
+                throw new Error("Lattice (for " + origSwf.nativePath + ") patch tool " + currentTool + " failed. Check the log file for details");
             }
 
             logger.log("toolFinished", currentTool + " has finished");
@@ -121,29 +131,17 @@ package Bezel.Lattice
             this.processError += this.process.standardError.readUTFBytes(process.standardError.bytesAvailable);
         }
 
-		// Disassembles the game into a clean asm. Prepares Lattice patches.
-        // Returns whether coremods should be reloaded, regardless of if they've changed or not
-		// Should not be called by anything other than Bezel.Bezel
-        bezel_internal function init(): Boolean
+		// Disassembles the file passed in into a clean asm if necessary. Prepares Lattice patches.
+        // Returns whether coremods should be reloaded, regardless of if they've changed or not.
+        // Dispatches LatticeEvents.DISASSEMBLY_DONE when finished.
+		// If this is the Lattice given by Bezel, this method SHOULD NOT be called by anything other than Bezel
+        public function init(): Boolean
         {
             var ret:Boolean = false;
 
-            if (!asm.exists || !cleanAsm.exists || !coremods.exists || !Bezel.Bezel.moddedSwf.exists || Bezel.Bezel.moddedSwf.modificationDate.getTime() < Bezel.Bezel.gameSwf.modificationDate.getTime())
+            if (!asm.exists || !cleanAsm.exists || !coremods.exists || !newSwf.exists || newSwf.modificationDate.getTime() < origSwf.modificationDate.getTime())
             {
-                if (asm.exists)
-                {
-                    asm.deleteFile();
-                }
-                if (cleanAsm.exists)
-                {
-                    cleanAsm.deleteFile();
-                }
-                if (coremods.exists)
-                {
-                    coremods.deleteFile();
-                }
-
-                callTool("disassemble", new <String>[Bezel.Bezel.gameSwf.nativePath, cleanAsm.nativePath]);
+                performDisassemble();
                 ret = true;
             }
 
@@ -151,28 +149,55 @@ package Bezel.Lattice
             {
                 logger.log("init", "Loading previous coremod info");
                 var stream:FileStream = new FileStream();
-                stream.open(coremods, FileMode.READ);
-                while (stream.bytesAvailable != 0)
-                {
-                    var filename:String = stream.readUTF();
-                    var offset:uint = stream.readUnsignedInt();
-                    var contents:String = stream.readUTF();
-                    var overwrite:uint = stream.readUnsignedInt();
-                    this.expectedPatches[this.expectedPatches.length] = new LatticePatch(filename, offset, overwrite, contents);
+                try {
+                    stream.open(coremods, FileMode.READ);
+                    while (stream.bytesAvailable != 0)
+                    {
+                        var filename:String = stream.readUTF();
+                        var offset:uint = stream.readUnsignedInt();
+                        var contents:String = stream.readUTF();
+                        var overwrite:uint = stream.readUnsignedInt();
+                        this.expectedPatches[this.expectedPatches.length] = new LatticePatch(filename, offset, overwrite, contents);
+                    }
+                    stream.close();
+                    dispatchEvent(new Event(LatticeEvent.DISASSEMBLY_DONE));
                 }
-                stream.close();
-                dispatchEvent(new Event(LatticeEvent.DISASSEMBLY_DONE));
+                catch (e:Error)
+                {
+                    logger.log("init", "Previous coremod info not openable or corrupt. Removing and starting Lattice disassembly.");
+                    performDisassemble();
+                    ret = true;
+                }
             }
             else
             {
-                logger.log("init", "Previous coremod info not found");
+                logger.log("init", "Previous coremod info not found. Starting Lattice disassembly.");
             }
 
             return ret;
         }
 
-		// Should not be called by anything other than Bezel.Bezel
-        bezel_internal function apply(): void
+        private function performDisassemble():void
+        {
+            if (asm.exists)
+            {
+                asm.deleteFile();
+            }
+            if (cleanAsm.exists)
+            {
+                cleanAsm.deleteFile();
+            }
+            if (coremods.exists)
+            {
+                coremods.deleteFile();
+            }
+
+            callTool("disassemble", new <String>[origSwf.nativePath, cleanAsm.nativePath]);
+        }
+
+        // Actually applies the coremods and runs the reassembler. Dispatches LatticeEvents.REBUILD_DONE when finished.
+		// If this is the Lattice given by Bezel, this method SHOULD NOT be called by anything other than Bezel
+        public function apply(): void
         {
             var comp:Function = function (patch1:LatticePatch, patch2:LatticePatch) : int {
                 if (patch1.filename < patch2.filename)
@@ -205,7 +230,18 @@ package Bezel.Lattice
                         }
                         else
                         {
-                            return 0;
+                            if (patch1.contents < patch2.contents)
+                            {
+                                return -1;
+                            }
+                            else if (patch2.contents < patch1.contents)
+                            {
+                                return 1;
+                            }
+                            else
+                            {
+                                return 0;
+                            }
                         }
                     }
                 }
@@ -249,7 +285,7 @@ package Bezel.Lattice
 
                 checkConflicts();
                 doPatch();
-                callTool("reassemble", new <String>[Bezel.Bezel.gameSwf.nativePath, asm.nativePath, Bezel.Bezel.moddedSwf.nativePath]);
+                callTool("reassemble", new <String>[origSwf.nativePath, asm.nativePath, newSwf.nativePath]);
             }
             else
             {
@@ -280,7 +316,7 @@ package Bezel.Lattice
                 if (patch.filename in replaced && Dictionary(replaced[patch.filename])[patch.offset] != null && Dictionary(replaced[patch.filename])[patch.offset] != patch)
                 {
                     if (patch.overwritten != 0 || (patch.offset != 0 && Dictionary(replaced[patch.filename])[patch.offset - 1] != null)) {
-                        throw new Error("Lattice: Modifications at line " + patch.offset + " conflict");
+                        throw new Error("Lattice (for " + origSwf.nativePath + "): Modifications at line " + patch.offset + " conflict");
                     }
                 }
             }

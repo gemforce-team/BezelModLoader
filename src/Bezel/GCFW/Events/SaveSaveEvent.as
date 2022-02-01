@@ -1,4 +1,4 @@
-package Bezel.Events
+package Bezel.GCFW.Events
 {
     /**
 	 * ...
@@ -6,13 +6,14 @@ package Bezel.Events
 	 */
 	
 	import flash.events.Event;
+	import com.giab.games.gcfw.struct.PlayerProgressData;
 
 	public class SaveSaveEvent extends Event
 	{
 		
-		private var _save:Object;
+		private var _save:PlayerProgressData;
 
-        public function get save():Object
+        public function get save():PlayerProgressData
 		{
 			return _save;
 		}
@@ -22,7 +23,7 @@ package Bezel.Events
 			return new SaveSaveEvent(save, type, bubbles, cancelable);
 		}
 
-		public function SaveSaveEvent(save:Object, type:String, bubbles:Boolean=false, cancelable:Boolean=false) 
+		public function SaveSaveEvent(save:PlayerProgressData, type:String, bubbles:Boolean=false, cancelable:Boolean=false) 
 		{
 			super(type, bubbles, cancelable);
 

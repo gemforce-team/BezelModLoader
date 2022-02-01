@@ -1,10 +1,5 @@
 package Bezel
 {
-	/**
-	 * ...
-	 * @author Hellrage
-	 */
-
 	import Bezel.BezelEvent;
 	import Bezel.Lattice.Lattice;
 	import Bezel.Lattice.LatticeEvent;
@@ -24,47 +19,31 @@ package Bezel
 	import flash.utils.getTimer;
 	import Bezel.Utils.SettingManager;
 	import flash.utils.getQualifiedClassName;
-	import flash.system.System;
 	
 	use namespace bezel_internal;
-
-	// We extend MovieClip so that flash.display.Loader accepts our class
-	// The loader also requires a parameterless constructor (AFAIK), so we also have a .bind method to bind our class to the game
+	use namespace mainloader_only;
+	
+	/**
+	 * Loader class for Bezel Mod Loader
+	 * @author Hellrage
+	 */
 	public class Bezel extends MovieClip
 	{
-		public static const VERSION:String = "1.1.2";
+		public static const VERSION:String = "2.0.0";
 
-		// Game objects, populated by the MainLoader
 		private var _gameObjects:Object;
-		public function get gameObjects():Object
-		{
-			return _gameObjects;
-		}
-		private var lattice:Lattice;
 		private var _mainLoader:MainLoader;
-		/**
-		 * The MainLoader for the game
-		 */
-		public function get mainLoader():MainLoader { return _mainLoader; }
 		private var _keybindManager:KeybindManager;
-		/**
-		 * The KeybindManager used for the game
-		 */
-		public function get keybindManager():KeybindManager { return _keybindManager; }
+		private var _modsReloadedTimestamp:int;
+		private static var _instance:Bezel;
+        private static var _gameSwf:File;
+		private static var _moddedSwf:File;
 
-		private var updateAvailable:Boolean;
-
+		private var lattice:Lattice;
 		private var logger:Logger;
 		private var mods:Object;
 
 		private var waitingMods:uint;
-
-		private var _modsReloadedTimestamp:int;
-		
-		bezel_internal function get modsReloadedTimestamp():int
-		{
-			return _modsReloadedTimestamp;
-		}
 
 		private var initialLoad:Boolean;
 		private var coremods:Array;
@@ -73,16 +52,55 @@ package Bezel
 		private var loadingTextField:TextField;
 		private static const loadingText:String = "Loading Mods...";
 
-		public static const bezelFolder:File = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/");
-		public static const toolsFolder:File = bezelFolder.resolvePath("tools/");
-		public static const latticeFolder:File = bezelFolder.resolvePath("Lattice/");
-		public static const coremodFile:File = bezelFolder.resolvePath("coremods.bzl");
+		public static const BEZEL_FOLDER:File = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/");
+		public static const TOOLS_FOLDER:File = BEZEL_FOLDER.resolvePath("tools/");
+		public static const LATTICE_FOLDER:File = BEZEL_FOLDER.resolvePath("Lattice/");
 
-		public static const modsFolder:File = File.applicationDirectory.resolvePath("Mods/");
+        public static const LATTICE_DEFAULT_ASM:File = LATTICE_FOLDER.resolvePath("game.basasm");
+        public static const LATTICE_DEFAULT_CLEAN_ASM:File = LATTICE_FOLDER.resolvePath("game-clean.basasm");
+        public static const LATTICE_DEFAULT_COREMODS:File = LATTICE_FOLDER.resolvePath("coremods.lttc");
+
+		public static const MODS_FOLDER:File = File.applicationDirectory.resolvePath("Mods/");
+
 		private static const gameConfig:File = File.applicationDirectory.resolvePath("game-file.txt");
-		internal static const mainLoaderFile:File = File.applicationDirectory.resolvePath("Bezel/MainLoader.swf");
-        private static var _gameSwf:File;
-		private static var _moddedSwf:File;
+		private static const BEZEL_COREMODS:File = BEZEL_FOLDER.resolvePath("coremods.bzl");
+		private static const mainLoaderFile:File = File.applicationDirectory.resolvePath("Bezel/MainLoader.swf");
+
+        [Embed(source = "../../assets/rabcdasm/rabcdasm.exe", mimeType = "application/octet-stream")] private static const disassemble_data:Class;
+        [Embed(source = "../../assets/rabcdasm/rabcasm.exe", mimeType = "application/octet-stream")] private static const reassemble_data:Class;
+		[Embed(source = "../../assets/splitter/splitter.exe", mimeType = "application/octet-stream")] private static const splitter_data:Class;
+		[Embed(source = "../../assets/rabcdasm/liblzma.dll", mimeType = "application/octet-stream")] private static const liblzma_data:Class;
+		[Embed(source = "../../assets/rabcdasm/COPYING", mimeType = "application/octet-stream")] private static const LICENSE_data:Class;
+		private static const disassemble:Object = {"name": "disassemble.exe", "data":disassemble_data};
+		private static const reassemble:Object = {"name": "reassemble.exe", "data":reassemble_data};
+		private static const splitter:Object = {"name": "splitter.exe", "data":splitter_data};
+		private static const liblzma:Object = {"name": "liblzma.dll", "data":liblzma_data};
+		private static const LICENSE:Object = {"name": "LICENSE", "data":LICENSE_data};
+		
+		private const gameLoader:SWFFile = new SWFFile(moddedSwf);
+		private const mainLoaderLoader:SWFFile = new SWFFile(mainLoaderFile);
+
+		/**
+		 * The instance of this class.
+		 */
+		public static function get instance():Bezel { return _instance; }
+		/**
+		 * MainLoaders may store references to game objects here. See your MainLoader for documentation on its gameObjects format.
+		 * Will never be null during or after the bind phase.
+		 */
+		public function get gameObjects():Object { return _gameObjects; }
+		/**
+		 * The MainLoader for the game. May be null for a game loaded without a MainLoader!
+		 */
+		public function get mainLoader():MainLoader { return _mainLoader; }
+		/**
+		 * The KeybindManager used for the game
+		 */
+		public function get keybindManager():KeybindManager { return _keybindManager; }
+		/**
+		 * Last time mods were reloaded. Can be used to implement a reload timeout.
+		 */
+		public function get modsReloadedTimestamp():int { return _modsReloadedTimestamp; }
 		
 		bezel_internal static function get gameSwf(): File
 		{
@@ -104,24 +122,6 @@ package Bezel
 			}
 			return _moddedSwf;
 		}
-
-        [Embed(source = "../../assets/rabcdasm/rabcdasm.exe", mimeType = "application/octet-stream")] private static const disassemble_data:Class;
-        [Embed(source = "../../assets/rabcdasm/rabcasm.exe", mimeType = "application/octet-stream")] private static const reassemble_data:Class;
-		[Embed(source = "../../assets/splitter/splitter.exe", mimeType = "application/octet-stream")] private static const splitter_data:Class;
-		[Embed(source = "../../assets/rabcdasm/liblzma.dll", mimeType = "application/octet-stream")] private static const liblzma_data:Class;
-		[Embed(source = "../../assets/rabcdasm/COPYING", mimeType = "application/octet-stream")] private static const LICENSE_data:Class;
-		
-		private static const disassemble:Object = {"name": "disassemble.exe", "data":disassemble_data};
-		private static const reassemble:Object = {"name": "reassemble.exe", "data":reassemble_data};
-		private static const splitter:Object = {"name": "splitter.exe", "data":splitter_data};
-		private static const liblzma:Object = {"name": "liblzma.dll", "data":liblzma_data};
-		private static const LICENSE:Object = {"name": "LICENSE", "data":LICENSE_data};
-
-		private static var _instance:Bezel;
-		public static function get instance():Bezel { return _instance; }
-		
-		private const gameLoader:SWFFile = new SWFFile(moddedSwf);
-		private const mainLoaderLoader:SWFFile = new SWFFile(mainLoaderFile);
 
 		public function Bezel()
 		{
@@ -160,14 +160,14 @@ package Bezel
 				NativeApplication.nativeApplication.exit(-1);
 			}
 
-			if (!toolsFolder.exists)
+			if (!TOOLS_FOLDER.exists)
 			{
-				toolsFolder.createDirectory();
+				TOOLS_FOLDER.createDirectory();
 			}
 			
 			for each (var tool:Object in [disassemble, reassemble, splitter, liblzma, LICENSE])
 			{
-				var file:File = toolsFolder.resolvePath(tool.name);
+				var file:File = TOOLS_FOLDER.resolvePath(tool.name);
 				if (!file.exists)
 				{
 					this.logger.log("Bezel", "Exporting tool " + tool.name);
@@ -179,7 +179,7 @@ package Bezel
 				}
 			}
 
-			this.lattice = new Lattice(this);
+			this.lattice = new Lattice(gameSwf, moddedSwf, LATTICE_DEFAULT_ASM, LATTICE_DEFAULT_CLEAN_ASM, LATTICE_DEFAULT_COREMODS);
 
 			this.lattice.addEventListener(LatticeEvent.DISASSEMBLY_DONE, this.loadMainLoader);
 			this.lattice.addEventListener(LatticeEvent.REBUILD_DONE, this.onGameBuilt);
@@ -192,10 +192,10 @@ package Bezel
 
 			if (!reloadCoremods)
 			{
-				if (coremodFile.exists)
+				if (BEZEL_COREMODS.exists)
 				{
 					var coremodStream:FileStream = new FileStream();
-					coremodStream.open(coremodFile, FileMode.READ);
+					coremodStream.open(BEZEL_COREMODS, FileMode.READ);
 					while (coremodStream.bytesAvailable != 0)
 					{
 						this.prevCoremods[this.prevCoremods.length] = {"name": coremodStream.readUTF(), "version": coremodStream.readUTF()};
@@ -289,16 +289,16 @@ package Bezel
 
 		private function prepareFolders(): void
 		{
-			if(!bezelFolder.isDirectory)
-				bezelFolder.createDirectory();
-			if (!latticeFolder.isDirectory)
-				latticeFolder.createDirectory();
+			if(!BEZEL_FOLDER.isDirectory)
+				BEZEL_FOLDER.createDirectory();
+			if (!LATTICE_FOLDER.isDirectory)
+				LATTICE_FOLDER.createDirectory();
 		}
 
 		// Tries to load every .swf in /Mods/ directory as a mod
 		private function loadMods(): void
 		{
-			var fileList:Array = modsFolder.getDirectoryListing();
+			var fileList:Array = MODS_FOLDER.getDirectoryListing();
 			var modFiles:Vector.<String> = new Vector.<String>();
 			for(var f:int = 0; f < fileList.length; f++)
 			{
@@ -313,7 +313,7 @@ package Bezel
 			waitingMods = modFiles.length;
 			for each (var file:String in modFiles)
 			{
-				var newMod:SWFFile = new SWFFile(modsFolder.resolvePath(file));
+				var newMod:SWFFile = new SWFFile(MODS_FOLDER.resolvePath(file));
 				newMod.load(successfulModLoad, failedModLoad);
 			}
 			
@@ -471,7 +471,7 @@ package Bezel
 		 * Returns the version formatted for display in a game version string. Probably unnecessary for anything except MainLoaders
 		 * @return Formatted version string
 		 */
-		bezel_internal static function prettyVersion(): String
+		public static function prettyVersion(): String
 		{
 			return 'Bezel v' + VERSION;
 		}
@@ -479,7 +479,7 @@ package Bezel
 		/**
 		 * Unloads, then reloads every mod. Almost certainly should only be used by MainLoaders
 		 */
-		bezel_internal function reloadAllMods(): void
+		mainloader_only function reloadAllMods(): void
 		{
 			logger.log("eh_keyboardKeyDown", "Reloading all mods!");
 			this._modsReloadedTimestamp = getTimer();
@@ -530,7 +530,7 @@ package Bezel
 			if (differentCoremods)
 			{
 				var stream:FileStream = new FileStream();
-				stream.open(coremodFile, FileMode.WRITE);
+				stream.open(BEZEL_COREMODS, FileMode.WRITE);
 				for each (var coremod:Object in this.coremods)
 				{
 					stream.writeUTF(coremod.name);
@@ -549,7 +549,11 @@ package Bezel
 			}
 		}
 
-		bezel_internal function triggerFullReload():void
+		/**
+		 * Triggers a full reload of Bezel, the game, and the MainLoader. Will not be called by Bezel itself, and must instead be called by
+		 * a MainLoader (and nearly certainly not a regular mod).
+		 */
+		mainloader_only function triggerFullReload():void
 		{
 			logger.log("Bezel", "Performing FULL RELOAD");
 			fullUnload();
