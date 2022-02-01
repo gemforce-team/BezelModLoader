@@ -24,9 +24,9 @@ extern "C"
         printf("Installation failed. This should be run from your GCFW folder, findable through Steam's \"Browse Local Files\". If you are running this in the correct place, please file a bug report.\n");
         printf("Exit code: %i (please provide this if you're making a bug report!)\n", exitCode);
     }
-    char trash[2];
-    printf("Hit any key to exit");
-    std::cin.read(trash, 1);
+    char trash;
+    printf("Hit enter to exit");
+    std::scanf("%c", &trash);
     exit(exitCode);
 }
 
@@ -56,14 +56,14 @@ int main()
     const std::filesystem::path metadataBkpFile{"META-INF/AIR/application.xml.bkp"};
     const std::filesystem::path gamePathFile{"game-file.txt"};
 
+    if (!std::filesystem::exists(metadataFile))
+    {
+        waitExit("Metadata file does not exist. Are you sure this is the game's install location?", -3);
+    }
+
     if (!std::filesystem::exists(metadataBkpFile))
     {
         std::filesystem::copy_file(metadataFile, metadataBkpFile, std::filesystem::copy_options::overwrite_existing);
-    }
-
-    if (!std::filesystem::exists(metadataFile))
-    {
-        waitExit("Metadata file does not exist.", -3);
     }
 
     FILE *inFile = _wfopen(metadataBkpFile.generic_wstring().c_str(), L"rt");
