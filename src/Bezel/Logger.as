@@ -17,11 +17,17 @@ package Bezel
 	public class Logger
 	{
 		private static const LOG_FILE:File = Bezel.Bezel.BEZEL_FOLDER.resolvePath("Bezel_log.log");
-		private static const _logStream:FileStream = new FileStream();
+		private static var _logStream:FileStream;
 		private static const loggers:Dictionary = new Dictionary();
-		
+
 		private static function get logStream(): FileStream
 		{
+			if (_logStream == null)
+			{
+				_logStream = new FileStream();
+				_logStream.open(LOG_FILE, FileMode.WRITE);
+				NativeApplication.nativeApplication.addEventListener(Event.EXITING, onExit);
+			}
 			_logStream.open(LOG_FILE, FileMode.APPEND);
 			return _logStream;
 		}
