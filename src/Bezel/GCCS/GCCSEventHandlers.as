@@ -107,10 +107,10 @@ package Bezel.GCCS
 				Bezel.Bezel.instance.reloadAllMods();
 				GCCSBezel.registerHotkeys();
 			}
-			else if (Bezel.Bezel.instance.keybindManager.getHotkeyValue("GCCS Bezel: Hard reload").matches(e))
-			{
-				Bezel.Bezel.instance.triggerFullReload();
-			}
+			// else if (Bezel.Bezel.instance.keybindManager.getHotkeyValue("GCCS Bezel: Hard reload").matches(e))
+			// {
+			// 	Bezel.Bezel.instance.triggerFullReload();
+			// }
 		}
 
 		// Called after the game is done loading its data

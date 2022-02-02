@@ -128,7 +128,7 @@ package Bezel.GCCS
 			}
 			
 			Bezel.Bezel.instance.keybindManager.registerHotkey("GCCS Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
-			Bezel.Bezel.instance.keybindManager.registerHotkey("GCCS Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
+			// Bezel.Bezel.instance.keybindManager.registerHotkey("GCCS Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
 		}
 		
 		private static function createDefaultKeyConfiguration():Object
