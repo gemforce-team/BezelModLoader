@@ -56,6 +56,7 @@ package Bezel
 		private var loadingProgressTextField:TextField;
 		private var loadingProgressBar:Sprite;
 
+		private static const DISASSEMBLING_GAME:String = "Disassembling Game...";
 		private static const LOADING_MODS:String = "Loading Mods...";
 		private static const LOADING_COREMODS:String = "Loading Coremods...";
 		private static const APPLYING_COREMODS:String = "Applying Coremods...";
@@ -192,6 +193,7 @@ package Bezel
 			loadingProgressTextField.y = (this.stage.stageHeight + emptyLoadingBar.height - loadingStageTextField.textHeight) / 2;
 
 			loadingProgressTextField.text = "";
+			loadingStageTextField.text = "";
 
 			this.addChild(loadingProgressTextField);
 
@@ -263,6 +265,13 @@ package Bezel
 					coremodStream.close();
 				}
 			}
+			else
+			{
+				this.loadingStageTextField.text = DISASSEMBLING_GAME;
+				updateProgress(0, 1);
+				// Don't really have anything to do, but we need to do *something*
+				FunctionDeferrer.hardDeferFunction(function(...args):void{}, [], null, true);
+			}
 		}
 
 		private function onDisassembleDone(e:Event):void
@@ -281,7 +290,7 @@ package Bezel
 					function(...args):void{
 						_mainLoader = MainLoader(mainLoaderLoader.instance);
 						addChild(DisplayObject(mainLoaderLoader.instance));
-						logger.log("Bezel", "MainLoader loaded from " + mainLoaderFile.getRelativePath(File.applicationDirectory));
+						logger.log("Bezel", "MainLoader loaded from " + File.applicationDirectory.getRelativePath(mainLoaderFile));
 						coremods[coremods.length] = mainLoader.coremodInfo;
 						FunctionDeferrer.deferFunction(that.loadMods, [], that, true);
 					},
