@@ -325,6 +325,7 @@ package Bezel
 				throw new TypeError("This game class (" + className + ") does not match the main loader's supported class name (" + wantedName + ")");
 			}
 			game.instance.bezel = this;
+			removeChildren();
 			game.instance.addChild(this);
 			// Base game's init (main.initFromBezel())
 			game.instance.initFromBezel();
@@ -367,15 +368,11 @@ package Bezel
 				{
 					FunctionDeferrer.deferFunction(bindSingleMod, [i+1], null, true);
 				}
-				else
-				{
-					that.removeChildren();
-				}
 			};
 
 			if (vecMods.length != 0)
 			{
-				bindSingleMod(0);
+				FunctionDeferrer.hardDeferFunction(bindSingleMod, [0], null, true);
 			}
 		}
 
@@ -444,7 +441,7 @@ package Bezel
 			}
 			else
 			{
-				loadSingleMod(0);
+				FunctionDeferrer.hardDeferFunction(loadSingleMod, [0], null, true);
 			}
 		}
 
@@ -678,11 +675,11 @@ package Bezel
 						loadingStageTextField.text = APPLYING_COREMODS;
 						updateProgress(0, lattice.numberOfPatches);
 
-						FunctionDeferrer.deferFunction(lattice.apply, [], lattice, true);
+						FunctionDeferrer.hardDeferFunction(lattice.apply, [], lattice, true);
 					}
 				};
 
-				loadSingleCoremod(0);
+				FunctionDeferrer.hardDeferFunction(loadSingleCoremod, [0], null, true);
 			}
 			else
 			{
