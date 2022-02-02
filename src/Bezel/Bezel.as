@@ -656,19 +656,19 @@ package Bezel
 				var stream:FileStream = new FileStream();
 				stream.open(BEZEL_COREMODS, FileMode.WRITE);
 
-				var loadSingleCoremod:Function = function(i:int):void
+				var loadSingleCoremod:Function = function(idx:int):void
 				{
-					var coremod:Object = coremods[i];
+					var coremod:Object = coremods[idx];
 					stream.writeUTF(coremod.name);
 					stream.writeUTF(coremod.version);
 
 					logger.log("doneModLoad", "Loading coremods for " + coremod.name);
 					coremod.load(lattice);
-					updateProgress(i+1, coremods.length);
+					updateProgress(idx+1, coremods.length);
 
-					if (i+1 < coremods.length)
+					if (idx+1 < coremods.length)
 					{
-						FunctionDeferrer.deferFunction(loadSingleCoremod, [i+1], null, true);
+						FunctionDeferrer.deferFunction(loadSingleCoremod, [idx+1], null, true);
 					}
 					else
 					{
