@@ -399,7 +399,7 @@ package Bezel
 				}
 			}
 
-			progressTotal = modFiles.length;
+			waitingMods = progressTotal = modFiles.length;
 			
 			updateProgress(0, progressTotal);
 			this.loadingStageTextField.text = LOADING_MODS;
@@ -416,14 +416,6 @@ package Bezel
 				else
 				{
 					_modsReloadedTimestamp = getTimer();
-					if (initialLoad)
-					{
-						FunctionDeferrer.deferFunction(doneModLoad, [], that, true);
-					}
-					else
-					{
-						FunctionDeferrer.deferFunction(doneModReload, [], that, true);
-					}
 				}
 			};
 			
