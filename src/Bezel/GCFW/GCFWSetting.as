@@ -121,7 +121,7 @@ package Bezel.GCFW
 
         public static function makeString(mod:String, name:String, validator:Function, onSet:Function, currentVal:Function, description:String):GCFWSetting
         {
-            return new GCFWSetting(TYPE_STRING, mod, name, onSet, currentVal, description, null, null, null, validator);
+            return new GCFWSetting(TYPE_STRING, mod, name, onSet, currentVal, description, NaN, NaN, NaN, validator);
         }
     }
 }

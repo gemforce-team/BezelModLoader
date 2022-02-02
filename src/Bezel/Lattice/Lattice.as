@@ -19,6 +19,7 @@ package Bezel.Lattice
     import flash.utils.ByteArray;
     import flash.utils.Dictionary;
     import flash.events.ProgressEvent;
+    import Bezel.Utils.FunctionDeferrer;
 
     public class Lattice extends EventDispatcher
     {
@@ -63,6 +64,11 @@ package Bezel.Lattice
         private var asm:File;
         private var cleanAsm:File;
         private var coremods:File;
+
+        public function get numberOfPatches():int
+        {
+            return patches.length;
+        }
 
         public function Lattice(origSwf:File, newSwf:File, asm:File, cleanAsm:File, coremods:File)
         {
@@ -284,8 +290,7 @@ package Bezel.Lattice
                 stream.close();
 
                 checkConflicts();
-                doPatch();
-                callTool("reassemble", new <String>[origSwf.nativePath, asm.nativePath, newSwf.nativePath]);
+                doPatchAndReassemble();
             }
             else
             {
@@ -322,29 +327,42 @@ package Bezel.Lattice
             }
         }
 
-        private function doPatch(): void
+        private function doPatchAndReassemble(): void
         {
-            for each (var patch:LatticePatch in patches)
+            var doSinglePatch:Function = function(i:int):void
             {
+                var patch:LatticePatch = patches[i];
                 logger.log("doPatch", "Patching line " + patch.offset + " of " + patch.filename);
 
-                var dataAsStrings:Array = this.asasmFiles[patch.filename].split('\n');
+                var dataAsStrings:Array = asasmFiles[patch.filename].split('\n');
 
                 dataAsStrings.splice(patch.offset, patch.overwritten, patch.contents);
 
                 // dataAsStrings.insertAt(patch.offset, patch.contents);
 
-                this.asasmFiles[patch.filename] = dataAsStrings.join('\n');
-            }
+                asasmFiles[patch.filename] = dataAsStrings.join('\n');
+                dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));
 
-            var stream:FileStream = new FileStream();
-            stream.open(asm, FileMode.WRITE);
-            for (var file:String in this.asasmFiles)
-            {
-                writeNTString(stream, file);
-                writeNTString(stream, this.asasmFiles[file]);
-            }
-            stream.close();
+                if (i+1 < patches.length)
+                {
+                    FunctionDeferrer.deferFunction(doSinglePatch, [i+1], null, true);
+                }
+                else
+                {
+                    var stream:FileStream = new FileStream();
+                    stream.open(asm, FileMode.WRITE);
+                    for (var file:String in asasmFiles)
+                    {
+                        writeNTString(stream, file);
+                        writeNTString(stream, asasmFiles[file]);
+                    }
+                    stream.close();
+
+                    callTool("reassemble", new <String>[origSwf.nativePath, asm.nativePath, newSwf.nativePath]);
+                }
+            };
+
+            doSinglePatch(0);
         }
 		
 		/**

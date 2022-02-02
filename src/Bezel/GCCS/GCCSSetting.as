@@ -121,7 +121,7 @@ package Bezel.GCCS
 
         public static function makeString(mod:String, name:String, validator:Function, onSet:Function, currentVal:Function, description:String):GCCSSetting
         {
-            return new GCCSSetting(TYPE_STRING, mod, name, onSet, currentVal, description, null, null, null, validator);
+            return new GCCSSetting(TYPE_STRING, mod, name, onSet, currentVal, description, NaN, NaN, NaN, validator);
         }
     }
 }

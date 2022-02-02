@@ -1,10 +1,10 @@
 package Bezel
 {
-	import Bezel.BezelEvent;
 	import Bezel.Lattice.Lattice;
 	import Bezel.Lattice.LatticeEvent;
 	import Bezel.Logger;
 	import Bezel.Utils.KeybindManager;
+	import Bezel.Utils.SettingManager;
 
 	import flash.desktop.NativeApplication;
 	import flash.display.*;
@@ -17,8 +17,10 @@ package Bezel
 	import flash.text.TextField;
 	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
-	import Bezel.Utils.SettingManager;
 	import flash.utils.getQualifiedClassName;
+	import flash.text.TextFormat;
+	import flash.text.TextFormatAlign;
+	import Bezel.Utils.FunctionDeferrer;
 	
 	use namespace bezel_internal;
 	use namespace mainloader_only;
@@ -44,13 +46,21 @@ package Bezel
 		private var mods:Object;
 
 		private var waitingMods:uint;
+		private var progressTotal:uint;
 
 		private var initialLoad:Boolean;
 		private var coremods:Array;
 		private var prevCoremods:Array;
 		
-		private var loadingTextField:TextField;
-		private static const loadingText:String = "Loading Mods...";
+		private var loadingStageTextField:TextField;
+		private var loadingProgressTextField:TextField;
+		private var loadingProgressBar:Sprite;
+
+		private static const LOADING_MODS:String = "Loading Mods...";
+		private static const LOADING_COREMODS:String = "Loading Coremods...";
+		private static const APPLYING_COREMODS:String = "Applying Coremods...";
+		private static const LOADING_GAME:String = "Loading Game...";
+		private static const BINDING_MODS:String = "Binding Mods...";
 
 		public static const BEZEL_FOLDER:File = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/");
 		public static const TOOLS_FOLDER:File = BEZEL_FOLDER.resolvePath("tools/");
@@ -127,26 +137,69 @@ package Bezel
 		{
 			_instance = this;
 			prepareFolders();
-
-			// Application flow is controlled using events. There's a page on the wiki that outlines it
-			this.addEventListener(BezelEvent.BEZEL_DONE_MOD_RELOAD, this.doneModReload);
-			this.addEventListener(BezelEvent.BEZEL_DONE_MOD_LOAD, this.doneModLoad);
-
 			this.addEventListener(LatticeEvent.REBUILD_DONE, this.onGameBuilt);
 
-			doLoadFromScratch();
+			FunctionDeferrer.deferFunction(this.startLoadFromScratch, [], this, true);
 		}
 
-		private function doLoadFromScratch():void
+		private function startLoadFromScratch(...args):void
 		{
 			this._keybindManager = new KeybindManager();
 			
-			loadingTextField = new TextField();
-			loadingTextField.selectable = false;
-			loadingTextField.text = loadingText;
-			loadingTextField.textColor = 0xFFFFFF;
-			this.addChild(loadingTextField);
+			loadingStageTextField = new TextField();
+			loadingStageTextField.selectable = false;
+			var textFormat:TextFormat = loadingStageTextField.defaultTextFormat;
+			textFormat.align = TextFormatAlign.CENTER;
+			textFormat.size = 24;
+			loadingStageTextField.defaultTextFormat = textFormat;
+			loadingStageTextField.textColor = 0xFFFFFF;
+			loadingStageTextField.text = LOADING_MODS;
+			loadingStageTextField.width = this.stage.stageWidth;
+			loadingStageTextField.y = this.stage.stageHeight * .40;
+			this.addChild(loadingStageTextField);
 
+			const emptyLoadingBarWidth:int = 4;
+
+			var emptyLoadingBar:Sprite = new Sprite();
+			emptyLoadingBar.graphics.lineStyle(emptyLoadingBarWidth, 0xFF0000, 1.0, true, "normal", "square", "miter");
+			emptyLoadingBar.graphics.lineTo(0, this.stage.stageHeight * .10);
+			emptyLoadingBar.graphics.lineTo(this.stage.stageWidth * .90, this.stage.stageHeight * .10);
+			emptyLoadingBar.graphics.lineTo(this.stage.stageWidth * .90, 0);
+			emptyLoadingBar.graphics.lineTo(0, 0);
+
+			emptyLoadingBar.y = this.stage.stageHeight * .50;
+			emptyLoadingBar.x = (this.stage.stageWidth - emptyLoadingBar.width) / 2;
+
+			this.addChild(emptyLoadingBar);
+
+			loadingProgressBar = new Sprite();
+			loadingProgressBar.graphics.beginFill(0x800000);
+			loadingProgressBar.graphics.drawRect(0, 0, emptyLoadingBar.width - emptyLoadingBarWidth * 2, emptyLoadingBar.height - emptyLoadingBarWidth * 2);
+
+			loadingProgressBar.scaleX = 0;
+			loadingProgressBar.y = emptyLoadingBar.y + emptyLoadingBarWidth / 2;
+			loadingProgressBar.x = emptyLoadingBar.x + emptyLoadingBarWidth / 2;
+
+			this.addChild(loadingProgressBar);
+
+			loadingProgressTextField = new TextField();
+			loadingProgressTextField.selectable = false;
+			loadingProgressTextField.defaultTextFormat = textFormat;
+			loadingProgressTextField.textColor = 0xFFFFFF;
+			loadingProgressTextField.text = LOADING_MODS;
+			loadingProgressTextField.width = this.stage.stageWidth;
+			// I give up, close enough.
+			loadingProgressTextField.y = (this.stage.stageHeight + emptyLoadingBar.height - loadingStageTextField.textHeight) / 2;
+
+			loadingProgressTextField.text = "";
+
+			this.addChild(loadingProgressTextField);
+
+			FunctionDeferrer.deferFunction(loadFromScratch2, [], this, true);
+		}
+
+		private function loadFromScratch2():void
+		{
 			this.initialLoad = true;
 
 			this.logger = Logger.getLogger("Bezel");
@@ -179,10 +232,17 @@ package Bezel
 				}
 			}
 
+			FunctionDeferrer.deferFunction(this.initLattice, [], this, true);
+		}
+
+		private function initLattice():void
+		{
 			this.lattice = new Lattice(gameSwf, moddedSwf, LATTICE_DEFAULT_ASM, LATTICE_DEFAULT_CLEAN_ASM, LATTICE_DEFAULT_COREMODS);
 
-			this.lattice.addEventListener(LatticeEvent.DISASSEMBLY_DONE, this.loadMainLoader);
+			this.lattice.addEventListener(LatticeEvent.DISASSEMBLY_DONE, this.onDisassembleDone);
 			this.lattice.addEventListener(LatticeEvent.REBUILD_DONE, this.onGameBuilt);
+			var patchesApplied:int = 0;
+			this.lattice.addEventListener(LatticeEvent.SINGLE_PATCH_APPLIED, function(...args):void{ updateProgress(++patchesApplied, lattice.numberOfPatches); });
 
 			this.coremods = new Array();
 			this.prevCoremods = new Array();
@@ -205,18 +265,25 @@ package Bezel
 			}
 		}
 
+		private function onDisassembleDone(e:Event):void
+		{
+			FunctionDeferrer.deferFunction(this.loadMainLoader, [], this, true);
+		}
+
 		// After we have the dissassembled game, add the MainLoader (if it exists) and load mods
-		private function loadMainLoader(e:Event): void
+		private function loadMainLoader(): void
 		{
 			if (mainLoaderFile.exists)
 			{
+				var that:Bezel = this;
+
 				this.mainLoaderLoader.load(
 					function(...args):void{
 						_mainLoader = MainLoader(mainLoaderLoader.instance);
 						addChild(DisplayObject(mainLoaderLoader.instance));
 						logger.log("Bezel", "MainLoader loaded from " + mainLoaderFile.getRelativePath(File.applicationDirectory));
 						coremods[coremods.length] = mainLoader.coremodInfo;
-						loadMods();
+						FunctionDeferrer.deferFunction(that.loadMods, [], that, true);
 					},
 					function(...args):void{
 						logger.log("Bezel", "MainLoader could not be loaded");
@@ -227,7 +294,7 @@ package Bezel
 			else
 			{
 				logger.log("Bezel", "No MainLoader present! All mods and coremods will have to handle themselves, and full reloads are not possible!");
-				loadMods();
+				FunctionDeferrer.deferFunction(this.loadMods, [], this, true);
 			}
 		}
 
@@ -236,12 +303,15 @@ package Bezel
 		{
 			// Last argument tells the flash Loader to load the game into the same ApplicationDomain as Bezel is running in.
 			// This gives Bezel direct access to the game's classes (using getDefinitionByName).
+			this.loadingStageTextField.text = LOADING_GAME;
+			this.updateProgress(0, 1);
 			this.gameLoader.load(this.gameLoadSuccess, this.gameLoadFail, true);
 		}
 
 		// Bind the game and Bezel to each other
 		private function gameLoadSuccess(game:SWFFile): void
 		{
+			this.stage.addChild(DisplayObject(game.instance));
 			var className:String = getQualifiedClassName(game.instance);
 			var wantedName:String = this.mainLoader.gameClassFullyQualifiedName;
 			if (wantedName.indexOf("::") == -1)
@@ -255,8 +325,6 @@ package Bezel
 				throw new TypeError("This game class (" + className + ") does not match the main loader's supported class name (" + wantedName + ")");
 			}
 			game.instance.bezel = this;
-			this.removeChild(this.loadingTextField);
-			this.stage.addChild(DisplayObject(game.instance));
 			game.instance.addChild(this);
 			// Base game's init (main.initFromBezel())
 			game.instance.initFromBezel();
@@ -280,10 +348,34 @@ package Bezel
 
 		private function bindMods() : void
 		{
+			var vecMods:Vector.<SWFFile> = new Vector.<SWFFile>();
 			for each (var mod:SWFFile in mods)
 			{
-				mod.instance.bind(this, this.gameObjects);
-				this.logger.log("bindMods", "Bound mod: " + mod.instance.MOD_NAME);
+				vecMods[vecMods.length] = mod;
+			}
+
+			this.loadingStageTextField.text = BINDING_MODS;
+			this.updateProgress(0, vecMods.length);
+
+			var that:Bezel = this;
+			var bindSingleMod:Function = function(i:int):void
+			{
+				vecMods[i].instance.bind(that, gameObjects);
+				logger.log("bindMods", "Bound mod: " + mod.instance.MOD_NAME);
+				updateProgress(i+1, vecMods.length);
+				if (i+1 < vecMods.length)
+				{
+					FunctionDeferrer.deferFunction(bindSingleMod, [i+1], null, true);
+				}
+				else
+				{
+					that.removeChildren();
+				}
+			};
+
+			if (vecMods.length != 0)
+			{
+				bindSingleMod(0);
 			}
 		}
 
@@ -310,26 +402,50 @@ package Bezel
 				}
 			}
 
-			waitingMods = modFiles.length;
-			for each (var file:String in modFiles)
-			{
-				var newMod:SWFFile = new SWFFile(MODS_FOLDER.resolvePath(file));
-				newMod.load(successfulModLoad, failedModLoad);
-			}
+			progressTotal = modFiles.length;
 			
-			if (modFiles.length == 0)
+			updateProgress(0, progressTotal);
+			this.loadingStageTextField.text = LOADING_MODS;
+
+			var that:Bezel = this;
+			var loadSingleMod:Function = function(i:int):void
 			{
-				if (this.initialLoad)
+				var newMod:SWFFile = new SWFFile(MODS_FOLDER.resolvePath(modFiles[i]));
+				newMod.load(successfulModLoad, failedModLoad);
+				if (i+1 < modFiles.length)
 				{
-					this.dispatchEvent(new Event(BezelEvent.BEZEL_DONE_MOD_LOAD));
+					FunctionDeferrer.deferFunction(loadSingleMod, [i+1], null, true);
 				}
 				else
 				{
-					this.dispatchEvent(new Event(BezelEvent.BEZEL_DONE_MOD_RELOAD));
+					_modsReloadedTimestamp = getTimer();
+					if (initialLoad)
+					{
+						FunctionDeferrer.deferFunction(doneModLoad, [], that, true);
+					}
+					else
+					{
+						FunctionDeferrer.deferFunction(doneModReload, [], that, true);
+					}
+				}
+			};
+			
+			if (modFiles.length == 0)
+			{
+				this._modsReloadedTimestamp = getTimer();
+				if (this.initialLoad)
+				{
+					FunctionDeferrer.deferFunction(this.doneModLoad, [], this, true);
+				}
+				else
+				{
+					FunctionDeferrer.deferFunction(this.doneModReload, [], this, true);
 				}
 			}
-			
-			this._modsReloadedTimestamp = getTimer();
+			else
+			{
+				loadSingleMod(0);
+			}
 		}
 
 		// Assuming the file loaded, add the mod to tracked mods. Check compatibility. Check if the mod has a coremod and add the patches if so.
@@ -403,9 +519,17 @@ package Bezel
 		private function reduceWaitingMods():void
 		{
 			waitingMods--;
+			updateProgress(progressTotal - waitingMods, progressTotal);
 			if (waitingMods == 0)
 			{
-				dispatchEvent(new Event(this.initialLoad ? BezelEvent.BEZEL_DONE_MOD_LOAD : BezelEvent.BEZEL_DONE_MOD_RELOAD));
+				if (this.initialLoad)
+				{
+					FunctionDeferrer.deferFunction(this.doneModLoad, [], this, true);
+				}
+				else
+				{
+					FunctionDeferrer.deferFunction(this.doneModReload, [], this, true);
+				}
 			}
 		}
 
@@ -481,6 +605,7 @@ package Bezel
 		 */
 		mainloader_only function reloadAllMods(): void
 		{
+			FunctionDeferrer.clear();
 			logger.log("eh_keyboardKeyDown", "Reloading all mods!");
 			this._modsReloadedTimestamp = getTimer();
 			SettingManager.unregisterAllManagers();
@@ -500,7 +625,7 @@ package Bezel
 			loadMods();
 		}
 
-		private function doneModReload(e:Event): void
+		private function doneModReload(): void
 		{
 			bindMods();
 		}
@@ -509,7 +634,7 @@ package Bezel
 		// If we do, load them into Lattice, apply them, rebuild the modded swf.
 		// Either Bezel sees that the coremods are all the same and skips calling Lattice (raises REBUILD_DONE)
 		// Or They are different and we call Lattice, which then raises REBUILD_DONE
-		private function doneModLoad(e:Event): void
+		private function doneModLoad(): void
 		{
 			var differentCoremods:Boolean = this.coremods.length != this.prevCoremods.length;
 			if (!differentCoremods)
@@ -529,19 +654,35 @@ package Bezel
 
 			if (differentCoremods)
 			{
+				this.loadingStageTextField.text = LOADING_COREMODS;
+				updateProgress(0, coremods.length);
 				var stream:FileStream = new FileStream();
 				stream.open(BEZEL_COREMODS, FileMode.WRITE);
-				for each (var coremod:Object in this.coremods)
+
+				var loadSingleCoremod:Function = function(i:int):void
 				{
+					var coremod:Object = coremods[i];
 					stream.writeUTF(coremod.name);
 					stream.writeUTF(coremod.version);
 
 					logger.log("doneModLoad", "Loading coremods for " + coremod.name);
-					coremod.load(this.lattice);
-				}
-				stream.close();
+					coremod.load(lattice);
+					updateProgress(i+1, coremods.length);
 
-				this.lattice.apply();
+					if (i+1 < coremods.length)
+					{
+						FunctionDeferrer.deferFunction(loadSingleCoremod, [i+1], null, true);
+					}
+					else
+					{
+						loadingStageTextField.text = APPLYING_COREMODS;
+						updateProgress(0, lattice.numberOfPatches);
+
+						FunctionDeferrer.deferFunction(lattice.apply, [], lattice, true);
+					}
+				};
+
+				loadSingleCoremod(0);
 			}
 			else
 			{
@@ -557,11 +698,12 @@ package Bezel
 		{
 			logger.log("Bezel", "Performing FULL RELOAD");
 			fullUnload();
-			doLoadFromScratch();
+			FunctionDeferrer.deferFunction(this.startLoadFromScratch, [], this, true);
 		}
 
 		private function fullUnload():void
 		{
+			FunctionDeferrer.clear();
 			this._modsReloadedTimestamp = getTimer();
 			SettingManager.unregisterAllManagers();
 			if (mainLoader != null)
@@ -583,6 +725,12 @@ package Bezel
 			this.mainLoader.cleanupForFullReload();
 			this.mainLoaderLoader.unload(true);
 			this.gameLoader.unload();
+		}
+
+		private function updateProgress(current:int, total:int):void
+		{
+			this.loadingProgressTextField.text = current + " / " + total;
+			this.loadingProgressBar.scaleX = Number(current)/Number(total);
 		}
 	}
 }
