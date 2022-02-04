@@ -406,7 +406,7 @@ package Bezel
 				//logger.log("loadMods", "Looking at " + fileName);
 				if (fileName.substring(fileName.length - 4, fileName.length) == ".swf")
 				{
-					enabledMods.registerBoolean(fileName, null, true, null);
+					enabledMods.registerBoolean(fileName, null, true, "Requires restart");
 					if (enabledMods.retrieveBoolean(fileName))
 					{
 						modFiles[modFiles.length] = fileName;
