@@ -1,6 +1,7 @@
 package Bezel.GCFW
 {
 	import Bezel.Utils.Keybind;
+	import Bezel.Utils.SettingManager;
 	
 	import com.giab.common.utils.MathToolbox;
 	import com.giab.games.gcfw.GV;
@@ -75,9 +76,9 @@ package Bezel.GCFW
                 var currentPanelX:int = getNewPanelX(0);
                 newSettings.sort(function(left:GCFWSetting, right:GCFWSetting):Number{
                     // Sort keybinds first
-                    if (left.mod == GCFWSetting.MOD_KEYBIND)
+                    if (left.mod == SettingManager.MOD_KEYBIND) // Keybinds always come second to last
                     {
-                        if (right.mod == GCFWSetting.MOD_KEYBIND)
+                        if (right.mod == SettingManager.MOD_KEYBIND)
                         {
                             if (left.name < right.name)
                                 return -1;
@@ -85,12 +86,35 @@ package Bezel.GCFW
                                 return 1;
                             return 0;
                         }
+                        else if (right.mod == SettingManager.MOD_ENABLED) // Enabled mods always comes last
+                        {
+                            return -1;
+                        }
                         else
                         {
                             return 1;
                         }
                     }
-                    else if (right.mod == GCFWSetting.MOD_KEYBIND)
+                    else if (left.mod == SettingManager.MOD_ENABLED)
+                    {
+                        if (right.mod == SettingManager.MOD_ENABLED)
+                        {
+                            if (left.name < right.name)
+                                return -1;
+                            if (left.name > right.name)
+                                return 1;
+                            return 0;
+                        }
+                        else if (right.mod == SettingManager.MOD_KEYBIND)
+                        {
+                            return 1;
+                        }
+                        else
+                        {
+                            return 1;
+                        }
+                    }
+                    else if (right.mod == SettingManager.MOD_KEYBIND || right.mod == SettingManager.MOD_ENABLED) // Both come after everything else
                     {
                         return -1;
                     }

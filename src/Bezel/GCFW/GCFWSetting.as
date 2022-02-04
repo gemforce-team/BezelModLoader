@@ -1,6 +1,7 @@
 package Bezel.GCFW
 {
     import flash.display.MovieClip;
+    import Bezel.Utils.SettingManager;
 
     /**
      * ...
@@ -79,8 +80,6 @@ package Bezel.GCFW
         public static const TYPE_KEYBIND:String = "keybind";
         public static const TYPE_NUMBER:String = "number";
         public static const TYPE_STRING:String = "string";
-
-        public static const MOD_KEYBIND:String = "Keybinds";
         
         public function GCFWSetting(type:String = null, mod:String = null, name:String = null, onSet:Function = null, currentVal:Function = null, description:String = null, min:Number = NaN, max:Number = NaN, step:Number = NaN, validator:Function = null)
         {
@@ -111,7 +110,7 @@ package Bezel.GCFW
 
         public static function makeKeybind(name:String, onSet:Function, currentVal:Function, description:String):GCFWSetting
         {
-            return new GCFWSetting(TYPE_KEYBIND, MOD_KEYBIND, name, onSet, currentVal, description);
+            return new GCFWSetting(TYPE_KEYBIND, SettingManager.MOD_KEYBIND, name, onSet, currentVal, description);
         }
 
         public static function makeNumber(mod:String, name:String, min:Number, max:Number, onSet:Function, currentVal:Function, description:String):GCFWSetting

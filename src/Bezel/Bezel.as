@@ -3,6 +3,7 @@ package Bezel
 	import Bezel.Lattice.Lattice;
 	import Bezel.Lattice.LatticeEvent;
 	import Bezel.Logger;
+	import Bezel.Utils.FunctionDeferrer;
 	import Bezel.Utils.KeybindManager;
 	import Bezel.Utils.SettingManager;
 
@@ -20,7 +21,6 @@ package Bezel
 	import flash.utils.getQualifiedClassName;
 	import flash.text.TextFormat;
 	import flash.text.TextFormatAlign;
-	import Bezel.Utils.FunctionDeferrer;
 	
 	use namespace bezel_internal;
 	use namespace mainloader_only;
@@ -396,6 +396,8 @@ package Bezel
 		// Tries to load every .swf in /Mods/ directory as a mod
 		private function loadMods(): void
 		{
+			var enabledMods:SettingManager = this.getSettingManager("Enabled Mods");
+
 			var fileList:Array = MODS_FOLDER.getDirectoryListing();
 			var modFiles:Vector.<String> = new Vector.<String>();
 			for(var f:int = 0; f < fileList.length; f++)
@@ -404,7 +406,11 @@ package Bezel
 				//logger.log("loadMods", "Looking at " + fileName);
 				if (fileName.substring(fileName.length - 4, fileName.length) == ".swf")
 				{
-					modFiles[modFiles.length] = fileName;
+					enabledMods.registerBoolean(fileName, null, true, null);
+					if (enabledMods.retrieveBoolean(fileName))
+					{
+						modFiles[modFiles.length] = fileName;
+					}
 				}
 			}
 

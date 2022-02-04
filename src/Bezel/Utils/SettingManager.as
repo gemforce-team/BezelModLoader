@@ -13,12 +13,17 @@ package Bezel.Utils
     import flash.events.Event;
 
     /**
-     * Manages settings for Bezel mods. Currently only works for numerical and boolean settings
+     * Manages settings for Bezel mods. Currently only works for numerical, boolean, and string settings.
+     * Automatically registers them for display with a MainLoader, if present
      * @author Chris
      */
     public class SettingManager
     {
         public static const SETTINGS_FOLDER:File = Bezel.Bezel.BEZEL_FOLDER.resolvePath("Mod Settings");
+
+        // Reserved mod names that should not be used for mod settings handlers
+        public static const MOD_KEYBIND:String = "Keybinds";
+        public static const MOD_ENABLED:String = "Enabled Mods";
      
         private static var _managers:Dictionary;
 
