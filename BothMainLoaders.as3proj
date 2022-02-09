@@ -79,9 +79,9 @@
     <hidden path="obj" />
   </hiddenPaths>
   <!-- Executed before build -->
-  <preBuildCommand>"$(FDBuild)" "GCFWMainLoader.as3proj" -compiler "$(CompilerPath)" -notrace -library "$(ToolsDir)/../Library" -target ""</preBuildCommand>
+  <preBuildCommand>cmd.exe /c "if "$(BuildConfig)"=="debug" ("$(FDBuild)" "GCFWMainLoader.as3proj" -compiler "$(CompilerPath)" -library "$(ToolsDir)/../Library" -target "") else ("$(FDBuild)" "GCFWMainLoader.as3proj" -compiler "$(CompilerPath)" -notrace -library "$(ToolsDir)/../Library" -target "")"</preBuildCommand>
   <!-- Executed after build -->
-  <postBuildCommand alwaysRun="False">"$(FDBuild)" "GCCSMainLoader.as3proj" -compiler "$(CompilerPath)" -notrace -library "$(ToolsDir)/../Library" -target ""</postBuildCommand>
+  <postBuildCommand alwaysRun="False">cmd.exe /c "if "$(BuildConfig)"=="debug" ("$(FDBuild)" "GCCSMainLoader.as3proj" -compiler "$(CompilerPath)" -library "$(ToolsDir)/../Library" -target "") else ("$(FDBuild)" "GCCSMainLoader.as3proj" -compiler "$(CompilerPath)" -notrace -library "$(ToolsDir)/../Library" -target "")"</postBuildCommand>
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />
