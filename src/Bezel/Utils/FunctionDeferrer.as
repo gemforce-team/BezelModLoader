@@ -23,7 +23,6 @@ package Bezel.Utils
         private function init():void
         {
             myTimer.addEventListener(TimerEvent.TIMER, this.onTimer);
-            myTimer.start();
         }
 
         private function onTimer(e:TimerEvent):void
@@ -50,6 +49,11 @@ package Bezel.Utils
                 functions[functions.length] = newFunction;
             }
             newFunctions.length = 0;
+
+            if (functions.length == 0)
+            {
+                myTimer.stop();
+            }
         }
 
         /**
@@ -66,6 +70,8 @@ package Bezel.Utils
                 throw new ArgumentError("Neither func nor args may be null when deferring a function");
             }
             instance.functions[instance.functions.length] = new DeferredFunctionToken(func, that, args, forceFrame);
+
+            instance.myTimer.start();
         }
 
         /**
@@ -82,6 +88,7 @@ package Bezel.Utils
                 throw new ArgumentError("Neither func nor args may be null when deferring a function");
             }
             instance.newFunctions[instance.newFunctions.length] = new DeferredFunctionToken(func, that, args, forceFrame);
+            instance.myTimer.start();
         }
 
         /**
@@ -89,6 +96,8 @@ package Bezel.Utils
          */
         bezel_internal static function clear():void
         {
+            instance.myTimer.stop();
+            
             instance.functions.length = 0;
         }
     }
