@@ -1,1 +1,0 @@
-No changes have been made to the source of these binaries. They are provided in a pre-compiled form for ease of building Bezel.

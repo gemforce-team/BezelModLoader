@@ -77,16 +77,8 @@ package Bezel
 		private static const BEZEL_COREMODS:File = BEZEL_FOLDER.resolvePath("coremods.bzl");
 		private static const mainLoaderFile:File = File.applicationDirectory.resolvePath("Bezel/MainLoader.swf");
 
-        [Embed(source = "../../assets/rabcdasm/rabcdasm.exe", mimeType = "application/octet-stream")] private static const disassemble_data:Class;
-        [Embed(source = "../../assets/rabcdasm/rabcasm.exe", mimeType = "application/octet-stream")] private static const reassemble_data:Class;
 		[Embed(source = "../../assets/splitter/splitter.exe", mimeType = "application/octet-stream")] private static const splitter_data:Class;
-		[Embed(source = "../../assets/rabcdasm/liblzma.dll", mimeType = "application/octet-stream")] private static const liblzma_data:Class;
-		[Embed(source = "../../assets/rabcdasm/COPYING", mimeType = "application/octet-stream")] private static const LICENSE_data:Class;
-		private static const disassemble:Object = {"name": "disassemble.exe", "data":disassemble_data};
-		private static const reassemble:Object = {"name": "reassemble.exe", "data":reassemble_data};
 		private static const splitter:Object = {"name": "splitter.exe", "data":splitter_data};
-		private static const liblzma:Object = {"name": "liblzma.dll", "data":liblzma_data};
-		private static const LICENSE:Object = {"name": "LICENSE", "data":LICENSE_data};
 		
 		private const gameLoader:SWFFile = new SWFFile(moddedSwf);
 		private const mainLoaderLoader:SWFFile = new SWFFile(mainLoaderFile);
@@ -129,7 +121,7 @@ package Bezel
 		{
 			if (_moddedSwf == null)
 			{
-				_moddedSwf = File.applicationDirectory.resolvePath(gameSwf.name.split('.').slice(0, -1).join('.') + "-modded.swf");
+				_moddedSwf = LATTICE_FOLDER.resolvePath(gameSwf.name.split('.').slice(0, -1).join('.') + "-modded.swf");
 			}
 			return _moddedSwf;
 		}
@@ -220,7 +212,7 @@ package Bezel
 				TOOLS_FOLDER.createDirectory();
 			}
 			
-			for each (var tool:Object in [disassemble, reassemble, splitter, liblzma, LICENSE])
+			for each (var tool:Object in [splitter])
 			{
 				var file:File = TOOLS_FOLDER.resolvePath(tool.name);
 				if (!file.exists)
@@ -314,7 +306,14 @@ package Bezel
 			// This gives Bezel direct access to the game's classes (using getDefinitionByName).
 			this.loadingStageTextField.text = LOADING_GAME;
 			this.updateProgress(0, 1);
-			this.gameLoader.load(this.gameLoadSuccess, this.gameLoadFail, true);
+			if (lattice.swfBytes != null)
+			{
+				this.gameLoader.loadBytes(lattice.swfBytes, this.gameLoadSuccess, this.gameLoadFail, true);
+			}
+			else
+			{
+				this.gameLoader.load(this.gameLoadSuccess, this.gameLoadFail, true);
+			}
 		}
 
 		// Bind the game and Bezel to each other

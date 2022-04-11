@@ -36,23 +36,16 @@ package Bezel
 				throw new ArgumentError("Tried to create a mod with no mod file!");
 			this.file = file;
 		}
-		
-		public function load(successCallback:Function, failureCallback:Function, intoMainLoaderDomain:Boolean = false): void
-		{
-			if (!file.exists)
-				throw new Error("SWF " + file.nativePath + " does not exist");
 
+		public function loadBytes(bytes:ByteArray, successCallback:Function, failureCallback:Function, intoMainLoaderDomain:Boolean = false):void
+		{
 			this.loader = new Loader();
 
 			this.successfulLoadCallback = successCallback;
 			this.failedLoadCallback = failureCallback;
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loadedSuccessfully);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, failedLoadCallback);
-			var bytes:ByteArray = new ByteArray();
-			var stream:FileStream = new FileStream();
-			stream.open(file, FileMode.READ);
-			stream.readBytes(bytes);
-			stream.close();
+
 			var context:LoaderContext;
 
 			// The domain matters: if you load mods into the same domain as the game, they will stay loaded until you restart the entire flash application
@@ -72,6 +65,20 @@ package Bezel
 			context.checkPolicyFile = false;
 			context.allowCodeImport = true;
 			loader.loadBytes(bytes, context);
+		}
+		
+		public function load(successCallback:Function, failureCallback:Function, intoMainLoaderDomain:Boolean = false): void
+		{
+			if (!file.exists)
+				throw new Error("SWF " + file.nativePath + " does not exist");
+			
+			var bytes:ByteArray = new ByteArray();
+			var stream:FileStream = new FileStream();
+			stream.open(file, FileMode.READ);
+			stream.readBytes(bytes);
+			stream.close();
+
+			loadBytes(bytes, successCallback, failureCallback, intoMainLoaderDomain);
 		}
 		
 		public function unload(resetMainLoaderIfApplicable:Boolean = false): void

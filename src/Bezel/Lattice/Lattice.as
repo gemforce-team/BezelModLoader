@@ -7,6 +7,8 @@ package Bezel.Lattice
 
     import Bezel.Bezel;
     import Bezel.Logger;
+	import com.cff.anebe.DisassemblyDoneEvent;
+	import com.cff.anebe.Events;
 
     import flash.desktop.NativeProcess;
     import flash.desktop.NativeProcessStartupInfo;
@@ -21,13 +23,26 @@ package Bezel.Lattice
     import flash.events.ProgressEvent;
     import Bezel.Utils.FunctionDeferrer;
 
+    import com.cff.anebe.BytecodeEditor;
+    import com.cff.anebe.AssemblyDoneEvent;
+
     public class Lattice extends EventDispatcher
     {
-        private var currentTool:String;
+        private var bytecodeEditor:BytecodeEditor = new BytecodeEditor();
+
         private var patches:Vector.<LatticePatch>;
         private var expectedPatches:Vector.<LatticePatch>;
 
         private var _asasmFiles:Object;
+        private var swfToLoad:ByteArray;
+
+        private var wasDisassembled:Boolean;
+
+        // May be populated, if an actual reassembly step was done. Check before using.
+        public function get swfBytes():ByteArray
+        {
+            return swfToLoad;
+        }
 
         private function get asasmFiles(): Object
         {
@@ -44,20 +59,14 @@ package Bezel.Lattice
                 while (bytes.bytesAvailable != 0)
                 {
                     var name:String = readNTString(bytes);
-                    this.asasmFiles[name] = readNTString(bytes);
+                    this._asasmFiles[name] = readNTString(bytes);
                 }
             }
 
         	return _asasmFiles;
         }
 
-        private var process:NativeProcess;
-        private var processInfo:NativeProcessStartupInfo;
-        private var processError:String;
-
         private static const logger:Logger = Logger.getLogger("Lattice");
-
-        private var doneDisassembling:Boolean = false;
 
         private var origSwf:File;
         private var newSwf:File;
@@ -87,54 +96,9 @@ package Bezel.Lattice
 
             this.patches = new Vector.<LatticePatch>();
             this.expectedPatches = new Vector.<LatticePatch>();
-        }
-
-        private function callTool(tool:String, argument:Vector.<String>): void
-        {
-            logger.log("callTool", "Starting " + tool);
-            this.process = new NativeProcess();
-            this.processInfo = new NativeProcessStartupInfo();
-            this.currentTool = tool;
-            processInfo.executable = Bezel.Bezel.TOOLS_FOLDER.resolvePath(tool + ".exe");
-            if (!processInfo.executable.exists)
-            {
-                processInfo.executable = Bezel.Bezel.TOOLS_FOLDER.resolvePath(tool);
-            }
-            processInfo.arguments = argument;
-            processInfo.workingDirectory = File.applicationStorageDirectory;
-            process.addEventListener(NativeProcessExitEvent.EXIT, this.toolFinished);
-            process.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, this.onToolError);
-            process.start(processInfo);
-        }
-
-        private function toolFinished(e:NativeProcessExitEvent): void
-        {
-            if (e.exitCode != 0)
-            {
-                logger.log("toolFinished", currentTool + " failed: " + this.processError);
-				if (coremods.exists)
-				{
-					coremods.deleteFile();
-				}
-                throw new Error("Lattice (for " + origSwf.nativePath + ") patch tool " + currentTool + " failed. Check the log file for details");
-            }
-
-            logger.log("toolFinished", currentTool + " has finished");
-            switch (currentTool)
-            {
-                case "disassemble":
-                    cleanAsm.copyTo(asm);
-                    dispatchEvent(new Event(LatticeEvent.DISASSEMBLY_DONE));
-                    break;
-                case "reassemble":
-                    dispatchEvent(new Event(LatticeEvent.REBUILD_DONE));
-                    break;
-            }
-        }
-
-        private function onToolError(e:Event): void
-        {
-            this.processError += this.process.standardError.readUTFBytes(process.standardError.bytesAvailable);
+			
+			bytecodeEditor.addEventListener(Events.DISASSEMBLY_DONE, this.onDisassemblyDone);
+			bytecodeEditor.addEventListener(Events.ASSEMBLY_DONE, this.onAssemblyDone);
         }
 
 		// Disassembles the file passed in into a clean asm if necessary. Prepares Lattice patches.
@@ -144,10 +108,16 @@ package Bezel.Lattice
         public function init(): Boolean
         {
             var ret:Boolean = false;
+            var needsNotification:Boolean = true;
 
-            if (!asm.exists || !cleanAsm.exists || !coremods.exists || !newSwf.exists || newSwf.modificationDate.getTime() < origSwf.modificationDate.getTime())
+            if (!cleanAsm.exists || cleanAsm.modificationDate.getTime() < origSwf.modificationDate.getTime())
             {
                 performDisassemble();
+                needsNotification = false;
+            }
+
+            if (!asm.exists || !coremods.exists || !newSwf.exists || newSwf.modificationDate.getTime() < origSwf.modificationDate.getTime())
+            {
                 ret = true;
             }
 
@@ -178,6 +148,10 @@ package Bezel.Lattice
             else
             {
                 logger.log("init", "Previous coremod info not found. Starting Lattice disassembly.");
+                if (needsNotification)
+                {
+                    dispatchEvent(new Event(LatticeEvent.DISASSEMBLY_DONE));
+                }
             }
 
             return ret;
@@ -197,9 +171,37 @@ package Bezel.Lattice
             {
                 coremods.deleteFile();
             }
+			if (newSwf.exists)
+			{
+				newSwf.deleteFile();
+			}
+			
+			var swf:ByteArray = new ByteArray();
 
-            callTool("disassemble", new <String>[origSwf.nativePath, cleanAsm.nativePath]);
+            var stream:FileStream = new FileStream();
+            stream.open(origSwf, FileMode.READ);
+            stream.readBytes(swf);
+            stream.close();
+			
+			bytecodeEditor.DisassembleAsync(swf);
         }
+		
+		private function onDisassemblyDone(e:DisassemblyDoneEvent):void
+		{
+			_asasmFiles = e.strings;
+			var stream:FileStream = new FileStream();
+			stream.open(cleanAsm, FileMode.WRITE);
+			for (var name:String in _asasmFiles)
+			{
+				writeNTString(stream, name);
+				writeNTString(stream, _asasmFiles[name]);
+			}
+			stream.close();
+
+            this.wasDisassembled = true;
+
+			dispatchEvent(new Event(LatticeEvent.DISASSEMBLY_DONE));
+		}
 
         // Actually applies the coremods and runs the reassembler. Dispatches LatticeEvents.REBUILD_DONE when finished.
 		// If this is the Lattice given by Bezel, this method SHOULD NOT be called by anything other than Bezel
@@ -358,11 +360,35 @@ package Bezel.Lattice
                     }
                     stream.close();
 
-                    callTool("reassemble", new <String>[origSwf.nativePath, asm.nativePath, newSwf.nativePath]);
+                    var replaceBytes:ByteArray = null;
+
+                    if (!wasDisassembled)
+                    {
+                        replaceBytes = new ByteArray();
+                        stream.open(origSwf, FileMode.READ);
+                        stream.readBytes(replaceBytes);
+                        stream.close();
+                    }
+                    
+                    bytecodeEditor.AssembleAsync(_asasmFiles, replaceBytes);
                 }
             };
 
             doSinglePatch(0);
+        }
+
+        private function onAssemblyDone(e:AssemblyDoneEvent):void
+        {
+            swfToLoad = e.assembled;
+
+            var out:FileStream = new FileStream();
+            out.open(newSwf, FileMode.WRITE);
+            out.writeBytes(swfToLoad);
+            out.close();
+			
+			bytecodeEditor.Cleanup();
+            
+            dispatchEvent(new Event(LatticeEvent.REBUILD_DONE));
         }
 		
 		/**
