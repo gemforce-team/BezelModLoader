@@ -13,4 +13,4 @@ ane.o: ane.s ANEBytecodeEditor.ane
 aneSWC.o: aneSWC.s ANEBytecodeEditor.swc
 
 clean:
-	rm bezel-swf.o bezel-swc.o gccs-loader.o gcfw-loader.o bezel-installer.o ane.o bezel-installer.exe
+	rm bezel-swf.o bezel-swc.o gccs-loader.o gcfw-loader.o bezel-installer.o ane.o bezel-installer.exe aneSWC.o
