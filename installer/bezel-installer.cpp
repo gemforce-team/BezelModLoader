@@ -125,12 +125,12 @@ int main()
     const std::filesystem::path bezelFile{"Bezel/BezelModLoader.swf"};
     const std::filesystem::path mainLoaderPath{"Bezel/MainLoader.swf"};
 
-    if (!getenv("APPDATA"))
+    if (!_wgetenv(L"APPDATA"))
     {
         waitExit("%APPDATA% does not exist", -7);
     }
 
-    const std::filesystem::path appdata{getenv("APPDATA")};
+    const std::filesystem::path appdata{_wgetenv(L"APPDATA")};
     if (std::filesystem::exists(appdata))
     {
         const std::filesystem::path gcfwData = appdata / gameID / "Local Store";
@@ -195,9 +195,9 @@ int main()
     fwrite(swfData, 1, swfSize, outFile);
     fclose(outFile);
 
-    if (getenv("BezelLibs"))
+    if (_wgetenv(L"BezelLibs"))
     {
-        const std::filesystem::path bezelLibs{getenv("BezelLibs")};
+        const std::filesystem::path bezelLibs{_wgetenv(L"BezelLibs")};
 
         ec.clear();
         if (!std::filesystem::exists(bezelLibs))
