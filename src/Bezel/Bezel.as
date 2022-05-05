@@ -370,7 +370,7 @@ package Bezel
 			var bindSingleMod:Function = function(i:int):void
 			{
 				vecMods[i].instance.bind(that, gameObjects);
-				logger.log("bindMods", "Bound mod: " + mod.instance.MOD_NAME);
+				logger.log("bindMods", "Bound mod: " + vecMods[i].instance.MOD_NAME);
 				updateProgress(i+1, vecMods.length);
 				if (i+1 < vecMods.length)
 				{
