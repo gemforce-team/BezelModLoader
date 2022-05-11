@@ -2,6 +2,7 @@ package Bezel.Utils
 {
 	import flash.events.KeyboardEvent;
 	import flash.ui.Keyboard;
+	import flash.utils.getQualifiedClassName;
 	/**
 	 * Represents a keybind for an action
 	 * @author Chris
@@ -85,7 +86,8 @@ package Bezel.Utils
 		/**
 		 * Checks that this Keybind represents the same combination as the given argument
 		 * @param	other KeyboardEvent or Keybind to check against
-		 * @return True if other is a KeyboardEvent or a Keybind and the control, alt, shift, and keycode match. False otherwise
+		 * @return True if other is a KeyboardEvent or a Keybind and the control, alt, shift, and keycode match. False if they don't
+		 * @throws ArgumentError if other is not a KeyboardEvent or a Keybind
 		 */
 		public function matches(other:*):Boolean
 		{
@@ -99,6 +101,10 @@ package Bezel.Utils
 			{
 				var o:Keybind = other as Keybind;
 				return (o.alt == this.alt) && (o.ctrl == this.ctrl) && (o.shift == this.shift) && (o.key == this.key);
+			}
+			else
+			{
+				throw new ArgumentError("Bezel.Utils.Keybind tried to match against a " + getQualifiedClassName(other));
 			}
 			
 			return false;
