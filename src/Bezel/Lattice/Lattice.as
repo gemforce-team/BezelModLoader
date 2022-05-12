@@ -76,13 +76,14 @@ package Bezel.Lattice
         private var asm:File;
         private var cleanAsm:File;
         private var coremods:File;
+        private var includeDebugInstructions:Boolean;
 
         public function get numberOfPatches():int
         {
             return patches.length;
         }
 
-        public function Lattice(origSwf:File, newSwf:File, asm:File, cleanAsm:File, coremods:File)
+        public function Lattice(origSwf:File, newSwf:File, asm:File, cleanAsm:File, coremods:File, includeDebugInstructions:Boolean)
         {
             if (origSwf == null || newSwf == null || asm == null || cleanAsm == null || coremods == null)
             {
@@ -95,6 +96,7 @@ package Bezel.Lattice
                 this.asm = asm;
                 this.cleanAsm = cleanAsm;
                 this.coremods = coremods;
+                this.includeDebugInstructions = includeDebugInstructions;
             }
 
             this.patches = new Vector.<LatticePatch>();
@@ -384,7 +386,7 @@ package Bezel.Lattice
                         stream.close();
                     }
                     
-                    bytecodeEditor.AssembleAsync(_asasmFiles, replaceBytes);
+                    bytecodeEditor.AssembleAsync(_asasmFiles, includeDebugInstructions, replaceBytes);
                 }
             };
 

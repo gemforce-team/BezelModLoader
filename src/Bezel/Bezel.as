@@ -56,6 +56,8 @@ package Bezel
 		private var loadingProgressTextField:TextField;
 		private var loadingProgressBar:Sprite;
 
+		private var manager:SettingManager;
+
 		private static const DISASSEMBLING_GAME:String = "Disassembling Game...";
 		private static const LOADING_MODS:String = "Loading Mods...";
 		private static const LOADING_COREMODS:String = "Loading Coremods...";
@@ -129,6 +131,7 @@ package Bezel
 		public function Bezel()
 		{
 			_instance = this;
+			manager = getSettingManager("Bezel Mod Loader");
 			prepareFolders();
 			this.addEventListener(LatticeEvent.REBUILD_DONE, this.onGameBuilt);
 
@@ -231,7 +234,15 @@ package Bezel
 
 		private function initLattice():void
 		{
-			this.lattice = new Lattice(gameSwf, moddedSwf, LATTICE_DEFAULT_ASM, LATTICE_DEFAULT_CLEAN_ASM, LATTICE_DEFAULT_COREMODS);
+			var includeDebugInstrs:Boolean = false;
+			try
+			{
+				// We intentionally register this boolean later so that the MainLoader can see that we registered it, so make sure to catch the error if it occurs
+				includeDebugInstrs = manager.retrieveBoolean("Include Debug Instructions");
+			}
+			catch (e:*){}
+
+			this.lattice = new Lattice(gameSwf, moddedSwf, LATTICE_DEFAULT_ASM, LATTICE_DEFAULT_CLEAN_ASM, LATTICE_DEFAULT_COREMODS, includeDebugInstrs);
 
 			this.lattice.addEventListener(LatticeEvent.DISASSEMBLY_DONE, this.onDisassembleDone);
 			this.lattice.addEventListener(LatticeEvent.REBUILD_DONE, this.onGameBuilt);
@@ -284,6 +295,7 @@ package Bezel
 						addChild(DisplayObject(mainLoaderLoader.instance));
 						logger.log("Bezel", "MainLoader loaded from " + File.applicationDirectory.getRelativePath(mainLoaderFile));
 						coremods[coremods.length] = mainLoader.coremodInfo;
+						manager.registerBoolean("Include Debug Instructions", function(...args):void{ if (LATTICE_DEFAULT_CLEAN_ASM.exists) LATTICE_DEFAULT_CLEAN_ASM.deleteFile(); }, false, "Requires restart and may cause slowdown");
 						FunctionDeferrer.deferFunction(that.loadMods, [], that, true);
 					},
 					function(...args):void{
