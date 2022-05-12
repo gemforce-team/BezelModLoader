@@ -25,6 +25,8 @@ package Bezel.Lattice
 
     import com.cff.anebe.BytecodeEditor;
     import com.cff.anebe.AssemblyDoneEvent;
+	
+	import Bezel.mainloader_only;
 
     public class Lattice extends EventDispatcher
     {
@@ -34,6 +36,7 @@ package Bezel.Lattice
         private var expectedPatches:Vector.<LatticePatch>;
 
         private var _asasmFiles:Object;
+		private var _asasmList:Vector.<String>;
         private var swfToLoad:ByteArray;
 
         private var wasDisassembled:Boolean;
@@ -228,29 +231,40 @@ package Bezel.Lattice
                     }
                     else
                     {
-                        if (patch1.overwritten < patch2.overwritten)
-                        {
-                            return 1;
-                        }
-                        else if (patch2.overwritten < patch1.overwritten)
-                        {
-                            return -1;
-                        }
-                        else
-                        {
-                            if (patch1.contents < patch2.contents)
-                            {
-                                return -1;
-                            }
-                            else if (patch2.contents < patch1.contents)
-                            {
-                                return 1;
-                            }
-                            else
-                            {
-                                return 0;
-                            }
-                        }
+						if (!patch1.causesConflict && patch2.causesConflict)
+						{
+							return -1;
+						}
+						else if (patch1.causesConflict && !patch2.causesConflict)
+						{
+							return 1;
+						}
+						else
+						{
+							if (patch1.overwritten < patch2.overwritten)
+							{
+								return 1;
+							}
+							else if (patch2.overwritten < patch1.overwritten)
+							{
+								return -1;
+							}
+							else
+							{
+								if (patch1.contents < patch2.contents)
+								{
+									return -1;
+								}
+								else if (patch2.contents < patch1.contents)
+								{
+									return 1;
+								}
+								else
+								{
+									return 0;
+								}
+							}
+						}
                     }
                 }
             };
@@ -305,7 +319,7 @@ package Bezel.Lattice
             var replaced:Object = new Object();
             for each (var patch:LatticePatch in patches)
             {
-                if (patch.overwritten != 0)
+                if (patch.causesConflict && patch.overwritten != 0)
                 {
                     if (!(patch.filename in replaced))
                     {
@@ -322,7 +336,7 @@ package Bezel.Lattice
             {
                 if (patch.filename in replaced && Dictionary(replaced[patch.filename])[patch.offset] != null && Dictionary(replaced[patch.filename])[patch.offset] != patch)
                 {
-                    if (patch.overwritten != 0 || (patch.offset != 0 && Dictionary(replaced[patch.filename])[patch.offset - 1] != null)) {
+                    if (patch.causesConflict && (patch.overwritten != 0 || (patch.offset != 0 && Dictionary(replaced[patch.filename])[patch.offset - 1] != null))) {
                         throw new Error("Lattice (for " + origSwf.nativePath + "): Modifications at line " + patch.offset + " conflict");
                     }
                 }
@@ -579,6 +593,47 @@ package Bezel.Lattice
         {
             stream.writeUTFBytes(data);
             stream.writeByte(0);
+        }
+		
+		/**
+		 * Gets a list of files available to edit in the currently loaded ABC.
+		 * @return List of filenames that can be passed to the code edit functions
+		 */
+		public function listFiles():Vector.<String>
+		{
+			var ret:Vector.<String> = new <String>[];
+			for (var file:String in asasmFiles)
+			{
+				ret[ret.length] = file;
+			}
+			return ret;
+		}
+		
+		/**
+		 * This should ONLY be used if you are ABSOLUTELY SURE you know what you're doing!
+		 * Applies a Lattice patch WITHOUT causing conflicts with any other patches that might affect the same line.
+		 * Example use case: GemCraft Chasing Shadows ENumbers can be inlined with a single instruction change, which results in massive performance gains
+		 * Should almost certainly only be used by MainLoaders
+		 * Note: these patches must replace the exact number of lines that the contents have
+         * 
+		 * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
+         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         * @param offset Offset at which to insert the contents. Note that this is zero-indexed: value 1 will be inserted AFTER line 1
+         * @param replaceLines Number of lines to remove at the specified offset. Note that this will delete with respect to zero-indexing:
+         *                     if this is 1 and offset is 1, the second line will be removed
+         * @param contents New lines of assembly to insert. Can be empty if only removal is necessary
+         */
+        mainloader_only function DANGEROUS_patchFile(filename:String, offset:int, replaceLines:int, contents:String): void
+        {
+            if (!(filename in this.asasmFiles))
+            {
+                throw new Error("File '" + filename + "' not in disassembly");
+            }
+            if (contents.split('\n').length != replaceLines)
+            {
+                throw new Error("DANGEROUS_patchFile for file '" + filename + "' received a number of lines different from the amount to be replaced");
+            }
+            this.patches[this.patches.length] = new LatticePatch(filename, offset, replaceLines, contents, false);
         }
     }
 }

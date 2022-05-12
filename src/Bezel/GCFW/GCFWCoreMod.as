@@ -5,6 +5,7 @@ package Bezel.GCFW
 	 * @author piepie62
 	 */
     import Bezel.Lattice.Lattice;
+    import Bezel.mainloader_only;
 
     internal class GCFWCoreMod
     {
@@ -317,17 +318,26 @@ package Bezel.GCFW
                         iffalse DoNotColorPlate \n \
                     ',
                     "DoNotColorPlate:"
+                ]),
+            new GCFWFileCoreMod("com/giab/common/data/ENumber.class.asasm", 
+                [
+                    'name "com.giab.common.data:ENumber/g"',
+                    [
+                        'name "com.giab.common.data:ENumber/s"',
+                        "throw"
+                    ]
+                ],
+                [12, 1],
+                [15, 26],
+                [
+                    'getlocal0\ngetproperty QName(PrivateNamespace("com.giab.common.data:ENumber"), "a")',
+                    'getlocal0\ngetlocal1\nsetproperty QName(PrivateNamespace("com.giab.common.data:ENumber"), "a")'
                 ])
         ];
 
-        private static const contents:Array = [
-            ,
-            ,
-            ,
-            ,
-            ,
-            ,
-            
+        private static var EVERY_FILE_EVERY_LINE_PATCHES:Vector.<Vector.<String>> = new <Vector.<String>>[
+            new <String>['callproperty.*\"g\"', 'getproperty QName(PrivateNamespace("com.giab.common.data:ENumber"), "a")'],
+            new <String>['callpropvoid.*\"s\"', 'setproperty QName(PrivateNamespace("com.giab.common.data:ENumber"), "a")']
         ];
 
         internal static function installHooks(lattice:Lattice): void
@@ -357,6 +367,24 @@ package Bezel.GCFW
                             throw new Error("Could not apply Bezel coremod for " + file.filename + ", patch number " + filepatch);
                         }
                         lattice.patchFile(file.filename, offset + file.offsets[filepatch], file.replaceNums[filepatch], file.contents[filepatch]);
+                    }
+                }
+            }
+
+            var allfiles:Vector.<String> = lattice.listFiles();
+            for each (var filename:String in allfiles)
+            {
+                for each (var everylinepatch:Vector.<String> in EVERY_FILE_EVERY_LINE_PATCHES)
+                {
+                    var re:RegExp = new RegExp(everylinepatch[0]);
+                    offset = 0;
+                    while (offset != -1)
+                    {
+                        offset = lattice.findPattern(filename, re, offset);
+                        if (offset != -1)
+                        {
+                            lattice.mainloader_only::DANGEROUS_patchFile(filename, offset-1, 1, everylinepatch[1]);
+                        }
                     }
                 }
             }
