@@ -31,7 +31,7 @@ package Bezel
 	 */
 	public class Bezel extends MovieClip
 	{
-		public static const VERSION:String = "2.0.2";
+		public static const VERSION:String = "2.0.3";
 
 		private var _gameObjects:Object;
 		private var _mainLoader:MainLoader;
