@@ -134,7 +134,7 @@ package Bezel.GCFW
 			for(var name:String in GCFWBezel.defaultHotkeys)
 			{
                 var hotkey:Keybind = GCFWBezel.defaultHotkeys[name];
-				if(Bezel.Bezel.instance.keybindManager.getHotkeyValue(name).matches(e))
+				if(Bezel.Bezel.instance.keybindManager.getHotkeyValue(name).matches(e.eventArgs.event))
 				{
 					e.eventArgs.event.keyCode = hotkey.key;
 					e.eventArgs.event.altKey = hotkey.alt;
@@ -143,7 +143,7 @@ package Bezel.GCFW
 					e.eventArgs.continueDefault = origDefault;
 					return;
 				}
-				else if (hotkey.matches(e))
+				else if (hotkey.matches(e.eventArgs.event))
 				{
 					e.eventArgs.continueDefault = false;
 				}

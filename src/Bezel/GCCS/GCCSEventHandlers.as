@@ -150,7 +150,7 @@ package Bezel.GCCS
 			for(var name:String in GCCSBezel.defaultHotkeys)
 			{
                 var hotkey:Keybind = GCCSBezel.defaultHotkeys[name];
-				if(Bezel.Bezel.instance.keybindManager.getHotkeyValue(name).matches(e))
+				if(Bezel.Bezel.instance.keybindManager.getHotkeyValue(name).matches(e.eventArgs.event))
 				{
 					e.eventArgs.event.keyCode = hotkey.key;
 					e.eventArgs.event.altKey = hotkey.alt;
@@ -159,7 +159,7 @@ package Bezel.GCCS
 					e.eventArgs.continueDefault = origDefault;
 					return;
 				}
-				else if (hotkey.matches(e))
+				else if (hotkey.matches(e.eventArgs.event))
 				{
 					e.eventArgs.continueDefault = false;
 				}
