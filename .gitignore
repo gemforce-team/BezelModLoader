@@ -19,6 +19,8 @@ automation/output/
 installer/*.exe
 installer/*.o
 assets/splitter/*.o
+installer/Cargo.lock
+installer/target/
 
 GameScripts/*
 GameScripts/scripts/*
