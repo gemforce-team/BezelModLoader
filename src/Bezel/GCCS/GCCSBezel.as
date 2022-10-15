@@ -45,6 +45,8 @@ package Bezel.GCCS
 	import flash.display.MovieClip;
 	import flash.desktop.NativeApplication;
 	import flash.events.Event;
+	import Bezel.Utils.SettingManager;
+	import Bezel.Lattice.Lattice;
 	
 	/*
 	 * The MainLoader for GemCraft: Chasing Shadows.
@@ -60,10 +62,24 @@ package Bezel.GCCS
 		public function get MOD_NAME():String { return "GCCS Bezel"; }
 		public function get VERSION():String { return Bezel.Bezel.VERSION; }
 		public function get BEZEL_VERSION():String { return Bezel.Bezel.VERSION; }
-		
-		public function get coremodInfo():Object 
+
+		private var manager:SettingManager;
+
+		public function GCCSBezel()
 		{
-			return {"name": "GCCS_BEZEL_MOD_LOADER", "version": GCCSCoreMod.VERSION, "load": GCCSCoreMod.installHooks};
+			manager = Bezel.Bezel.instance.getSettingManager("GCCS Bezel");
+		}
+		
+		public function get coremodInfo(): Object
+		{
+			// This may not be registered, so default to true if not
+			var doEnumberFix:Boolean = true;
+			try {
+				doEnumberFix = manager.retrieveBoolean("Optimize game numbers");
+			}
+			catch (e:*) {}
+
+			return {"name": "GCCS_BEZEL_MOD_LOADER", "version": GCCSCoreMod.VERSION + (doEnumberFix ? "" : "NOENUMBER"), "load": function(lattice:Lattice):void {GCCSCoreMod.installHooks(lattice, doEnumberFix)}};
 		}
 		
 		// mainGame cannot be the proper type, for consistency with MainLoader interface
@@ -118,6 +134,7 @@ package Bezel.GCCS
 			GCCSEventHandlers.register();
 
 			registerHotkeys();
+			registerSettings();
 		}
 
 		internal static function registerHotkeys():void
@@ -129,6 +146,11 @@ package Bezel.GCCS
 			
 			Bezel.Bezel.instance.keybindManager.registerHotkey("GCCS Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
 			// Bezel.Bezel.instance.keybindManager.registerHotkey("GCCS Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
+		}
+
+		internal function registerSettings():void
+		{
+			manager.registerBoolean("Optimize game numbers", function(...args):void {}, true, "Makes the game faster by optimizing away some useless memory obfuscation code. Probably don't disable unless you're a developer making a coremod that's frustrated by long loading times.");
 		}
 		
 		private static function createDefaultKeyConfiguration():Object

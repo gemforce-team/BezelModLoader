@@ -31,7 +31,7 @@ package Bezel
 	 */
 	public class Bezel extends MovieClip
 	{
-		public static const VERSION:String = "2.0.4";
+		public static const VERSION:String = "2.0.5";
 
 		private var _gameObjects:Object;
 		private var _mainLoader:MainLoader;
@@ -138,7 +138,7 @@ package Bezel
 			FunctionDeferrer.deferFunction(this.startLoadFromScratch, [], this, true);
 		}
 
-		private function startLoadFromScratch(...args):void
+		private function startLoadFromScratch():void
 		{
 			this._keybindManager = new KeybindManager();
 			

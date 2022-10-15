@@ -47,6 +47,8 @@ package Bezel.GCFW
 	import flash.desktop.NativeApplication;
 	import flash.events.Event;
 	import flash.events.UncaughtErrorEvent;
+	import Bezel.Utils.SettingManager;
+	import Bezel.Lattice.Lattice;
 	
 	/**
 	 * The MainLoader for GemCraft: Frostborn Wrath.
@@ -62,10 +64,24 @@ package Bezel.GCFW
 		public function get MOD_NAME():String { return "GCFW Bezel"; }
 		public function get VERSION():String { return Bezel.Bezel.VERSION; }
 		public function get BEZEL_VERSION():String { return Bezel.Bezel.VERSION; }
+
+		private var manager:SettingManager;
+
+		public function GCFWBezel()
+		{
+			manager = Bezel.Bezel.instance.getSettingManager("GCFW Bezel");
+		}
 		
 		public function get coremodInfo(): Object
 		{
-			return {"name": "GCFW_BEZEL_MOD_LOADER", "version": GCFWCoreMod.VERSION, "load": GCFWCoreMod.installHooks};
+			// This may not be registered, so default to true if not
+			var doEnumberFix:Boolean = true;
+			try {
+				doEnumberFix = manager.retrieveBoolean("Optimize game numbers");
+			}
+			catch (e:*) {}
+
+			return {"name": "GCFW_BEZEL_MOD_LOADER", "version": GCFWCoreMod.VERSION + (doEnumberFix ? "" : "NOENUMBER"), "load": function(lattice:Lattice):void {GCFWCoreMod.installHooks(lattice, doEnumberFix)}};
 		}
 		
 		// mainGame cannot be the proper type, for consistency with MainLoader interface
@@ -120,6 +136,7 @@ package Bezel.GCFW
 			GCFWEventHandlers.register();
 
 			registerHotkeys();
+			registerSettings();
 			
 			var version:String = GV.main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text;
 			version = version.slice(0, version.search(' ') + 1) + Bezel.Bezel.prettyVersion();
@@ -135,6 +152,11 @@ package Bezel.GCFW
 			
 			Bezel.Bezel.instance.keybindManager.registerHotkey("GCFW Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
 			//Bezel.Bezel.instance.keybindManager.registerHotkey("GCFW Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
+		}
+
+		internal function registerSettings():void
+		{
+			manager.registerBoolean("Optimize game numbers", function(...args):void {}, true, "Makes the game faster by optimizing away some useless memory obfuscation code. Probably don't disable unless you're a developer making a coremod that's frustrated by long loading times.");
 		}
 		
 		private static function createDefaultKeyConfiguration():Object

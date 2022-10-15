@@ -9,7 +9,7 @@ package Bezel.GCCS
      */
     internal class GCCSCoreMod
     {
-        public static const VERSION:String = "10";
+        public static const VERSION:String = "11";
 
         private static const coremods:Vector.<GCCSFileCoreMod> = new <GCCSFileCoreMod>[
             new GCCSFileCoreMod("com/giab/games/gccs/steam/Main.class.asasm",
@@ -486,7 +486,7 @@ package Bezel.GCCS
             new <String>['callproperty.*\"s\"', 'setproperty QName(PrivateNamespace("com.giab.common.data:ENumber"), "a")']
         ];
 
-        internal static function installHooks(lattice:Lattice): void
+        internal static function installHooks(lattice:Lattice, doEnumberFix:Boolean): void
         {
             for each (var file:GCCSFileCoreMod in coremods)
             {
@@ -517,19 +517,22 @@ package Bezel.GCCS
                 }
             }
 
-            var allfiles:Vector.<String> = lattice.listFiles();
-            for each (var filename:String in allfiles)
+            if (doEnumberFix)
             {
-                for each (var everylinepatch:Vector.<String> in EVERY_FILE_EVERY_LINE_PATCHES)
+                var allfiles:Vector.<String> = lattice.listFiles();
+                for each (var filename:String in allfiles)
                 {
-                    var re:RegExp = new RegExp(everylinepatch[0]);
-                    offset = 0;
-                    while (offset != -1)
+                    for each (var everylinepatch:Vector.<String> in EVERY_FILE_EVERY_LINE_PATCHES)
                     {
-                        offset = lattice.findPattern(filename, re, offset);
-                        if (offset != -1)
+                        var re:RegExp = new RegExp(everylinepatch[0]);
+                        offset = 0;
+                        while (offset != -1)
                         {
-                            lattice.mainloader_only::DANGEROUS_patchFile(filename, offset-1, 1, everylinepatch[1]);
+                            offset = lattice.findPattern(filename, re, offset);
+                            if (offset != -1)
+                            {
+                                lattice.mainloader_only::DANGEROUS_patchFile(filename, offset-1, 1, everylinepatch[1]);
+                            }
                         }
                     }
                 }
