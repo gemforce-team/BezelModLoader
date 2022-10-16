@@ -14,6 +14,7 @@ enum ErrorCode {
     ContentDoesNotExist,
     CouldntMakeDir(std::io::Error),
     CouldntWriteBezel(std::io::Error),
+    CouldntWriteGame(std::io::Error),
     CouldNotExtractZip(ZipError),
 }
 
@@ -45,6 +46,9 @@ impl std::fmt::Display for ErrorCode {
             }
             Self::CouldntWriteBezel(e) => {
                 write!(f, "Could not install required file: {}", e)
+            }
+            Self::CouldntWriteGame(e) => {
+                write!(f, "Could not write the game identifier file: {}", e)
             }
             Self::CouldNotExtractZip(e) => {
                 write!(f, "Could not extract ANE ZIP: {}", e)
@@ -139,7 +143,7 @@ fn main() {
         .find(&metadata, "id")
         .unwrap_or_else(|| wait_exit(Some(ErrorCode::InvalidMetadataXML)))
         .text_content(&metadata);
-    let orig_game_content = Path::new(&sanitize_contents_path(
+    let game_content = sanitize_contents_path(
         &metadata
             .root_element()
             .unwrap_or_else(|| wait_exit(Some(ErrorCode::InvalidMetadataXML)))
@@ -148,14 +152,14 @@ fn main() {
             .find(&metadata, "content")
             .unwrap_or_else(|| wait_exit(Some(ErrorCode::InvalidMetadataXML)))
             .text_content(&metadata),
-    ))
-    .to_owned();
-    if !orig_game_content.is_file() {
+    );
+    let game_content_path = Path::new(&game_content).to_owned();
+    if !game_content_path.is_file() {
         wait_exit(Some(ErrorCode::ContentDoesNotExist))
     }
 
     let modded_game_content =
-        orig_game_content.with_file_name(orig_game_content.file_stem().unwrap().to_str().unwrap());
+        game_content_path.with_file_name(game_content_path.file_stem().unwrap().to_str().unwrap());
     metadata
         .root_element()
         .unwrap_or_else(|| wait_exit(Some(ErrorCode::InvalidMetadataXML)))
@@ -235,6 +239,9 @@ fn main() {
     std::fs::write("Bezel/BezelModLoader.swf", swf)
         .unwrap_or_else(|e| wait_exit(Some(ErrorCode::CouldntWriteBezel(e))));
 
+    std::fs::write("game-file.txt", game_content)
+        .unwrap_or_else(|e| wait_exit(Some(ErrorCode::CouldntWriteGame(e))));
+
     if let Some(bezel_libs) = std::env::var_os("BezelLibs") {
         let bezel_libs = Path::new(&bezel_libs);
         if !bezel_libs.exists() {
@@ -253,11 +260,11 @@ fn main() {
         }
     }
 
-    if orig_game_content == Path::new("GemCraft Frostborn Wrath.swf") {
+    if game_content_path == Path::new("GemCraft Frostborn Wrath.swf") {
         println!("Found GemCraft Frostborn Wrath. Exporting its MainLoader");
         std::fs::write("Bezel/MainLoader.swf", gcfw_loader)
             .unwrap_or_else(|e| wait_exit(Some(ErrorCode::CouldntWriteBezel(e))));
-    } else if orig_game_content == Path::new("gc-cs-steam.swf") {
+    } else if game_content_path == Path::new("gc-cs-steam.swf") {
         println!("Found GemCraft Chasing Shadows. Exporting its MainLoader");
         std::fs::write("Bezel/MainLoader.swf", gccs_loader)
             .unwrap_or_else(|e| wait_exit(Some(ErrorCode::CouldntWriteBezel(e))));
