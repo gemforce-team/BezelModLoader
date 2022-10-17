@@ -11,20 +11,10 @@ package Bezel.GCCS
     {
         public static const VERSION:String = "11";
 
-        private static const coremods:Vector.<GCCSFileCoreMod> = new <GCCSFileCoreMod>[
-            new GCCSFileCoreMod("com/giab/games/gccs/steam/Main.class.asasm",
-                [
-                    "constructsuper",
-                    "initproperty .*steamworks",
-                    "trait.*_cm",
-                    "trait.*_cm",
-                    "trait slot.*steamworks"
-                ],
-                [ -2, -4, 0, -3, 0],
-                [ 2, 0, 0, 0, 0],
-                [
-                    "",
-                    '    getlocal0 \n \
+        private static const coremods:Object = {
+            "com/giab/games/gccs/steam/Main.class.asasm": new <GCCSSingleCoreMod>[
+                new GCCSSingleCoreMod("constructsuper", -2, 2, ""),
+                new GCCSSingleCoreMod("initproperty .*steamworks", -4, 0, '    getlocal0 \n \
                         constructsuper 0 \n \
                         returnvoid \n \
                         end \n \
@@ -48,41 +38,28 @@ package Bezel.GCCS
                         dup \n \
                         setlocal1 \n \
                         pushscope \n \
-                    ',
-                    'end',
-                    ' \
+                    '),
+                new GCCSSingleCoreMod("trait.*_cm", 0, 0, 'end'),
+                new GCCSSingleCoreMod("trait.*_cm", -3, 0, ' \
                         getlocal0 \n \
                         pushnull \n \
                         callpropvoid QName(PackageNamespace(""),"doEnterFramePreloader"), 1 \n \
-                    ',
-                    'trait slot QName(PackageNamespace(\"\"), \"bezel\") type QName(PackageNamespace(\"\"), \"Object\") end'
-                ]),
-            new GCCSFileCoreMod("com/giab/games/gccs/steam/ingame/IngameInfoPanelRenderer2.class.asasm",
-                ["trait.*method.*renderMonsterInfoPanel"],
-                [ -15 ],
-                [ 0 ],
-                [
-                    // renderInfoPanelGem
-                    ' \n \
+                    '),
+                new GCCSSingleCoreMod("trait slot.*steamworks", 0, 0, 'trait slot QName(PackageNamespace(\"\"), \"bezel\") type QName(PackageNamespace(\"\"), \"Object\") end')
+            ],
+            "com/giab/games/gccs/steam/ingame/IngameInfoPanelRenderer2.class.asasm": new <GCCSSingleCoreMod>[
+                // renderInfoPanelGem
+                new GCCSSingleCoreMod("trait.*method.*renderMonsterInfoPanel", -15, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         getlocal            6 \n \
                         getlocal            1 \n \
                         getlex              QName(PackageNamespace("com.giab.common.utils"), "NumberFormatter") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "ingameGemInfoPanelFormed"), 3 \n \
-                    '
-                ]),
-            new GCCSFileCoreMod("com/giab/games/gccs/steam/ingame/IngameInputHandler2.class.asasm",
-                [
-                    "CAST_STRIKESPELL_INITIATED",
-                    "trait.*method.*rightClickOnScene",
-                    "QName.*PackageNamespace.*\"\".*.*\"B\"",
-                    "trait.*method.*rightClickOnScene"
-                ],
-                [ -5, 37, -5, 16 ],
-                [ 0, 0, 0, 1 ],
-                [
-                    // clickOnScene
-                    ' \n \
+                    ')
+            ],
+            "com/giab/games/gccs/steam/ingame/IngameInputHandler2.class.asasm": new <GCCSSingleCoreMod>[
+                // clickOnScene
+                new GCCSSingleCoreMod("CAST_STRIKESPELL_INITIATED", -5, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         getlocal1 \n \
                         getlocal            2 \n \
@@ -95,9 +72,9 @@ package Bezel.GCCS
                             returnvoid \n \
                         L86: \n \
                             label \n \
-                    ',
-                    // rightClickOnScene
-                    ' \n \
+                    '),
+                // rightClickOnScene
+                new GCCSSingleCoreMod("trait.*method.*rightClickOnScene", 37, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         getlocal1 \n \
                         getlocal            2 \n \
@@ -110,9 +87,9 @@ package Bezel.GCCS
                             returnvoid \n \
                         L28: \n \
                             label \n \
-                    ',
-                    // ehKeyDown
-                    ' \n \
+                    '),
+                // ehKeyDown
+                new GCCSSingleCoreMod("QName.*PackageNamespace.*\"\".*.*\"B\"", -5, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         getlocal1 \n \
                         callproperty        QName(PackageInternalNs("Bezel.GCCS"), "ingameKeyDown"), 1 \n \
@@ -120,16 +97,12 @@ package Bezel.GCCS
                         iffalse             L55 \n \
                             returnvoid \n \
                         L55: \n \
-                    ',
-                    "maxstack 14"
-                ]),
-            new GCCSFileCoreMod("com/giab/games/gccs/steam/ingame/IngameInfoPanelRenderer.class.asasm",
-                ["CHANGE_TARGET_TYPE_DRAGGING"],
-                [ 5 ],
-                [ 0 ],
-                [
-                    // renderInfoPanel
-                    ' \n \
+                    '),
+                new GCCSSingleCoreMod("trait.*method.*rightClickOnScene", 16, 1, "maxstack 14")
+            ],
+            "com/giab/games/gccs/steam/ingame/IngameInfoPanelRenderer.class.asasm": new <GCCSSingleCoreMod>[
+                // renderInfoPanel
+                new GCCSSingleCoreMod("CHANGE_TARGET_TYPE_DRAGGING", 5, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callproperty        QName(PackageInternalNs("Bezel.GCCS"), "ingamePreRenderInfoPanel"), 0 \n \
                         pushtrue \n \
@@ -137,297 +110,162 @@ package Bezel.GCCS
                             returnvoid \n \
                         L160: \n \
                             label \n \
-                    '
-                ]),
-            new GCCSFileCoreMod("com/giab/games/gccs/steam/utils/LoaderSaver.class.asasm",
-                [
-                    [
-                        "method.*saveGameData",
-                        "callpropvoid.*close"
-                    ],
-                    [
-                        "method.*ehContinueSlotL1Clicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehContinueSlotL2Clicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehContinueSlotL3Clicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehContinueSlotL4Clicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehContinueSlotL5Clicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehContinueSlotL6Clicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehContinueSlotL7Clicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehContinueSlotL8Clicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehNewGameSlotL1Clicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehNewGameSlotL2Clicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehNewGameSlotL3Clicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehNewGameSlotL4Clicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehNewGameSlotL5Clicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehNewGameSlotL6Clicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehNewGameSlotL7Clicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehNewGameSlotL8Clicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehNewGameSlotL1IronClicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehNewGameSlotL2IronClicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehNewGameSlotL3IronClicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehNewGameSlotL4IronClicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehNewGameSlotL5IronClicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehNewGameSlotL6IronClicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehNewGameSlotL7IronClicked",
-                        "returnvoid"
-                    ],
-                    [
-                        "method.*ehNewGameSlotL8IronClicked",
-                        "returnvoid"
-                    ]
-                ],
-                [ 0, -1, -1, -1, -1, -1, -1, -1, -1, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3 ],
-                [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-                [
-                    // saveSave
-                    ' \n \
+                    ')
+            ],
+            "com/giab/games/gccs/steam/utils/LoaderSaver.class.asasm": new <GCCSSingleCoreMod>[
+                // saveSave
+                new GCCSSingleCoreMod([ "method.*saveGameData", "callpropvoid.*close" ], 0, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "saveSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehContinueSlotL1Clicked", "returnvoid" ], -1, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehContinueSlotL2Clicked", "returnvoid" ], -1, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehContinueSlotL3Clicked", "returnvoid" ], -1, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehContinueSlotL4Clicked", "returnvoid" ], -1, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehContinueSlotL5Clicked", "returnvoid" ], -1, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehContinueSlotL6Clicked", "returnvoid" ], -1, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehContinueSlotL7Clicked", "returnvoid" ], -1, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehContinueSlotL8Clicked", "returnvoid" ], -1, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehNewGameSlotL1Clicked", "returnvoid" ], -3, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehNewGameSlotL2Clicked", "returnvoid" ], -3, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehNewGameSlotL3Clicked", "returnvoid" ], -3, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehNewGameSlotL4Clicked", "returnvoid" ], -3, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehNewGameSlotL5Clicked", "returnvoid" ], -3, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehNewGameSlotL6Clicked", "returnvoid" ], -3, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehNewGameSlotL7Clicked", "returnvoid" ], -3, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehNewGameSlotL8Clicked", "returnvoid" ], -3, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehNewGameSlotL1IronClicked", "returnvoid" ], -3, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehNewGameSlotL2IronClicked", "returnvoid" ], -3, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehNewGameSlotL3IronClicked", "returnvoid" ], -3, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehNewGameSlotL4IronClicked", "returnvoid" ], -3, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehNewGameSlotL5IronClicked", "returnvoid" ], -3, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehNewGameSlotL6IronClicked", "returnvoid" ], -3, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehNewGameSlotL7IronClicked", "returnvoid" ], -3, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    ',
-                    // loadSave
-                    ' \n \
+                    '),
+                // loadSave
+                new GCCSSingleCoreMod([ "method.*ehNewGameSlotL8IronClicked", "returnvoid" ], -3, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "loadSave"), 0 \n \
-                    '
-                ]),
-            new GCCSFileCoreMod("com/giab/games/gccs/steam/ingame/IngameInitializer.class.asasm",
-                [
-                    [
-                        "method.*setScene3Initiate",
-                        "returnvoid"
-                    ]
-                ],
-                [ -1 ],
-                [ 0 ],
-                [
-                    // newScene
-                    ' \n \
+                    ')
+            ],
+            "com/giab/games/gccs/steam/ingame/IngameInitializer.class.asasm": new <GCCSSingleCoreMod>[
+                // newScene
+                new GCCSSingleCoreMod([ "method.*setScene3Initiate", "returnvoid" ], -1, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "ingameNewScene"), 0 \n \
-                    '
-                ]),
-            new GCCSFileCoreMod("com/giab/games/gccs/steam/scr/ScrMainMenu.class.asasm",
-                ["initproperty.*mc"],
-                [ 0 ],
-                [ 0 ],
-                [
-                    // Add Bezel version string
-                    '\n \
+                    ')
+            ],
+            "com/giab/games/gccs/steam/scr/ScrMainMenu.class.asasm": new <GCCSSingleCoreMod>[
+                // add Bezel version string
+                new GCCSSingleCoreMod("initproperty.*mc", 0, 0, '\n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers") \n \
                         getlocal1 \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "setVersion"), 1 \n \
-                    '
-                ]),
-            new GCCSFileCoreMod("com/giab/games/gccs/steam/scr/ScrOptions.class.asasm",
-                [
-                    [
-                        "method.*switchOptions",
-                        "pushscope"
-                    ],
-                    [
-                        "method.*renderPanelInfoPanel",
-                        "setlocal3",
-                        "setlocal3"
-                    ],
-                    "getproperty.*height",
-                    "getproperty.*height",
-                    "getproperty.*height"
-                ],
-                [ 0, -2, 3, 5, 14 ],
-                [ 0, 1, 0, 0, 0 ],
-                [
-                    ' \n \
+                    ')
+            ],
+            "com/giab/games/gccs/steam/scr/ScrOptions.class.asasm": new <GCCSSingleCoreMod>[
+                new GCCSSingleCoreMod([ "method.*switchOptions", "pushscope" ], 0, 0, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSSettingsHandler") \n \
                         callpropvoid        QName(PackageInternalNs("Bezel.GCCS"), "toggleCustomSettingsFromGame"), 0 \n \
-                    ',
-                    ' \n \
+                    '),
+                new GCCSSingleCoreMod([ "method.*renderPanelInfoPanel", "setlocal3", "setlocal3" ], -2, 1, ' \n \
                         getlex              QName(PackageInternalNs("Bezel.GCCS"), "GCCSSettingsHandler") \n \
                         getlocal1 \n \
                         getlocal2 \n \
                         callproperty        QName(PackageInternalNs("Bezel.GCCS"), "renderInfoPanel"), 2 \n \
-                    ',
-                    ' \n \
+                    '),
+                new GCCSSingleCoreMod("getproperty.*height", 3, 0, ' \n \
                         dup \n \
                         iffalse AfterKeybindChoiceCheck \n \
                         pop \n \
@@ -435,8 +273,8 @@ package Bezel.GCCS
                         getproperty QName(PackageInternalNs("Bezel.GCCS"), "IS_CHOOSING_KEYBIND") \n \
                         not \n \
                     AfterKeybindChoiceCheck: \n \
-                    ',
-                    ' \n \
+                    '),
+                new GCCSSingleCoreMod("getproperty.*height", 5, 0, ' \n \
                         getlocal0 \n \
                         getproperty QName(PackageNamespace(""),"mc") \n \
                         getproperty QName(PackageNamespace(""),"arrCntContents") \n \
@@ -462,24 +300,14 @@ package Bezel.GCCS
                         not \n \
                     AfterFullVisibilityCheck: \n \
                         iffalse DoNotColorPlate \n \
-                    ',
-                    "DoNotColorPlate:"
-                ]),
-            new GCCSFileCoreMod("com/giab/common/data/ENumber.class.asasm", 
-                [
-                    'name "com.giab.common.data:ENumber/g"',
-                    [
-                        'name "com.giab.common.data:ENumber/s"',
-                        "throw"
-                    ]
-                ],
-                [12, 1],
-                [39, 134],
-                [
-                    'getlocal0\ngetproperty QName(PrivateNamespace("com.giab.common.data:ENumber"), "a")',
-                    'getlocal0\ngetlocal1\nsetproperty QName(PrivateNamespace("com.giab.common.data:ENumber"), "a")'
-                ])
-        ];
+                    '),
+                new GCCSSingleCoreMod("getproperty.*height", 14, 0, "DoNotColorPlate:")
+            ],
+            "com/giab/common/data/ENumber.class.asasm": new <GCCSSingleCoreMod>[
+                new GCCSSingleCoreMod('name "com.giab.common.data:ENumber/g"', 12, 39, 'getlocal0\ngetproperty QName(PrivateNamespace("com.giab.common.data:ENumber"), "a")'),
+                new GCCSSingleCoreMod([ 'name "com.giab.common.data:ENumber/s"', "throw" ], 1, 134, 'getlocal0\ngetlocal1\nsetproperty QName(PrivateNamespace("com.giab.common.data:ENumber"), "a")')
+            ]
+        }
 
         private static var EVERY_FILE_EVERY_LINE_PATCHES:Vector.<Vector.<String>> = new <Vector.<String>>[
             new <String>['callproperty.*\"g\"', 'getproperty QName(PrivateNamespace("com.giab.common.data:ENumber"), "a")'],
@@ -488,32 +316,16 @@ package Bezel.GCCS
 
         internal static function installHooks(lattice:Lattice, doEnumberFix:Boolean): void
         {
-            for each (var file:GCCSFileCoreMod in coremods)
+            for (var file:String in coremods)
             {
-                for (var filepatch:uint = 0; filepatch < file.matches.length; filepatch++)
+                for each (var coremod:GCCSSingleCoreMod in (coremods[file] as Vector.<GCCSSingleCoreMod>))
                 {
                     var offset:int = 0;
-                    if (file.matches[filepatch] is Array)
+                    for each (var regex:* in coremod.matches)
                     {
-                        for each (var regex:String in file.matches[filepatch])
-                        {
-                            offset = lattice.findPattern(file.filename, new RegExp(regex), offset);
-                            if (offset == -1)
-                            {
-                                throw new Error("Could not apply Bezel coremod for " + file.filename + ", patch number " + filepatch);
-                            }
-                        }
-                        lattice.patchFile(file.filename, offset + file.offsets[filepatch], file.replaceNums[filepatch], file.contents[filepatch]);
+                        offset = lattice.findPattern(file, new RegExp(regex), offset);
                     }
-                    else
-                    {
-                        offset = lattice.findPattern(file.filename, new RegExp(file.matches[filepatch]));
-                        if (offset == -1)
-                        {
-                            throw new Error("Could not apply Bezel coremod for " + file.filename + ", patch number " + filepatch);
-                        }
-                        lattice.patchFile(file.filename, offset + file.offsets[filepatch], file.replaceNums[filepatch], file.contents[filepatch]);
-                    }
+                    lattice.patchFile(file, offset + coremod.offset, coremod.replacenum, coremod.contents);
                 }
             }
 

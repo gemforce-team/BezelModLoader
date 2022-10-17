@@ -95,7 +95,7 @@ package Bezel.GCCS
 
 		internal static function stageKeyDown(e: KeyboardEvent): void
 		{
-			if (Bezel.Bezel.instance.keybindManager.getHotkeyValue("GCCS Bezel: Reload all mods").matches(e))
+			if (Bezel.Bezel.instance.keybindManager.getHotkeyValue(GCCSBezel.RELOAD_HOTKEY).matches(e))
 			{
 				if (Bezel.Bezel.instance.modsReloadedTimestamp + 10*1000 > getTimer())
 				{

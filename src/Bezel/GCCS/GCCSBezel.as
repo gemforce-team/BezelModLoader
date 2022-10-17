@@ -57,6 +57,8 @@ package Bezel.GCCS
 		private var logger:Logger;
 
 		internal static const defaultHotkeys:Object = createDefaultKeyConfiguration();
+		internal static const RELOAD_HOTKEY:String = "GCCS Bezel: Reload all mods";
+		internal static const ENUMBER_SETTING:String = "Optimize game numbers";
 		
 		public function get gameClassFullyQualifiedName():String { return "com.giab.games.gccs.steam.Main"; }
 		public function get MOD_NAME():String { return "GCCS Bezel"; }
@@ -75,7 +77,7 @@ package Bezel.GCCS
 			// This may not be registered, so default to true if not
 			var doEnumberFix:Boolean = true;
 			try {
-				doEnumberFix = manager.retrieveBoolean("Optimize game numbers");
+				doEnumberFix = manager.retrieveBoolean(ENUMBER_SETTING);
 			}
 			catch (e:*) {}
 
@@ -144,13 +146,13 @@ package Bezel.GCCS
 				Bezel.Bezel.instance.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
 			}
 			
-			Bezel.Bezel.instance.keybindManager.registerHotkey("GCCS Bezel: Reload all mods", new Keybind("ctrl+alt+shift+home"));
+			Bezel.Bezel.instance.keybindManager.registerHotkey(RELOAD_HOTKEY, new Keybind("ctrl+alt+shift+home"));
 			// Bezel.Bezel.instance.keybindManager.registerHotkey("GCCS Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
 		}
 
 		internal function registerSettings():void
 		{
-			manager.registerBoolean("Optimize game numbers", function(...args):void {}, true, "Makes the game faster by optimizing away some useless memory obfuscation code. Probably don't disable unless you're a developer making a coremod that's frustrated by long loading times.");
+			manager.registerBoolean(ENUMBER_SETTING, function(...args):void {}, true, "Makes the game faster by optimizing away some useless memory obfuscation code. Probably don't disable unless you're a developer making a coremod that's frustrated by long loading times.");
 		}
 		
 		private static function createDefaultKeyConfiguration():Object
