@@ -106,6 +106,7 @@ package Bezel.GCCS
 				GV.vfxEngine.createFloatingText(GV.main.mouseX,GV.main.mouseY < 60?Number(GV.main.mouseY + 30):Number(GV.main.mouseY - 20),"Reloading mods!",16768392,14,"center",Math.random() * 3 - 1.5,-4 - Math.random() * 3,0,0.55,12,0,1000);
 				Bezel.Bezel.instance.reloadAllMods();
 				GCCSBezel.registerHotkeys();
+				(Bezel.Bezel.instance.mainLoader as GCCSBezel).registerSettings();
 			}
 			// else if (Bezel.Bezel.instance.keybindManager.getHotkeyValue("GCCS Bezel: Hard reload").matches(e))
 			// {

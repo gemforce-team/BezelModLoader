@@ -81,7 +81,10 @@ package Bezel
 
 		[Embed(source = "../../assets/splitter/splitter.exe", mimeType = "application/octet-stream")] private static const splitter_data:Class;
 		private static const splitter:Object = {"name": "splitter.exe", "data":splitter_data};
-		
+
+		private static const DEBUG_INSTR_SETTING:String = "Include Debug Instructions";
+		private static const ALWAYS_COREMOD_SETTING:String = "Always submit coremod patches";
+
 		private const gameLoader:SWFFile = new SWFFile(moddedSwf);
 		private const mainLoaderLoader:SWFFile = new SWFFile(mainLoaderFile);
 
@@ -238,7 +241,7 @@ package Bezel
 			try
 			{
 				// We intentionally register this boolean later so that the MainLoader can see that we registered it, so make sure to catch the error if it occurs
-				includeDebugInstrs = manager.retrieveBoolean("Include Debug Instructions");
+				includeDebugInstrs = manager.retrieveBoolean(DEBUG_INSTR_SETTING);
 			}
 			catch (e:*){}
 
@@ -295,7 +298,6 @@ package Bezel
 						addChild(DisplayObject(mainLoaderLoader.instance));
 						logger.log("Bezel", "MainLoader loaded from " + File.applicationDirectory.getRelativePath(mainLoaderFile));
 						coremods[coremods.length] = mainLoader.coremodInfo;
-						manager.registerBoolean("Include Debug Instructions", function(...args):void{ if (LATTICE_DEFAULT_CLEAN_ASM.exists) LATTICE_DEFAULT_CLEAN_ASM.deleteFile(); }, false, "Requires restart and may cause slowdown");
 						FunctionDeferrer.deferFunction(that.loadMods, [], that, true);
 					},
 					function(...args):void{
@@ -358,7 +360,7 @@ package Bezel
 					this.mainLoader.loaderBind(this, gameLoader.instance, gameObjects);
 				}
 			}
-			bindMods();
+			bindModsAndLateRegisterSettingsAndKeybinds();
 			this.initialLoad = false;
 		}
 
@@ -367,8 +369,11 @@ package Bezel
 			this.logger.log("gameLoadFail", "Loading game failed");
 		}
 
-		private function bindMods() : void
+		private function bindModsAndLateRegisterSettingsAndKeybinds() : void
 		{
+			manager.registerBoolean(DEBUG_INSTR_SETTING, function(...args):void{ if (LATTICE_DEFAULT_CLEAN_ASM.exists) LATTICE_DEFAULT_CLEAN_ASM.deleteFile(); }, false, "Requires restart and may cause slowdown");
+			manager.registerBoolean(ALWAYS_COREMOD_SETTING, function(...args):void{}, false, "Requires restart and may cause longer load times. Mostly useful for coremod devs.");
+
 			var vecMods:Vector.<SWFFile> = new Vector.<SWFFile>();
 			for each (var mod:SWFFile in mods)
 			{
@@ -626,7 +631,7 @@ package Bezel
 			SettingManager.unregisterAllManagers();
 			if (mainLoader != null)
 			{
-				mainLoader.deregisterOption("Keybinds", null);
+				mainLoader.deregisterOption(SettingManager.MOD_KEYBIND, null);
 			}
 			for each (var mod:SWFFile in mods)
 			{
@@ -642,7 +647,7 @@ package Bezel
 
 		private function doneModReload(): void
 		{
-			bindMods();
+			bindModsAndLateRegisterSettingsAndKeybinds();
 		}
 
 		// After bezel loads mods from /Mods/ and aggregates all coremods, check if we need to reapply the coremods.
@@ -651,7 +656,15 @@ package Bezel
 		// Or They are different and we call Lattice, which then raises REBUILD_DONE
 		private function doneModLoad(): void
 		{
-			var differentCoremods:Boolean = this.coremods.length != this.prevCoremods.length;
+			var differentCoremods:Boolean = false;
+			try
+			{
+				// We intentionally register this boolean later so that the MainLoader can see that we registered it, so make sure to catch the error if it occurs
+				differentCoremods = manager.retrieveBoolean(ALWAYS_COREMOD_SETTING);
+			}
+			catch (e:*){}
+			
+			differentCoremods = differentCoremods || this.coremods.length != this.prevCoremods.length;
 			if (!differentCoremods)
 			{
 				this.coremods.sortOn("name");
@@ -723,7 +736,7 @@ package Bezel
 			SettingManager.unregisterAllManagers();
 			if (mainLoader != null)
 			{
-				mainLoader.deregisterOption("Keybinds", null);
+				mainLoader.deregisterOption(SettingManager.MOD_KEYBIND, null);
 			}
 			for each (var mod:SWFFile in mods)
 			{
