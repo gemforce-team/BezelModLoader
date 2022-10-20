@@ -1,32 +1,26 @@
 package Bezel.Lattice
 {
-	/**
-	 * Coremod handling system: accepts and applies changes to game assembly
-	 * @author piepie62
-	 */
+    /**
+     * Coremod handling system: accepts and applies changes to game assembly
+     * @author piepie62
+     */
 
-    import Bezel.Bezel;
     import Bezel.Logger;
-	import com.cff.anebe.DisassemblyDoneEvent;
-	import com.cff.anebe.Events;
+    import Bezel.mainloader_only;
+    import Bezel.Utils.FunctionDeferrer;
 
-    import flash.desktop.NativeProcess;
-    import flash.desktop.NativeProcessStartupInfo;
+    import com.cff.anebe.AssemblyDoneEvent;
+    import com.cff.anebe.BytecodeEditor;
+    import com.cff.anebe.DisassemblyDoneEvent;
+    import com.cff.anebe.Events;
+
     import flash.events.Event;
     import flash.events.EventDispatcher;
-    import flash.events.NativeProcessExitEvent;
     import flash.filesystem.File;
     import flash.filesystem.FileMode;
     import flash.filesystem.FileStream;
     import flash.utils.ByteArray;
     import flash.utils.Dictionary;
-    import flash.events.ProgressEvent;
-    import Bezel.Utils.FunctionDeferrer;
-
-    import com.cff.anebe.BytecodeEditor;
-    import com.cff.anebe.AssemblyDoneEvent;
-	
-	import Bezel.mainloader_only;
 
     public class Lattice extends EventDispatcher
     {
@@ -36,7 +30,7 @@ package Bezel.Lattice
         private var expectedPatches:Vector.<LatticePatch>;
 
         private var _asasmFiles:Object;
-		private var _asasmList:Vector.<String>;
+        private var _asasmList:Vector.<String>;
         private var swfToLoad:ByteArray;
 
         private var wasDisassembled:Boolean;
@@ -47,7 +41,7 @@ package Bezel.Lattice
             return swfToLoad;
         }
 
-        private function get asasmFiles(): Object
+        private function get asasmFiles():Object
         {
             if (this._asasmFiles == null)
             {
@@ -66,7 +60,7 @@ package Bezel.Lattice
                 }
             }
 
-        	return _asasmFiles;
+            return _asasmFiles;
         }
 
         private static const logger:Logger = Logger.getLogger("Lattice");
@@ -101,16 +95,16 @@ package Bezel.Lattice
 
             this.patches = new Vector.<LatticePatch>();
             this.expectedPatches = new Vector.<LatticePatch>();
-			
-			bytecodeEditor.addEventListener(Events.DISASSEMBLY_DONE, this.onDisassemblyDone);
-			bytecodeEditor.addEventListener(Events.ASSEMBLY_DONE, this.onAssemblyDone);
+
+            bytecodeEditor.addEventListener(Events.DISASSEMBLY_DONE, this.onDisassemblyDone);
+            bytecodeEditor.addEventListener(Events.ASSEMBLY_DONE, this.onAssemblyDone);
         }
 
-		// Disassembles the file passed in into a clean asm if necessary. Prepares Lattice patches.
+        // Disassembles the file passed in into a clean asm if necessary. Prepares Lattice patches.
         // Returns whether coremods should be reloaded, regardless of if they've changed or not.
         // Dispatches LatticeEvents.DISASSEMBLY_DONE when finished.
-		// If this is the Lattice given by Bezel, this method SHOULD NOT be called by anything other than Bezel
-        public function init(): Boolean
+        // If this is the Lattice given by Bezel, this method SHOULD NOT be called by anything other than Bezel
+        public function init():Boolean
         {
             var ret:Boolean = false;
             var needsNotification:Boolean = true;
@@ -130,7 +124,8 @@ package Bezel.Lattice
             {
                 logger.log("init", "Loading previous coremod info");
                 var stream:FileStream = new FileStream();
-                try {
+                try
+                {
                     stream.open(coremods, FileMode.READ);
                     while (stream.bytesAvailable != 0)
                     {
@@ -138,6 +133,7 @@ package Bezel.Lattice
                         var offset:uint = stream.readUnsignedInt();
                         var contents:String = stream.readUTF();
                         var overwrite:uint = stream.readUnsignedInt();
+                        var causesConflict:Boolean = stream.readBoolean();
                         this.expectedPatches[this.expectedPatches.length] = new LatticePatch(filename, offset, overwrite, contents);
                     }
                     stream.close();
@@ -176,43 +172,44 @@ package Bezel.Lattice
             {
                 coremods.deleteFile();
             }
-			if (newSwf.exists)
-			{
-				newSwf.deleteFile();
-			}
-			
-			var swf:ByteArray = new ByteArray();
+            if (newSwf.exists)
+            {
+                newSwf.deleteFile();
+            }
+
+            var swf:ByteArray = new ByteArray();
 
             var stream:FileStream = new FileStream();
             stream.open(origSwf, FileMode.READ);
             stream.readBytes(swf);
             stream.close();
-			
-			bytecodeEditor.DisassembleAsync(swf);
+
+            bytecodeEditor.DisassembleAsync(swf);
         }
-		
-		private function onDisassemblyDone(e:DisassemblyDoneEvent):void
-		{
-			_asasmFiles = e.strings;
-			var stream:FileStream = new FileStream();
-			stream.open(cleanAsm, FileMode.WRITE);
-			for (var name:String in _asasmFiles)
-			{
-				writeNTString(stream, name);
-				writeNTString(stream, _asasmFiles[name]);
-			}
-			stream.close();
+
+        private function onDisassemblyDone(e:DisassemblyDoneEvent):void
+        {
+            _asasmFiles = e.strings;
+            var stream:FileStream = new FileStream();
+            stream.open(cleanAsm, FileMode.WRITE);
+            for (var name:String in _asasmFiles)
+            {
+                writeNTString(stream, name);
+                writeNTString(stream, _asasmFiles[name]);
+            }
+            stream.close();
 
             this.wasDisassembled = true;
 
-			dispatchEvent(new Event(LatticeEvent.DISASSEMBLY_DONE));
-		}
+            dispatchEvent(new Event(LatticeEvent.DISASSEMBLY_DONE));
+        }
 
         // Actually applies the coremods and runs the reassembler. Dispatches LatticeEvents.REBUILD_DONE when finished.
-		// If this is the Lattice given by Bezel, this method SHOULD NOT be called by anything other than Bezel
-        public function apply(): void
+        // If this is the Lattice given by Bezel, this method SHOULD NOT be called by anything other than Bezel
+        public function apply():void
         {
-            var comp:Function = function (patch1:LatticePatch, patch2:LatticePatch) : int {
+            var comp:Function = function (patch1:LatticePatch, patch2:LatticePatch):int
+            {
                 if (patch1.filename < patch2.filename)
                 {
                     return -1;
@@ -233,40 +230,40 @@ package Bezel.Lattice
                     }
                     else
                     {
-						if (!patch1.causesConflict && patch2.causesConflict)
-						{
-							return -1;
-						}
-						else if (patch1.causesConflict && !patch2.causesConflict)
-						{
-							return 1;
-						}
-						else
-						{
-							if (patch1.overwritten < patch2.overwritten)
-							{
-								return 1;
-							}
-							else if (patch2.overwritten < patch1.overwritten)
-							{
-								return -1;
-							}
-							else
-							{
-								if (patch1.contents < patch2.contents)
-								{
-									return -1;
-								}
-								else if (patch2.contents < patch1.contents)
-								{
-									return 1;
-								}
-								else
-								{
-									return 0;
-								}
-							}
-						}
+                        if (!patch1.causesConflict && patch2.causesConflict)
+                        {
+                            return -1;
+                        }
+                        else if (patch1.causesConflict && !patch2.causesConflict)
+                        {
+                            return 1;
+                        }
+                        else
+                        {
+                            if (patch1.overwritten < patch2.overwritten)
+                            {
+                                return 1;
+                            }
+                            else if (patch2.overwritten < patch1.overwritten)
+                            {
+                                return -1;
+                            }
+                            else
+                            {
+                                if (patch1.contents < patch2.contents)
+                                {
+                                    return -1;
+                                }
+                                else if (patch2.contents < patch1.contents)
+                                {
+                                    return 1;
+                                }
+                                else
+                                {
+                                    return 0;
+                                }
+                            }
+                        }
                     }
                 }
             };
@@ -286,7 +283,8 @@ package Bezel.Lattice
                     if (expectedPatches[i].filename != patches[i].filename ||
                         expectedPatches[i].contents != patches[i].contents ||
                         expectedPatches[i].offset != patches[i].offset ||
-                        expectedPatches[i].overwritten != patches[i].overwritten)
+                        expectedPatches[i].overwritten != patches[i].overwritten ||
+                        expectedPatches[i].causesConflict != patches[i].causesConflict)
                     {
                         unchangedPatches = false;
                         break;
@@ -304,6 +302,7 @@ package Bezel.Lattice
                     stream.writeUnsignedInt(patch.offset);
                     stream.writeUTF(patch.contents);
                     stream.writeUnsignedInt(patch.overwritten);
+                    stream.writeBoolean(patch.causesConflict);
                 }
                 stream.close();
 
@@ -316,7 +315,7 @@ package Bezel.Lattice
             }
         }
 
-        private function checkConflicts(): void
+        private function checkConflicts():void
         {
             var replaced:Object = new Object();
             for each (var patch:LatticePatch in patches)
@@ -338,16 +337,17 @@ package Bezel.Lattice
             {
                 if (patch.filename in replaced && Dictionary(replaced[patch.filename])[patch.offset] != null && Dictionary(replaced[patch.filename])[patch.offset] != patch)
                 {
-                    if (patch.causesConflict && (patch.overwritten != 0 || (patch.offset != 0 && Dictionary(replaced[patch.filename])[patch.offset - 1] != null))) {
+                    if (patch.causesConflict && (patch.overwritten != 0 || (patch.offset != 0 && Dictionary(replaced[patch.filename])[patch.offset - 1] != null)))
+                    {
                         throw new Error("Lattice (for " + origSwf.nativePath + "): Modifications at line " + patch.offset + " conflict");
                     }
                 }
             }
         }
 
-        private function doPatchAndReassemble(): void
+        private function doPatchAndReassemble():void
         {
-            var doSinglePatch:Function = function(i:int):void
+            var doSinglePatch:Function = function (i:int):void
             {
                 var patch:LatticePatch = patches[i];
                 logger.log("doPatch", "Patching line " + patch.offset + " of " + patch.filename);
@@ -361,9 +361,9 @@ package Bezel.Lattice
                 asasmFiles[patch.filename] = dataAsStrings.join('\n');
                 dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));
 
-                if (i+1 < patches.length)
+                if (i + 1 < patches.length)
                 {
-                    FunctionDeferrer.deferFunction(doSinglePatch, [i+1], null, true);
+                    FunctionDeferrer.deferFunction(doSinglePatch, [i + 1], null, true);
                 }
                 else
                 {
@@ -385,7 +385,7 @@ package Bezel.Lattice
                         stream.readBytes(replaceBytes);
                         stream.close();
                     }
-                    
+
                     bytecodeEditor.AssembleAsync(_asasmFiles, includeDebugInstructions, replaceBytes);
                 }
             };
@@ -401,21 +401,21 @@ package Bezel.Lattice
             out.open(newSwf, FileMode.WRITE);
             out.writeBytes(swfToLoad);
             out.close();
-			
-			bytecodeEditor.Cleanup();
-            
+
+            bytecodeEditor.Cleanup();
+
             dispatchEvent(new Event(LatticeEvent.REBUILD_DONE));
         }
-		
-		/**
-		 * Returns whether a file exists in the disassembly.
-		 * @param filename File to search for
-		 * @return Whether or not it exists
-		 */
-		public function doesFileExist(filename:String): Boolean
-		{
-			return filename in this.asasmFiles;
-		}
+
+        /**
+         * Returns whether a file exists in the disassembly.
+         * @param filename File to search for
+         * @return Whether or not it exists
+         */
+        public function doesFileExist(filename:String):Boolean
+        {
+            return filename in this.asasmFiles;
+        }
 
         /**
          * Inserts and optionally removes assembly at a given line offset within a passed-in GCFW assembly filename.
@@ -426,7 +426,7 @@ package Bezel.Lattice
          *                     if this is 1 and offset is 1, the second line will be removed
          * @param contents New lines of assembly to insert. Can be empty if only removal is necessary
          */
-        public function patchFile(filename:String, offset:int, replaceLines:int, contents:String): void
+        public function patchFile(filename:String, offset:int, replaceLines:int, contents:String):void
         {
             if (!(filename in this.asasmFiles))
             {
@@ -440,7 +440,7 @@ package Bezel.Lattice
          * @param filename File to retrieve. If retrieving a class, this will be the fully qualified name of the class with periods replaced by /,
          *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          */
-        public function retrieveFile(filename:String): String
+        public function retrieveFile(filename:String):String
         {
             if (!(filename in this.asasmFiles))
             {
@@ -454,10 +454,10 @@ package Bezel.Lattice
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
          *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param pattern Pattern to search for. Can be a multiline regex
-		 * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
+         * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
          * @return The line index where the pattern matched. Zero-indexed, so can be passed directly into another findPattern or into patchFile
          */
-        public function findPattern(filename:String, pattern:RegExp, searchFrom:int = 0): int
+        public function findPattern(filename:String, pattern:RegExp, searchFrom:int = 0):int
         {
             if (!(filename in this.asasmFiles))
             {
@@ -490,10 +490,10 @@ package Bezel.Lattice
          *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param pattern Pattern to search for. Can be a multiline regex
          * @param replacement Object to use for replacement string. Passed into the second argument of String.replace
-		 * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
+         * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
          * @return Whether the find and replacement succeeded
          */
-        public function replacePattern(filename:String, pattern:RegExp, replacement:*, searchFrom:int = 0): Boolean
+        public function replacePattern(filename:String, pattern:RegExp, replacement:*, searchFrom:int = 0):Boolean
         {
             if (!(filename in this.asasmFiles))
             {
@@ -511,7 +511,7 @@ package Bezel.Lattice
                 searchString = searchString.split('\n').slice(0, lines.length).join('\n');
 
                 var replaced:String = searchString.replace(pattern, replacement);
-                
+
                 this.patchFile(filename, line, lines.length, replaced);
 
                 return true;
@@ -525,10 +525,10 @@ package Bezel.Lattice
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
          *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param pattern Pattern to search for. Can be a multiline regex
-		 * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
+         * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
          * @return The result of pattern.exec
          */
-        public function retrievePattern(filename:String, pattern:RegExp, searchFrom:int = 0): Object
+        public function retrievePattern(filename:String, pattern:RegExp, searchFrom:int = 0):Object
         {
             if (!(filename in this.asasmFiles))
             {
@@ -548,7 +548,7 @@ package Bezel.Lattice
          * @param lines Number of lines to retrieve
          * @return A string containing the specified region of code
          */
-        public function retrieveCode(filename:String, offset:int, lines:int): String
+        public function retrieveCode(filename:String, offset:int, lines:int):String
         {
             if (!(filename in this.asasmFiles))
             {
@@ -566,7 +566,7 @@ package Bezel.Lattice
          * @param lines Number of lines to retrieve
          * @return A string containing the specified region of code
          */
-        public function extractCode(filename:String, offset:int, lines:int): String
+        public function extractCode(filename:String, offset:int, lines:int):String
         {
             if (!(filename in this.asasmFiles))
             {
@@ -578,14 +578,14 @@ package Bezel.Lattice
             return retrieveCode(filename, offset, lines);
         }
 
-        private static function readNTString(data:ByteArray): String
+        private static function readNTString(data:ByteArray):String
         {
             var position:uint = data.position;
             var length:uint = data.length;
             var num:uint = 0;
             while (num + position < length && data[num + position] != 0)
             {
-                ++num;
+                ++ num;
             }
 
             var ret:String = data.readUTFBytes(num);
@@ -593,41 +593,41 @@ package Bezel.Lattice
             return ret;
         }
 
-        private static function writeNTString(stream:FileStream, data:String): void
+        private static function writeNTString(stream:FileStream, data:String):void
         {
             stream.writeUTFBytes(data);
             stream.writeByte(0);
         }
-		
-		/**
-		 * Gets a list of files available to edit in the currently loaded ABC.
-		 * @return List of filenames that can be passed to the code edit functions
-		 */
-		public function listFiles():Vector.<String>
-		{
-			var ret:Vector.<String> = new <String>[];
-			for (var file:String in asasmFiles)
-			{
-				ret[ret.length] = file;
-			}
-			return ret;
-		}
-		
-		/**
-		 * This should ONLY be used if you are ABSOLUTELY SURE you know what you're doing!
-		 * Applies a Lattice patch WITHOUT causing conflicts with any other patches that might affect the same line.
-		 * Example use case: GemCraft Chasing Shadows ENumbers can be inlined with a single instruction change, which results in massive performance gains
-		 * Should almost certainly only be used by MainLoaders
-		 * Note: these patches must replace the exact number of lines that the contents have
-         * 
-		 * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
+
+        /**
+         * Gets a list of files available to edit in the currently loaded ABC.
+         * @return List of filenames that can be passed to the code edit functions
+         */
+        public function listFiles():Vector.<String>
+        {
+            var ret:Vector.<String> = new <String>[];
+            for (var file:String in asasmFiles)
+            {
+                ret[ret.length] = file;
+            }
+            return ret;
+        }
+
+        /**
+         * This should ONLY be used if you are ABSOLUTELY SURE you know what you're doing!
+         * Applies a Lattice patch WITHOUT causing conflicts with any other patches that might affect the same line.
+         * Example use case: GemCraft Chasing Shadows ENumbers can be inlined with a single instruction change, which results in massive performance gains
+         * Should almost certainly only be used by MainLoaders
+         * Note: these patches must replace the exact number of lines that the contents have
+         *
+         * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
          *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param offset Offset at which to insert the contents. Note that this is zero-indexed: value 1 will be inserted AFTER line 1
          * @param replaceLines Number of lines to remove at the specified offset. Note that this will delete with respect to zero-indexing:
          *                     if this is 1 and offset is 1, the second line will be removed
          * @param contents New lines of assembly to insert. Can be empty if only removal is necessary
          */
-        mainloader_only function DANGEROUS_patchFile(filename:String, offset:int, replaceLines:int, contents:String): void
+        mainloader_only function DANGEROUS_patchFile(filename:String, offset:int, replaceLines:int, contents:String):void
         {
             if (!(filename in this.asasmFiles))
             {

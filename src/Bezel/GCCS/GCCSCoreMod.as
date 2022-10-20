@@ -1,4 +1,4 @@
-package Bezel.GCCS 
+package Bezel.GCCS
 {
     import Bezel.Lattice.Lattice;
     import Bezel.mainloader_only;
@@ -307,14 +307,14 @@ package Bezel.GCCS
                 new GCCSSingleCoreMod('name "com.giab.common.data:ENumber/g"', 12, 39, 'getlocal0\ngetproperty QName(PrivateNamespace("com.giab.common.data:ENumber"), "a")'),
                 new GCCSSingleCoreMod([ 'name "com.giab.common.data:ENumber/s"', "throw" ], 1, 134, 'getlocal0\ngetlocal1\nsetproperty QName(PrivateNamespace("com.giab.common.data:ENumber"), "a")')
             ]
-        }
+        };
 
         private static var EVERY_FILE_EVERY_LINE_PATCHES:Vector.<Vector.<String>> = new <Vector.<String>>[
-            new <String>['callproperty.*\"g\"', 'getproperty QName(PrivateNamespace("com.giab.common.data:ENumber"), "a")'],
-            new <String>['callproperty.*\"s\"', 'setproperty QName(PrivateNamespace("com.giab.common.data:ENumber"), "a")']
-        ];
+                new <String>['callproperty.*"g"', 'getproperty QName(PrivateNamespace("com.giab.common.data:ENumber"), "a")'],
+                new <String>['callproperty.*"s"', 'setproperty QName(PrivateNamespace("com.giab.common.data:ENumber"), "a")']
+            ];
 
-        internal static function installHooks(lattice:Lattice, doEnumberFix:Boolean): void
+        internal static function installHooks(lattice:Lattice, doEnumberFix:Boolean):void
         {
             for (var file:String in coremods)
             {
@@ -334,17 +334,22 @@ package Bezel.GCCS
                 var allfiles:Vector.<String> = lattice.listFiles();
                 for each (var filename:String in allfiles)
                 {
+                    // Note: this is honestly pretty disgusting logic and should probably not be replicated in any other coremods. 
+                    var fileContents:String = lattice.retrieveFile(filename);
                     for each (var everylinepatch:Vector.<String> in EVERY_FILE_EVERY_LINE_PATCHES)
                     {
-                        var re:RegExp = new RegExp(everylinepatch[0]);
-                        offset = 0;
-                        while (offset != -1)
+                        var re:RegExp = new RegExp(everylinepatch[0], "g");
+                        var result:Object = re.exec(fileContents);
+                        var previousOffset:int = 0;
+                        var previousLineOffset:int = 0;
+                        while (result != null)
                         {
-                            offset = lattice.findPattern(filename, re, offset);
-                            if (offset != -1)
-                            {
-                                lattice.mainloader_only::DANGEROUS_patchFile(filename, offset-1, 1, everylinepatch[1]);
-                            }
+                            offset = result.index;
+                            var lineOffset:int = previousLineOffset + fileContents.substr(previousOffset, offset - previousOffset).split('\n').length - 1;
+                            lattice.mainloader_only::DANGEROUS_patchFile(filename, lineOffset, 1, everylinepatch[1]);
+                            previousOffset = offset;
+                            previousLineOffset = lineOffset;
+                            result = re.exec(fileContents);
                         }
                     }
                 }

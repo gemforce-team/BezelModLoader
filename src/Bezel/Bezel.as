@@ -8,19 +8,19 @@ package Bezel
 	import Bezel.Utils.SettingManager;
 
 	import flash.desktop.NativeApplication;
-	import flash.display.*;
-	import flash.events.*;
+	import flash.display.DisplayObject;
+	import flash.display.MovieClip;
+	import flash.display.Sprite;
 	import flash.events.Event;
-	import flash.filesystem.*;
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
 	import flash.text.TextField;
+	import flash.text.TextFormat;
+	import flash.text.TextFormatAlign;
 	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
 	import flash.utils.getQualifiedClassName;
-	import flash.text.TextFormat;
-	import flash.text.TextFormatAlign;
 	
 	use namespace bezel_internal;
 	use namespace mainloader_only;
