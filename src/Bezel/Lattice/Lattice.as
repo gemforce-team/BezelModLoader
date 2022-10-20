@@ -347,18 +347,19 @@ package Bezel.Lattice
 
         private function doPatchAndReassemble():void
         {
+            var dataAsStrings:Object = new Object();
             var doSinglePatch:Function = function (i:int):void
             {
                 var patch:LatticePatch = patches[i];
                 logger.log("doPatch", "Patching line " + patch.offset + " of " + patch.filename);
 
-                var dataAsStrings:Array = asasmFiles[patch.filename].split('\n');
+                if (!(patch.filename in dataAsStrings))
+                {
+                    dataAsStrings[patch.filename] = asasmFiles[patch.filename].split('\n');
+                }
+                var lines:Array = dataAsStrings[patch.filename];
+                dataAsStrings[patch.filename] = lines.slice(0, patch.offset).concat(patch.contents.split('\n'), lines.slice(patch.offset + patch.overwritten));
 
-                dataAsStrings.splice(patch.offset, patch.overwritten, patch.contents);
-
-                // dataAsStrings.insertAt(patch.offset, patch.contents);
-
-                asasmFiles[patch.filename] = dataAsStrings.join('\n');
                 dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));
 
                 if (i + 1 < patches.length)
@@ -367,6 +368,11 @@ package Bezel.Lattice
                 }
                 else
                 {
+                    for (var filename:String in dataAsStrings)
+                    {
+                        asasmFiles[filename] = dataAsStrings[filename].join('\n');
+                    }
+
                     var stream:FileStream = new FileStream();
                     stream.open(asm, FileMode.WRITE);
                     for (var file:String in asasmFiles)
