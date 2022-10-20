@@ -357,7 +357,12 @@ package Bezel.Lattice
                 {
                     dataAsStrings[patch.filename] = asasmFiles[patch.filename].split('\n');
                 }
-                dataAsStrings[patch.filename].splice(patch.offset, patch.overwritten, patch.contents);
+                var lines:Array = dataAsStrings[patch.filename];
+                var appendAfter:Array = lines.splice(patch.offset + patch.overwritten, lines.length - (patch.offset + patch.overwritten));
+                lines.splice(patch.offset, patch.overwritten);
+                lines = lines.concat(patch.contents.split('\n'));
+                lines = lines.concat(appendAfter);
+                dataAsStrings[patch.filename] = lines;
 
                 dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));
 
