@@ -580,8 +580,10 @@ package Bezel.Lattice
 
         private static function readNTString(data:ByteArray): String
         {
+            var position:uint = data.position;
+            var length:uint = data.length;
             var num:uint = 0;
-            while (num + data.position < data.length && data[num + data.position] != 0)
+            while (num + position < length && data[num + position] != 0)
             {
                 ++num;
             }
