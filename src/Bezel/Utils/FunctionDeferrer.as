@@ -7,7 +7,7 @@ package Bezel.Utils
     import Bezel.bezel_internal;
 
     /**
-     * ...
+     * Utility to delay function calls until later. "Later" may mean either the next frame or sometime in this one.
      * @author Chris
      */
     public class FunctionDeferrer
@@ -16,7 +16,7 @@ package Bezel.Utils
         instance.init();
 
         // 30FPS
-        private const myTimer:Timer = new Timer(1000/30);
+        private const myTimer:Timer = new Timer(1000 / 30);
         private const functions:Vector.<DeferredFunctionToken> = new <DeferredFunctionToken>[];
         private const newFunctions:Vector.<DeferredFunctionToken> = new <DeferredFunctionToken>[];
 
@@ -38,7 +38,7 @@ package Bezel.Utils
                     {
                         e.updateAfterEvent();
                     }
-                    if (currentTime + 16 <= getTimer()) // Only use a maximum of about half a frame
+                    if (currentTime + 33 <= getTimer()) // Only use a maximum of about half a frame
                     {
                         break;
                     }
@@ -97,7 +97,7 @@ package Bezel.Utils
         bezel_internal static function clear():void
         {
             instance.myTimer.stop();
-            
+
             instance.functions.length = 0;
         }
     }
