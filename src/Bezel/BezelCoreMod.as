@@ -1,7 +1,7 @@
 package Bezel
 {
 	import Bezel.Lattice.Lattice;
-	
+
 	/**
 	 * Defines the interface of a coremod. Coremods can perform assembly edits to the game using Lattice
 	 * @author Chris
@@ -12,10 +12,10 @@ package Bezel
 		 * The version of the coremod
 		 */
 		function get COREMOD_VERSION():String;
+
 		/**
 		 * Registers all coremod changes with Lattice
 		 */
 		function loadCoreMod(lattice:Lattice):void;
 	}
-	
 }

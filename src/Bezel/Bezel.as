@@ -89,24 +89,24 @@ package Bezel
 		private const mainLoaderLoader:SWFFile = new SWFFile(mainLoaderFile);
 
 		/**
-		 * The instance of this class.
+         * The instance of this class.
 		 */
 		public static function get instance():Bezel { return _instance; }
 		/**
-		 * MainLoaders may store references to game objects here. See your MainLoader for documentation on its gameObjects format.
+         * MainLoaders may store references to game objects here. See your MainLoader for documentation on its gameObjects format.
 		 * Will never be null during or after the bind phase.
 		 */
 		public function get gameObjects():Object { return _gameObjects; }
 		/**
-		 * The MainLoader for the game. May be null for a game loaded without a MainLoader!
+         * The MainLoader for the game. May be null for a game loaded without a MainLoader!
 		 */
 		public function get mainLoader():MainLoader { return _mainLoader; }
 		/**
-		 * The KeybindManager used for the game
+         * The KeybindManager used for the game
 		 */
 		public function get keybindManager():KeybindManager { return _keybindManager; }
 		/**
-		 * Last time mods were reloaded. Can be used to implement a reload timeout.
+         * Last time mods were reloaded. Can be used to implement a reload timeout.
 		 */
 		public function get modsReloadedTimestamp():int { return _modsReloadedTimestamp; }
 		
@@ -580,7 +580,7 @@ package Bezel
 		}
 
 		/**
-		 * Gets a logger for the given mod ID
+         * Gets a logger for the given mod ID
 		 * @param id Mod ID
 		 * @return Logger for the ID
 		 */
@@ -590,7 +590,7 @@ package Bezel
 		}
 
 		/**
-		 * Gets a setting manager for the given mod ID
+         * Gets a setting manager for the given mod ID
 		 * @param id Mod ID
 		 * @return Manager for the ID
 		 */
@@ -600,7 +600,7 @@ package Bezel
 		}
 
 		/**
-		 * Returns a mod's instance, if such a mod is loaded. Used for cross-mod interactions
+         * Returns a mod's instance, if such a mod is loaded. Used for cross-mod interactions
 		 * @param	modName Name of the mod to retrive
 		 * @return  The mod loaded by the name "modName", or null if none exists
 		 */
@@ -612,7 +612,7 @@ package Bezel
 		}
 
 		/**
-		 * Returns the version formatted for display in a game version string. Probably unnecessary for anything except MainLoaders
+         * Returns the version formatted for display in a game version string. Probably unnecessary for anything except MainLoaders
 		 * @return Formatted version string
 		 */
 		public static function prettyVersion(): String
@@ -621,7 +621,7 @@ package Bezel
 		}
 
 		/**
-		 * Unloads, then reloads every mod. Almost certainly should only be used by MainLoaders
+         * Unloads, then reloads every mod. Almost certainly should only be used by MainLoaders
 		 */
 		mainloader_only function reloadAllMods(): void
 		{
@@ -719,7 +719,7 @@ package Bezel
 		}
 
 		/**
-		 * Triggers a full reload of Bezel, the game, and the MainLoader. Will not be called by Bezel itself, and must instead be called by
+         * Triggers a full reload of Bezel, the game, and the MainLoader. Will not be called by Bezel itself, and must instead be called by
 		 * a MainLoader (and nearly certainly not a regular mod).
 		 */
 		mainloader_only function triggerFullReload():void

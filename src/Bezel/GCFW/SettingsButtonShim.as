@@ -1,8 +1,8 @@
 package Bezel.GCFW
 {
-	import GemCraftFrostbornWrath_fla.btnplate160x34_24;
-	import flash.display.MovieClip;
-	import flash.text.TextField;
+    import GemCraftFrostbornWrath_fla.btnplate160x34_24;
+    import flash.display.MovieClip;
+    import flash.text.TextField;
 
     /**
      * ...

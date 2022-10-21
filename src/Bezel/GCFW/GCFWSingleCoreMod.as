@@ -7,13 +7,25 @@ package Bezel.GCFW
     internal class GCFWSingleCoreMod
     {
         private var _matches:Array;
-        public function get matches():Array { return _matches; }
+        public function get matches():Array
+        {
+            return _matches;
+        }
         private var _offset:int;
-        public function get offset():int { return _offset; }
+        public function get offset():int
+        {
+            return _offset;
+        }
         private var _replacenum:int;
-        public function get replacenum():int { return _replacenum; }
+        public function get replacenum():int
+        {
+            return _replacenum;
+        }
         private var _contents:String;
-        public function get contents():String { return _contents; }
+        public function get contents():String
+        {
+            return _contents;
+        }
 
         public function GCFWSingleCoreMod(match:*, offset:int, replacenum:int, contents:String)
         {

@@ -1,10 +1,5 @@
 package Bezel.Lattice
 {
-    /**
-     * Coremod handling system: accepts and applies changes to game assembly
-     * @author piepie62
-     */
-
     import Bezel.Logger;
     import Bezel.mainloader_only;
     import Bezel.Utils.FunctionDeferrer;
@@ -22,6 +17,10 @@ package Bezel.Lattice
     import flash.utils.ByteArray;
     import flash.utils.Dictionary;
 
+    /**
+     * Coremod handling system: accepts and applies changes to game assembly
+     * @author piepie62
+     */
     public class Lattice extends EventDispatcher
     {
         private var bytecodeEditor:BytecodeEditor = new BytecodeEditor();
@@ -426,10 +425,10 @@ package Bezel.Lattice
         /**
          * Inserts and optionally removes assembly at a given line offset within a passed-in GCFW assembly filename.
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
-         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         * followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param offset Offset at which to insert the contents. Note that this is zero-indexed: value 1 will be inserted AFTER line 1
          * @param replaceLines Number of lines to remove at the specified offset. Note that this will delete with respect to zero-indexing:
-         *                     if this is 1 and offset is 1, the second line will be removed
+         * if this is 1 and offset is 1, the second line will be removed
          * @param contents New lines of assembly to insert. Can be empty if only removal is necessary
          */
         public function patchFile(filename:String, offset:int, replaceLines:int, contents:String):void
@@ -444,7 +443,7 @@ package Bezel.Lattice
         /**
          * Retrieves the contents of the passed-in GCFW assembly filename.
          * @param filename File to retrieve. If retrieving a class, this will be the fully qualified name of the class with periods replaced by /,
-         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         * followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          */
         public function retrieveFile(filename:String):String
         {
@@ -458,7 +457,7 @@ package Bezel.Lattice
         /**
          * Finds a regex within a passed-in GCFW assembly filename
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
-         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         * followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param pattern Pattern to search for. Can be a multiline regex
          * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
          * @return The line index where the pattern matched. Zero-indexed, so can be passed directly into another findPattern or into patchFile
@@ -493,7 +492,7 @@ package Bezel.Lattice
         /**
          * Finds and replaces a regex within a passed-in GCFW assembly filename. Note that $ replacement codes can be used in the replacement string.
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
-         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         * followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param pattern Pattern to search for. Can be a multiline regex
          * @param replacement Object to use for replacement string. Passed into the second argument of String.replace
          * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
@@ -529,7 +528,7 @@ package Bezel.Lattice
         /**
          * Copies out code found via a regex within a passed-in GCFW assembly filename
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
-         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         * followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param pattern Pattern to search for. Can be a multiline regex
          * @param searchFrom Offset at which to start searching the contents. Note that this is zero-indexed: value 1 will search lines 2-end
          * @return The result of pattern.exec
@@ -549,7 +548,7 @@ package Bezel.Lattice
         /**
          * Copies out code from the passed-in GCFW assembly filename
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
-         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         * followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param offset Offset from which to pull the contents. Note that this is zero-indexed: value 1 will retrieve lines 2-offset+lines
          * @param lines Number of lines to retrieve
          * @return A string containing the specified region of code
@@ -567,7 +566,7 @@ package Bezel.Lattice
         /**
          * Copies out code from the passed-in GCFW assembly filename, removing it from its original position.
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
-         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         * followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param offset Offset from which to pull the contents. Note that this is zero-indexed: value 1 will retrieve lines 2-offset+lines
          * @param lines Number of lines to retrieve
          * @return A string containing the specified region of code
@@ -627,10 +626,10 @@ package Bezel.Lattice
          * Note: these patches must replace the exact number of lines that the contents have
          *
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
-         *                 followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
+         * followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param offset Offset at which to insert the contents. Note that this is zero-indexed: value 1 will be inserted AFTER line 1
          * @param replaceLines Number of lines to remove at the specified offset. Note that this will delete with respect to zero-indexing:
-         *                     if this is 1 and offset is 1, the second line will be removed
+         * if this is 1 and offset is 1, the second line will be removed
          * @param contents New lines of assembly to insert. Can be empty if only removal is necessary
          */
         mainloader_only function DANGEROUS_patchFile(filename:String, offset:int, replaceLines:int, contents:String):void

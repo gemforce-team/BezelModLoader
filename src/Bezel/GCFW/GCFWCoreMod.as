@@ -1,12 +1,12 @@
 package Bezel.GCFW
 {
+    import Bezel.Lattice.Lattice;
+    import Bezel.mainloader_only;
+    
     /**
      * ...
      * @author piepie62
      */
-    import Bezel.Lattice.Lattice;
-    import Bezel.mainloader_only;
-
     internal class GCFWCoreMod
     {
         public static const VERSION:String = "10";

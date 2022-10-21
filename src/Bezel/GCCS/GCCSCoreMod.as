@@ -3,10 +3,6 @@ package Bezel.GCCS
     import Bezel.Lattice.Lattice;
     import Bezel.mainloader_only;
 
-    /**
-     * ...
-     * @author piepie62
-     */
     internal class GCCSCoreMod
     {
         public static const VERSION:String = "11";

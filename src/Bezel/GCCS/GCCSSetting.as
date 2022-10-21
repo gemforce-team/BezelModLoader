@@ -27,52 +27,52 @@ package Bezel.GCCS
 
         public function get type():String
         {
-        	return _type;
+            return _type;
         }
 
         public function get mod():String
         {
-        	return _mod;
+            return _mod;
         }
 
         public function get name():String
         {
-        	return _name;
+            return _name;
         }
 
         public function get onSet():Function
         {
-        	return _onSet;
+            return _onSet;
         }
 
         public function get currentVal():Function
         {
-        	return _currentVal;
+            return _currentVal;
         }
 
         public function get description():String
         {
-        	return _description;
+            return _description;
         }
 
         public function get min():Number
         {
-        	return _min;
+            return _min;
         }
 
         public function get max():Number
         {
-        	return _max;
+            return _max;
         }
 
         public function get step():Number
         {
-        	return _step;
+            return _step;
         }
 
         public function get validator():Function
         {
-        	return _validator;
+            return _validator;
         }
 
         public static const TYPE_BOOL:String = "bool";
@@ -80,7 +80,7 @@ package Bezel.GCCS
         public static const TYPE_KEYBIND:String = "keybind";
         public static const TYPE_NUMBER:String = "number";
         public static const TYPE_STRING:String = "string";
-        
+
         public function GCCSSetting(type:String = null, mod:String = null, name:String = null, onSet:Function = null, currentVal:Function = null, description:String = null, min:Number = NaN, max:Number = NaN, step:Number = NaN, validator:Function = null)
         {
             this._type = type;

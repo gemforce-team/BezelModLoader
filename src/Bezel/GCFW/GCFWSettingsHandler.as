@@ -1,21 +1,21 @@
 package Bezel.GCFW
 {
-	import Bezel.Utils.Keybind;
-	import Bezel.Utils.SettingManager;
-	
-	import com.giab.common.utils.MathToolbox;
-	import com.giab.games.gcfw.GV;
-	import com.giab.games.gcfw.mcDyn.McInfoPanel;
-	import com.giab.games.gcfw.mcDyn.McOptPanel;
-	import com.giab.games.gcfw.mcDyn.McOptTitle;
-	
-	import flash.display.MovieClip;
-	import flash.display.Sprite;
-	import flash.events.KeyboardEvent;
-	import flash.events.MouseEvent;
-	import flash.text.TextFormat;
-	import flash.ui.Keyboard;
-	import flash.utils.describeType;
+    import Bezel.Utils.Keybind;
+    import Bezel.Utils.SettingManager;
+
+    import com.giab.common.utils.MathToolbox;
+    import com.giab.games.gcfw.GV;
+    import com.giab.games.gcfw.mcDyn.McInfoPanel;
+    import com.giab.games.gcfw.mcDyn.McOptPanel;
+    import com.giab.games.gcfw.mcDyn.McOptTitle;
+
+    import flash.display.MovieClip;
+    import flash.display.Sprite;
+    import flash.events.KeyboardEvent;
+    import flash.events.MouseEvent;
+    import flash.text.TextFormat;
+    import flash.ui.Keyboard;
+    import flash.utils.describeType;
 
     /**
      * ...
@@ -33,14 +33,14 @@ package Bezel.GCFW
         private static const KeyboardConstants:XMLList = describeType(Keyboard).constant.(@type == "uint").@name;
 
         internal static function registerBooleanForDisplay(mod:String, name:String, onSet:Function, currentValue:Function, description:String):void
-		{
+        {
             newSettings[newSettings.length] = GCFWSetting.makeBool(mod, name, onSet, currentValue, description);
-		}
+        }
 
-		internal static function registerFloatRangeForDisplay(mod:String, name:String, min:Number, max:Number, step:Number, onSet:Function, currentValue:Function, description:String):void
-		{
-			newSettings[newSettings.length] = GCFWSetting.makeRange(mod, name, min, max, step, onSet, currentValue, description);
-		}
+        internal static function registerFloatRangeForDisplay(mod:String, name:String, min:Number, max:Number, step:Number, onSet:Function, currentValue:Function, description:String):void
+        {
+            newSettings[newSettings.length] = GCFWSetting.makeRange(mod, name, min, max, step, onSet, currentValue, description);
+        }
 
         internal static function registerKeybindForDisplay(name:String, onSet:Function, currentValue:Function, description:String):void
         {
@@ -57,16 +57,16 @@ package Bezel.GCFW
             newSettings[newSettings.length] = GCFWSetting.makeString(mod, name, validator, onSet, currentValue, description);
         }
 
-		internal static function deregisterOption(mod:String, name:String):void
-		{
+        internal static function deregisterOption(mod:String, name:String):void
+        {
             for (var i:int = newSettings.length; i > 0; i--)
             {
-                if (newSettings[i-1].mod == mod && (name == null || newSettings[i-1].name == name))
+                if (newSettings[i - 1].mod == mod && (name == null || newSettings[i - 1].name == name))
                 {
-                    newSettings.splice(i-1, 1);
+                    newSettings.splice(i - 1, 1);
                 }
             }
-		}
+        }
 
         internal static function toggleCustomSettingsFromGame():void
         {
@@ -74,7 +74,8 @@ package Bezel.GCFW
             {
                 var vY:int = 2720;
                 var currentPanelX:int = getNewPanelX(0);
-                newSettings.sort(function(left:GCFWSetting, right:GCFWSetting):Number{
+                newSettings.sort(function (left:GCFWSetting, right:GCFWSetting):Number
+                {
                     // Sort keybinds first
                     if (left.mod == SettingManager.MOD_KEYBIND) // Keybinds always come second to last
                     {
@@ -144,15 +145,16 @@ package Bezel.GCFW
                         vY += getNewPanelYModifier(currentPanelX);
                         var boolPanel:McOptPanel = new McOptPanel(setting.name, currentPanelX, vY, false);
                         currentPanelX = getNewPanelX(currentPanelX);
-                        var onBooleanClicked:Function = function(s:GCFWSetting):Function
+                        var onBooleanClicked:Function = function (s:GCFWSetting):Function
                         {
-                            return function(e:MouseEvent):void
+                            return function (e:MouseEvent):void
                             {
                                 var current:Boolean = s.currentVal();
                                 s.onSet(!current);
                                 e.target.parent.btn.gotoAndStop(!current ? 2 : 1);
                             };
-                        }(setting);
+                        }
+                        (setting);
                         boolPanel.btn.gotoAndStop(setting.currentVal() ? 2 : 1);
                         boolPanel.plate.addEventListener(MouseEvent.CLICK, onBooleanClicked);
                         setting.panel = boolPanel;
@@ -164,9 +166,9 @@ package Bezel.GCFW
                         vY += getNewPanelYModifier(currentPanelX);
                         var rangePanel:McOptPanel = new McOptPanel(setting.name, currentPanelX, vY, true);
                         currentPanelX = getNewPanelX(currentPanelX);
-                        var onRangeClicked:Function = function(s:GCFWSetting):Function
+                        var onRangeClicked:Function = function (s:GCFWSetting):Function
                         {
-                            var onRangeReleased:Function = function(e:MouseEvent):void
+                            var onRangeReleased:Function = function (e:MouseEvent):void
                             {
                                 GV.main.stage.removeEventListener(MouseEvent.MOUSE_UP, arguments.callee, true);
                                 GV.main.scrOptions.isDragging = false;
@@ -179,17 +181,18 @@ package Bezel.GCFW
 
                                 s.onSet(calculateValue(s, (s.panel as McOptPanel).knob));
                             };
-                            return function(e:MouseEvent):void
+                            return function (e:MouseEvent):void
                             {
                                 GV.main.scrOptions.draggedKnob = e.target.parent;
                                 GV.main.scrOptions.draggedKnob.gotoAndStop(2);
                                 GV.main.stage.addEventListener(MouseEvent.MOUSE_UP, onRangeReleased, true, 0, false);
                                 GV.main.scrOptions.isDragging = true;
                             };
-                        }(setting);
+                        }
+                        (setting);
                         rangePanel.knob.addEventListener(MouseEvent.MOUSE_DOWN, onRangeClicked);
                         setting.panel = rangePanel;
-                        
+
                         addMC(rangePanel);
 
                         rangePanel.knob.x = calculateX(setting);
@@ -200,9 +203,9 @@ package Bezel.GCFW
                         currentPanelX = getNewPanelX(0);
                         var keybindButton:SettingsButtonShim = new SettingsButtonShim(GV.main.scrOptions.mc.btnClose);
                         keybindButton.tf.text = (setting.currentVal()).toString().toUpperCase();
-                        var onKeybindClick:Function = function(s:GCFWSetting):Function
+                        var onKeybindClick:Function = function (s:GCFWSetting):Function
                         {
-                            var onKeybindTyped:Function = function(e:KeyboardEvent):void
+                            var onKeybindTyped:Function = function (e:KeyboardEvent):void
                             {
                                 if (e.keyCode == 0 || e.keyCode == Keyboard.CONTROL || e.keyCode == Keyboard.SHIFT || e.keyCode == Keyboard.ALTERNATE)
                                     return;
@@ -226,9 +229,9 @@ package Bezel.GCFW
                                 }
 
                                 var sequence:String = (e.controlKey ? "ctrl+" : "") +
-                                                        (e.shiftKey ? "shift+" : "") +
-                                                        (e.altKey ? "alt+" : "");
-                                
+                                    (e.shiftKey ? "shift+" : "") +
+                                    (e.altKey ? "alt+" : "");
+
                                 for each (var key:String in KeyboardConstants)
                                 {
                                     if (e.keyCode == Keyboard[key])
@@ -244,7 +247,7 @@ package Bezel.GCFW
 
                                 updateButtonColors();
                             };
-                            return function(e:MouseEvent):void
+                            return function (e:MouseEvent):void
                             {
                                 GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeybindTyped, true, 10, false);
                                 GV.main.stage.addEventListener(MouseEvent.CLICK, discardAllMouseInput, true, 10, false);
@@ -258,7 +261,8 @@ package Bezel.GCFW
 
                                 IS_CHOOSING_KEYBIND = true;
                             };
-                        }(setting);
+                        }
+                        (setting);
                         keybindButton.addEventListener(MouseEvent.CLICK, onKeybindClick, true);
                         keybindButton.addEventListener(MouseEvent.MOUSE_OVER, onButtonMouseover);
                         keybindButton.addEventListener(MouseEvent.MOUSE_OUT, onButtonMouseout);
@@ -270,8 +274,8 @@ package Bezel.GCFW
                         keybindPanel.removeChild(keybindPanel.btn);
 
                         var keybindExtraSize:Sprite = new Sprite();
-                        keybindExtraSize.graphics.beginFill(0,0);
-                        keybindExtraSize.graphics.drawRect(0,0,1,1);
+                        keybindExtraSize.graphics.beginFill(0, 0);
+                        keybindExtraSize.graphics.drawRect(0, 0, 1, 1);
                         keybindExtraSize.graphics.endFill();
                         keybindExtraSize.width = (keybindButton.x + keybindButton.width) - 500;
                         keybindExtraSize.height = keybindButton.height;
@@ -291,9 +295,9 @@ package Bezel.GCFW
                         currentPanelX = getNewPanelX(0);
                         var numberButton:SettingsButtonShim = new SettingsButtonShim(GV.main.scrOptions.mc.btnClose);
                         numberButton.tf.text = setting.currentVal().toString();
-                        var onNumberClick:Function = function(s:GCFWSetting):Function
+                        var onNumberClick:Function = function (s:GCFWSetting):Function
                         {
-                            var onNumberTyped:Function = function(e:KeyboardEvent):void
+                            var onNumberTyped:Function = function (e:KeyboardEvent):void
                             {
                                 if (e.keyCode == Keyboard.ESCAPE)
                                 {
@@ -346,7 +350,7 @@ package Bezel.GCFW
                                 e.stopImmediatePropagation();
                                 e.preventDefault();
                             };
-                            return function(e:MouseEvent):void
+                            return function (e:MouseEvent):void
                             {
                                 GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, onNumberTyped, true, 10, false);
                                 GV.main.stage.addEventListener(MouseEvent.CLICK, discardAllMouseInput, true, 10, false);
@@ -358,7 +362,8 @@ package Bezel.GCFW
                                 s.button.tf.text = "";
                                 s.button.plate.gotoAndStop(4);
                             };
-                        }(setting);
+                        }
+                        (setting);
                         numberButton.addEventListener(MouseEvent.CLICK, onNumberClick, true);
                         numberButton.addEventListener(MouseEvent.MOUSE_OVER, onButtonMouseover);
                         numberButton.addEventListener(MouseEvent.MOUSE_OUT, onButtonMouseout);
@@ -370,8 +375,8 @@ package Bezel.GCFW
                         numberPanel.removeChild(numberPanel.btn);
 
                         var integerExtraSize:Sprite = new Sprite();
-                        integerExtraSize.graphics.beginFill(0,0);
-                        integerExtraSize.graphics.drawRect(0,0,1,1);
+                        integerExtraSize.graphics.beginFill(0, 0);
+                        integerExtraSize.graphics.drawRect(0, 0, 1, 1);
                         integerExtraSize.graphics.endFill();
                         integerExtraSize.width = (numberButton.x + numberButton.width) - 500;
                         integerExtraSize.height = numberButton.height;
@@ -393,9 +398,9 @@ package Bezel.GCFW
                         stringButton.plate.scaleX = 4;
                         stringButton.tf.width = stringButton.plate.width;
                         stringButton.tf.text = setting.currentVal();
-                        var onStringClick:Function = function(s:GCFWSetting):Function
+                        var onStringClick:Function = function (s:GCFWSetting):Function
                         {
-                            var onStringTyped:Function = function(e:KeyboardEvent):void
+                            var onStringTyped:Function = function (e:KeyboardEvent):void
                             {
                                 if (e.keyCode == Keyboard.ESCAPE)
                                 {
@@ -440,7 +445,7 @@ package Bezel.GCFW
                                 e.stopImmediatePropagation();
                                 e.preventDefault();
                             };
-                            return function(e:MouseEvent):void
+                            return function (e:MouseEvent):void
                             {
                                 GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, onStringTyped, true, 10, false);
                                 GV.main.stage.addEventListener(MouseEvent.CLICK, discardAllMouseInput, true, 10, false);
@@ -452,7 +457,8 @@ package Bezel.GCFW
                                 s.button.tf.text = "";
                                 s.button.plate.gotoAndStop(4);
                             };
-                        }(setting);
+                        }
+                        (setting);
                         stringButton.addEventListener(MouseEvent.CLICK, onStringClick, true);
                         stringButton.addEventListener(MouseEvent.MOUSE_OVER, onButtonMouseover);
                         stringButton.addEventListener(MouseEvent.MOUSE_OUT, onButtonMouseout);
@@ -464,8 +470,8 @@ package Bezel.GCFW
                         stringPanel.removeChild(stringPanel.btn);
 
                         var stringExtraSize:Sprite = new Sprite();
-                        stringExtraSize.graphics.beginFill(0,0);
-                        stringExtraSize.graphics.drawRect(0,0,1,1);
+                        stringExtraSize.graphics.beginFill(0, 0);
+                        stringExtraSize.graphics.drawRect(0, 0, 1, 1);
                         stringExtraSize.graphics.endFill();
                         stringExtraSize.width = (stringButton.x + stringButton.width) - 400;
                         stringExtraSize.height = stringButton.height;
@@ -607,7 +613,7 @@ package Bezel.GCFW
                 if (newSettings[i].type == GCFWSetting.TYPE_KEYBIND)
                 {
                     var kb:Keybind = newSettings[i].currentVal();
-                    for (var j:int = i+1; j < newSettings.length; j++)
+                    for (var j:int = i + 1; j < newSettings.length; j++)
                     {
                         if (newSettings[j].type == GCFWSetting.TYPE_KEYBIND && kb.matches(newSettings[j].currentVal()))
                         {

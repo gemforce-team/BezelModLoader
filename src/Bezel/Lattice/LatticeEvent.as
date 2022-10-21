@@ -2,10 +2,10 @@ package Bezel.Lattice
 {
     import flash.errors.IllegalOperationError;
 
-	/**
-	 * Lattice lifetime events
-	 * @author piepie62
-	 */
+    /**
+     * Lattice lifetime events
+     * @author piepie62
+     */
     public class LatticeEvent
     {
         public static const REBUILD_DONE:String = "rebuildDone";

@@ -1,20 +1,21 @@
-package Bezel.Utils 
+package Bezel.Utils
 {
 	import Bezel.Bezel;
 	import Bezel.Logger;
 	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
+
 	/**
 	 * Manages hotkeys for Bezel mods
 	 * @author Chris
 	 */
-	public class KeybindManager 
+	public class KeybindManager
 	{
 		private static const HOTKEYS_FILE:File = Bezel.Bezel.BEZEL_FOLDER.resolvePath("hotkeys.json");
-		
+
 		private var _configuredHotkeys:Object;
-		
+
 		private function get configuredHotkeys():Object
 		{
 			if (_configuredHotkeys == null)
@@ -45,11 +46,9 @@ package Bezel.Utils
 			}
 			return _configuredHotkeys;
 		}
-		
-		public function KeybindManager() 
-		{
-		}
-		
+
+		public function KeybindManager() {}
+
 		/**
 		 * Registers a hotkey with this KeybindManager.
 		 * @param	name Name of the hotkey to register
@@ -63,21 +62,21 @@ package Bezel.Utils
 				this.configuredHotkeys[name] = defaultVal;
 				this.saveHotkeys();
 			}
-			var set:Function = function(val:Keybind):void
+			var set :Function = function (val:Keybind):void
 			{
 				configuredHotkeys[name] = val;
 				saveHotkeys();
 			};
-			var get:Function = function():Keybind
+			var get :Function = function ():Keybind
 			{
 				return getHotkeyValue(name);
-			}
+			};
 			if (Bezel.Bezel.instance.mainLoader != null)
 			{
-				Bezel.Bezel.instance.mainLoader.registerKeybindForDisplay(name, set, get, description);
+				Bezel.Bezel.instance.mainLoader.registerKeybindForDisplay(name, set , get , description);
 			}
 		}
-		
+
 		/**
 		 * Gets the value of a hotkey registered with registerHotkey.
 		 * @param	name Name of the hotkey to retrieve
@@ -87,7 +86,7 @@ package Bezel.Utils
 		{
 			return this.configuredHotkeys[name];
 		}
-		
+
 		private function saveHotkeys():void
 		{
 			var stream:FileStream = new FileStream();
@@ -113,7 +112,7 @@ package Bezel.Utils
 				stream.close();
 			}
 		}
-		
+
 		private static function reviver(k:*, v:*):*
 		{
 			if (k != "")
@@ -142,9 +141,8 @@ package Bezel.Utils
 					}
 				}
 			}
-			
+
 			return v;
 		}
 	}
-
 }

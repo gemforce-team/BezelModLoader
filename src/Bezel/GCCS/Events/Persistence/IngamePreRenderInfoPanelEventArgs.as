@@ -1,18 +1,18 @@
-package Bezel.GCCS.Events.Persistence 
+package Bezel.GCCS.Events.Persistence
 {
 	/**
 	 * ...
 	 * @author Chris
 	 */
-	public class IngamePreRenderInfoPanelEventArgs 
+	public class IngamePreRenderInfoPanelEventArgs
 	{
 		public var continueDefault:Boolean;
-		
-		public function IngamePreRenderInfoPanelEventArgs(continueDefault:Boolean) 
+
+		public function IngamePreRenderInfoPanelEventArgs(continueDefault:Boolean)
 		{
 			this.continueDefault = continueDefault;
 		}
-		
+
 	}
 
 }

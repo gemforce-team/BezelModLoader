@@ -1,10 +1,10 @@
-package Bezel.GCCS 
+package Bezel.GCCS
 {
 	import Bezel.Bezel;
 	import Bezel.Logger;
 	import Bezel.MainLoader;
 	import Bezel.Utils.Keybind;
-	
+
 	import com.giab.games.gccs.steam.GV;
 	import com.giab.games.gccs.steam.Mods;
 	import com.giab.games.gccs.steam.Prefs;
@@ -47,7 +47,7 @@ package Bezel.GCCS
 	import flash.events.Event;
 	import Bezel.Utils.SettingManager;
 	import Bezel.Lattice.Lattice;
-	
+
 	/*
 	 * The MainLoader for GemCraft: Chasing Shadows.
 	 * @author piepie62
@@ -59,11 +59,23 @@ package Bezel.GCCS
 		internal static const defaultHotkeys:Object = createDefaultKeyConfiguration();
 		internal static const RELOAD_HOTKEY:String = "GCCS Bezel: Reload all mods";
 		internal static const ENUMBER_SETTING:String = "Optimize game numbers";
-		
-		public function get gameClassFullyQualifiedName():String { return "com.giab.games.gccs.steam.Main"; }
-		public function get MOD_NAME():String { return "GCCS Bezel"; }
-		public function get VERSION():String { return Bezel.Bezel.VERSION; }
-		public function get BEZEL_VERSION():String { return Bezel.Bezel.VERSION; }
+
+		public function get gameClassFullyQualifiedName():String
+		{
+			return "com.giab.games.gccs.steam.Main";
+		}
+		public function get MOD_NAME():String
+		{
+			return "GCCS Bezel";
+		}
+		public function get VERSION():String
+		{
+			return Bezel.Bezel.VERSION;
+		}
+		public function get BEZEL_VERSION():String
+		{
+			return Bezel.Bezel.VERSION;
+		}
 
 		private var manager:SettingManager;
 
@@ -71,24 +83,29 @@ package Bezel.GCCS
 		{
 			manager = Bezel.Bezel.instance.getSettingManager("GCCS Bezel");
 		}
-		
-		public function get coremodInfo(): Object
+
+		public function get coremodInfo():Object
 		{
 			// This may not be registered, so default to true if not
 			var doEnumberFix:Boolean = true;
-			try {
+			try
+			{
 				doEnumberFix = manager.retrieveBoolean(ENUMBER_SETTING);
 			}
 			catch (e:*) {}
 
-			return {"name": "GCCS_BEZEL_MOD_LOADER", "version": GCCSCoreMod.VERSION + (doEnumberFix ? "" : "NOENUMBER"), "load": function(lattice:Lattice):void {GCCSCoreMod.installHooks(lattice, doEnumberFix)}};
+			return {"name": "GCCS_BEZEL_MOD_LOADER", "version": GCCSCoreMod.VERSION + (doEnumberFix ? "" : "NOENUMBER"), "load": function (lattice:Lattice):void
+				{
+					GCCSCoreMod.installHooks(lattice, doEnumberFix);
+				}
+			};
 		}
-		
+
 		// mainGame cannot be the proper type, for consistency with MainLoader interface
-		public function loaderBind(bezel:Bezel, mainGame:Object, gameObjects:Object): void
+		public function loaderBind(bezel:Bezel, mainGame:Object, gameObjects:Object):void
 		{
 			this.logger = bezel.getLogger("GCCS Bezel");
-			
+
 			gameObjects.main = mainGame;
 			gameObjects.GV = GV;
 			gameObjects.SB = SB;
@@ -129,7 +146,7 @@ package Bezel.GCCS
 			gameObjects.constants.waveFormation = WaveFormation;
 			gameObjects.constants.wizLockType = WizLockType;
 
-			//checkForUpdates();
+			// checkForUpdates();
 
 			this.logger.log("GCCS Bezel", "GCCS Bezel bound to game's objects!");
 
@@ -145,16 +162,16 @@ package Bezel.GCCS
 			{
 				Bezel.Bezel.instance.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
 			}
-			
+
 			Bezel.Bezel.instance.keybindManager.registerHotkey(RELOAD_HOTKEY, new Keybind("ctrl+alt+shift+home"));
 			// Bezel.Bezel.instance.keybindManager.registerHotkey("GCCS Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
 		}
 
 		internal function registerSettings():void
 		{
-			manager.registerBoolean(ENUMBER_SETTING, function(...args):void {}, true, "Makes the game faster by optimizing away some useless memory obfuscation code. Probably don't disable unless you're a developer making a coremod that's frustrated by long loading times.");
+			manager.registerBoolean(ENUMBER_SETTING, function (...args):void {}, true, "Makes the game faster by optimizing away some useless memory obfuscation code. Probably don't disable unless you're a developer making a coremod that's frustrated by long loading times.");
 		}
-		
+
 		private static function createDefaultKeyConfiguration():Object
 		{
 			var config:Object = new Object();

@@ -1,28 +1,56 @@
-package Bezel.Utils 
+package Bezel.Utils
 {
 	import flash.events.KeyboardEvent;
 	import flash.ui.Keyboard;
 	import flash.utils.getQualifiedClassName;
+
 	/**
 	 * Represents a keybind for an action
 	 * @author Chris
 	 */
-	public class Keybind 
+	public class Keybind
 	{
 		private var _key:int;
 		private var _ctrl:Boolean;
 		private var _alt:Boolean;
 		private var _shift:Boolean;
 		internal var _stringRep:String;
-		
-		public function get key():int { return _key; }
-		public function get ctrl():Boolean { return _ctrl; }
-		public function get alt():Boolean { return _alt; }
-		public function get shift():Boolean { return _shift; }
-		
+
+		/**
+		 * The key (as in flash.ui.Keyboard)
+		 */
+		public function get key():int
+		{
+			return _key;
+		}
+
+		/**
+		 * Whether control is down or not
+		 */
+		public function get ctrl():Boolean
+		{
+			return _ctrl;
+		}
+
+		/**
+		 * Whether alt is down or not
+		 */
+		public function get alt():Boolean
+		{
+			return _alt;
+		}
+
+		/**
+		 * Whether shift is down or not
+		 */
+		public function get shift():Boolean
+		{
+			return _shift;
+		}
+
 		/**
 		 * Constructs a Keybind that represents the given sequence
-		 * @param	sequence A string in the form "[modifiers]+key". Examples: "ctrl+f", "f", "shift+alt+ctrl+f". Exactly one non-modifier key must be specified.
+		 * @param sequence A string in the form "[modifiers]+key". Examples: "ctrl+f", "f", "shift+alt+ctrl+f". Exactly one non-modifier key must be specified.
 		 * Note that this non-modifier key must be specified as the case-insensitive name of a property of flash.ui.Keyboard, such as "NUMpad_0"
 		 * @return Keybind that represents the given sequence
 		 * @throws ArgumentError if the given sequence is invalid
@@ -69,7 +97,7 @@ package Bezel.Utils
 						}
 						else
 						{
-							throw new ArgumentError("Key \'" + component + "\' was not found");
+							throw new ArgumentError("Key '" + component + "' was not found");
 						}
 					}
 				}
@@ -79,13 +107,13 @@ package Bezel.Utils
 			{
 				throw new ArgumentError("No key provided");
 			}
-			
+
 			_stringRep = sequence;
 		}
-		
+
 		/**
 		 * Checks that this Keybind represents the same combination as the given argument
-		 * @param	other KeyboardEvent or Keybind to check against
+		 * @param other KeyboardEvent or Keybind to check against
 		 * @return True if other is a KeyboardEvent or a Keybind and the control, alt, shift, and keycode match. False if they don't
 		 * @throws ArgumentError if other is not a KeyboardEvent or a Keybind
 		 */
@@ -106,10 +134,10 @@ package Bezel.Utils
 			{
 				throw new ArgumentError("Bezel.Utils.Keybind tried to match against a " + getQualifiedClassName(other));
 			}
-			
+
 			return false;
 		}
-		
+
 		public function toJSON(k:*):*
 		{
 			return this._stringRep;

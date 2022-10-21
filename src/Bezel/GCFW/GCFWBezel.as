@@ -1,10 +1,10 @@
-package Bezel.GCFW 
+package Bezel.GCFW
 {
 	import Bezel.Bezel;
 	import Bezel.Logger;
 	import Bezel.MainLoader;
 	import Bezel.Utils.Keybind;
-	
+
 	import com.giab.games.gcfw.GV;
 	import com.giab.games.gcfw.Main;
 	import com.giab.games.gcfw.Mods;
@@ -49,7 +49,7 @@ package Bezel.GCFW
 	import flash.events.UncaughtErrorEvent;
 	import Bezel.Utils.SettingManager;
 	import Bezel.Lattice.Lattice;
-	
+
 	/**
 	 * The MainLoader for GemCraft: Frostborn Wrath.
 	 * @author piepie62
@@ -57,16 +57,28 @@ package Bezel.GCFW
 	public class GCFWBezel extends MovieClip implements MainLoader
 	{
 		private var logger:Logger;
-		
+
 		internal static const defaultHotkeys:Object = createDefaultKeyConfiguration();
 
 		internal static const RELOAD_HOTKEY:String = "GCFW Bezel: Reload all mods";
 		internal static const ENUMBER_SETTING:String = "Optimize game numbers";
-		
-		public function get gameClassFullyQualifiedName():String { return "com.giab.games.gcfw.Main"; }
-		public function get MOD_NAME():String { return "GCFW Bezel"; }
-		public function get VERSION():String { return Bezel.Bezel.VERSION; }
-		public function get BEZEL_VERSION():String { return Bezel.Bezel.VERSION; }
+
+		public function get gameClassFullyQualifiedName():String
+		{
+			return "com.giab.games.gcfw.Main";
+		}
+		public function get MOD_NAME():String
+		{
+			return "GCFW Bezel";
+		}
+		public function get VERSION():String
+		{
+			return Bezel.Bezel.VERSION;
+		}
+		public function get BEZEL_VERSION():String
+		{
+			return Bezel.Bezel.VERSION;
+		}
 
 		private var manager:SettingManager;
 
@@ -74,30 +86,35 @@ package Bezel.GCFW
 		{
 			manager = Bezel.Bezel.instance.getSettingManager("GCFW Bezel");
 		}
-		
-		public function get coremodInfo(): Object
+
+		public function get coremodInfo():Object
 		{
 			// This may not be registered, so default to true if not
 			var doEnumberFix:Boolean = true;
-			try {
+			try
+			{
 				doEnumberFix = manager.retrieveBoolean(ENUMBER_SETTING);
 			}
 			catch (e:*) {}
 
-			return {"name": "GCFW_BEZEL_MOD_LOADER", "version": GCFWCoreMod.VERSION + (doEnumberFix ? "" : "NOENUMBER"), "load": function(lattice:Lattice):void {GCFWCoreMod.installHooks(lattice, doEnumberFix)}};
+			return {"name": "GCFW_BEZEL_MOD_LOADER", "version": GCFWCoreMod.VERSION + (doEnumberFix ? "" : "NOENUMBER"), "load": function (lattice:Lattice):void
+				{
+					GCFWCoreMod.installHooks(lattice, doEnumberFix);
+				}
+			};
 		}
-		
+
 		// mainGame cannot be the proper type, for consistency with MainLoader interface
-		public function loaderBind(bezel:Bezel, mainGame:Object, gameObjects:Object): void
+		public function loaderBind(bezel:Bezel, mainGame:Object, gameObjects:Object):void
 		{
 			this.logger = bezel.getLogger("GCFW Bezel");
-			
+
 			gameObjects.main = mainGame;
 			gameObjects.GV = GV;
 			gameObjects.SB = SB;
 			gameObjects.prefs = Prefs;
 			gameObjects.mods = Mods;
-			
+
 			gameObjects.constants = new Object();
 			gameObjects.constants.achievementIngameStatus = AchievementIngameStatus;
 			gameObjects.constants.actionStatus = ActionStatus;
@@ -132,7 +149,7 @@ package Bezel.GCFW
 			gameObjects.constants.wizLockType = WizLockType;
 			gameObjects.constants.wizStashStatus = WizStashStatus;
 
-			//checkForUpdates();
+			// checkForUpdates();
 
 			this.logger.log("GCFW Bezel", "GCFW Bezel bound to game's objects!");
 
@@ -140,7 +157,7 @@ package Bezel.GCFW
 
 			registerHotkeys();
 			registerSettings();
-			
+
 			var version:String = GV.main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text;
 			version = version.slice(0, version.search(' ') + 1) + Bezel.Bezel.prettyVersion();
 			GV.main.scrMainMenu.mc.mcBottomTexts.tfDateStamp.text = version;
@@ -152,16 +169,16 @@ package Bezel.GCFW
 			{
 				Bezel.Bezel.instance.keybindManager.registerHotkey(hotkey, defaultHotkeys[hotkey]);
 			}
-			
+
 			Bezel.Bezel.instance.keybindManager.registerHotkey(RELOAD_HOTKEY, new Keybind("ctrl+alt+shift+home"));
-			//Bezel.Bezel.instance.keybindManager.registerHotkey("GCFW Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
+			// Bezel.Bezel.instance.keybindManager.registerHotkey("GCFW Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
 		}
 
 		internal function registerSettings():void
 		{
-			manager.registerBoolean(ENUMBER_SETTING, function(...args):void {}, true, "Makes the game faster by optimizing away some useless memory obfuscation code. Probably don't disable unless you're a developer making a coremod that's frustrated by long loading times.");
+			manager.registerBoolean(ENUMBER_SETTING, function (...args):void {}, true, "Makes the game faster by optimizing away some useless memory obfuscation code. Probably don't disable unless you're a developer making a coremod that's frustrated by long loading times.");
 		}
-		
+
 		private static function createDefaultKeyConfiguration():Object
 		{
 			var config:Object = new Object();
