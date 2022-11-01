@@ -137,16 +137,16 @@ fn main() {
     )
     .unwrap_or_else(|e| wait_exit(Some(ErrorCode::NoParseMetadata(e))));
 
-    let game_id = metadata
+    let metadata_root = metadata
         .root_element()
-        .unwrap_or_else(|| wait_exit(Some(ErrorCode::InvalidMetadataXML)))
+        .unwrap_or_else(|| wait_exit(Some(ErrorCode::InvalidMetadataXML)));
+
+    let game_id = metadata_root
         .find(&metadata, "id")
         .unwrap_or_else(|| wait_exit(Some(ErrorCode::InvalidMetadataXML)))
         .text_content(&metadata);
     let game_content = sanitize_contents_path(
-        &metadata
-            .root_element()
-            .unwrap_or_else(|| wait_exit(Some(ErrorCode::InvalidMetadataXML)))
+        &metadata_root
             .find(&metadata, "initialWindow")
             .unwrap_or_else(|| wait_exit(Some(ErrorCode::InvalidMetadataXML)))
             .find(&metadata, "content")
@@ -160,20 +160,18 @@ fn main() {
 
     let modded_game_content =
         game_content_path.with_file_name(game_content_path.file_stem().unwrap().to_str().unwrap());
-    metadata
-        .root_element()
-        .unwrap_or_else(|| wait_exit(Some(ErrorCode::InvalidMetadataXML)))
+    metadata_root
         .find(&metadata, "initialWindow")
         .unwrap_or_else(|| wait_exit(Some(ErrorCode::InvalidMetadataXML)))
         .find(&metadata, "content")
         .unwrap_or_else(|| wait_exit(Some(ErrorCode::InvalidMetadataXML)))
         .set_text_content(&mut metadata, "Bezel/BezelModLoader.swf");
 
-    let extension_element = metadata
-        .root_element()
-        .unwrap_or_else(|| wait_exit(Some(ErrorCode::InvalidMetadataXML)))
+    let extension_element = metadata_root
         .find(&metadata, "extensions")
-        .unwrap_or_else(|| wait_exit(Some(ErrorCode::InvalidMetadataXML)));
+        .unwrap_or_else(|| {
+            xml_doc::Element::build(&mut metadata, "extensions").push_to(metadata_root)
+        });
 
     xml_doc::Element::build(&mut metadata, "extensionID")
         .text_content("com.cff.anebe.ANEBytecodeEditor")
