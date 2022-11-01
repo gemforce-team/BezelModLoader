@@ -22,6 +22,7 @@ package Bezel.GCFW
 	import com.giab.games.gcfw.entity.Gem;
 	import com.giab.games.gcfw.mcDyn.McInfoPanel;
 
+	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.utils.getTimer;
@@ -37,12 +38,12 @@ package Bezel.GCFW
 	{
 		internal static function register():void
 		{
-			Bezel.Bezel.instance.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
+			Bezel.Bezel.instance.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown, false, 0, true);
 		}
 
 		internal static function unregister():void
 		{
-			Bezel.Bezel.instance.stage.removeEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
+			Bezel.Bezel.instance.stage.removeEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown, false);
 		}
 
 		// Called after the gem's info panel has been formed but before it's returned to the game for rendering
@@ -90,6 +91,11 @@ package Bezel.GCFW
 			return eventArgs.continueDefault;
 		}
 
+		internal static function doNothingEventHandler(e:Event):void
+		{
+			e.preventDefault();
+		}
+
 		internal static function stageKeyDown(e:KeyboardEvent):void
 		{
 			if (Bezel.Bezel.instance.keybindManager.getHotkeyValue(GCFWBezel.RELOAD_HOTKEY).matches(e))
@@ -101,14 +107,41 @@ package Bezel.GCFW
 				}
 				SB.playSound("sndalert");
 				GV.vfxEngine.createFloatingText4(GV.main.mouseX, GV.main.mouseY < 60 ? Number(GV.main.mouseY + 30) : Number(GV.main.mouseY - 20), "Reloading mods!", 16768392, 14, "center", Math.random() * 3 - 1.5, -4 - Math.random() * 3, 0, 0.55, 12, 0, 1000);
+				// Temporarily deparent
+				// Bezel.Bezel.instance.removeChild(GV.main);
+				// Disable input
+				Bezel.Bezel.instance.stage.addEventListener(KeyboardEvent.KEY_DOWN, doNothingEventHandler, true, int.MAX_VALUE, true);
+				Bezel.Bezel.instance.stage.addEventListener(KeyboardEvent.KEY_UP, doNothingEventHandler, true, int.MAX_VALUE, true);
+				Bezel.Bezel.instance.stage.addEventListener(MouseEvent.CLICK, doNothingEventHandler, true, int.MAX_VALUE, true);
+				Bezel.Bezel.instance.stage.addEventListener(MouseEvent.MOUSE_DOWN, doNothingEventHandler, true, int.MAX_VALUE, true);
+				Bezel.Bezel.instance.stage.addEventListener(MouseEvent.MOUSE_UP, doNothingEventHandler, true, int.MAX_VALUE, true);
+				Bezel.Bezel.instance.stage.addEventListener(MouseEvent.MOUSE_MOVE, doNothingEventHandler, true, int.MAX_VALUE, true);
+				Bezel.Bezel.instance.stage.addEventListener(MouseEvent.MOUSE_OUT, doNothingEventHandler, true, int.MAX_VALUE, true);
+				Bezel.Bezel.instance.stage.addEventListener(MouseEvent.MOUSE_OVER, doNothingEventHandler, true, int.MAX_VALUE, true);
+				Bezel.Bezel.instance.stage.addEventListener(MouseEvent.MOUSE_WHEEL, doNothingEventHandler, true, int.MAX_VALUE, true);
+
 				Bezel.Bezel.instance.reloadAllMods();
 				GCFWBezel.registerHotkeys();
 				(Bezel.Bezel.instance.mainLoader as GCFWBezel).registerSettings();
+
+				// Reenable input
+				Bezel.Bezel.instance.stage.removeEventListener(KeyboardEvent.KEY_DOWN, doNothingEventHandler, true);
+				Bezel.Bezel.instance.stage.removeEventListener(KeyboardEvent.KEY_UP, doNothingEventHandler, true);
+				Bezel.Bezel.instance.stage.removeEventListener(MouseEvent.CLICK, doNothingEventHandler, true);
+				Bezel.Bezel.instance.stage.removeEventListener(MouseEvent.MOUSE_DOWN, doNothingEventHandler, true);
+				Bezel.Bezel.instance.stage.removeEventListener(MouseEvent.MOUSE_UP, doNothingEventHandler, true);
+				Bezel.Bezel.instance.stage.removeEventListener(MouseEvent.MOUSE_MOVE, doNothingEventHandler, true);
+				Bezel.Bezel.instance.stage.removeEventListener(MouseEvent.MOUSE_OUT, doNothingEventHandler, true);
+				Bezel.Bezel.instance.stage.removeEventListener(MouseEvent.MOUSE_OVER, doNothingEventHandler, true);
+				Bezel.Bezel.instance.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, doNothingEventHandler, true);
+
+				// And reparent
+				// Bezel.Bezel.instance.addChild(GV.main);
 			}
-			// else if (Bezel.Bezel.instance.keybindManager.getHotkeyValue("GCFW Bezel: Hard reload").matches(e))
-			// {
-			// Bezel.Bezel.instance.triggerFullReload();
-			// }
+			else if (Bezel.Bezel.instance.keybindManager.getHotkeyValue(GCFWBezel.HARD_RELOAD_HOTKEY).matches(e))
+			{
+				Bezel.Bezel.instance.triggerFullReload();
+			}
 		}
 
 		// Called after the game is done loading its data

@@ -49,6 +49,9 @@ package Bezel.GCFW
 	import flash.events.UncaughtErrorEvent;
 	import Bezel.Utils.SettingManager;
 	import Bezel.Lattice.Lattice;
+	import com.giab.common.utils.Key;
+	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
 
 	/**
 	 * The MainLoader for GemCraft: Frostborn Wrath.
@@ -62,6 +65,7 @@ package Bezel.GCFW
 
 		internal static const RELOAD_HOTKEY:String = "GCFW Bezel: Reload all mods";
 		internal static const ENUMBER_SETTING:String = "Optimize game numbers";
+		internal static const HARD_RELOAD_HOTKEY:String = "GCFW Bezel: Hard reload";
 
 		public function get gameClassFullyQualifiedName():String
 		{
@@ -171,7 +175,7 @@ package Bezel.GCFW
 			}
 
 			Bezel.Bezel.instance.keybindManager.registerHotkey(RELOAD_HOTKEY, new Keybind("ctrl+alt+shift+home"));
-			// Bezel.Bezel.instance.keybindManager.registerHotkey("GCFW Bezel: Hard reload", new Keybind("ctrl+alt+shift+f12"));
+			// Bezel.Bezel.instance.keybindManager.registerHotkey(HARD_RELOAD_HOTKEY, new Keybind("ctrl+alt+shift+f12"));
 		}
 
 		internal function registerSettings():void
@@ -256,6 +260,27 @@ package Bezel.GCFW
 			if (GV.main.isSteamworksInitiated)
 			{
 				Main.steamworks.dispose();
+			}
+
+			Bezel.Bezel.instance.stage.removeEventListener(Event.RESIZE, GV.main.onResize);
+			Bezel.Bezel.instance.stage.removeEventListener(KeyboardEvent.KEY_DOWN, GV.main.preventEsc, true);
+			Key.deinitialize(Bezel.Bezel.instance.stage);
+			if (GV.selectorCore != null)
+			{
+				if (GV.selectorCore.pnlSkills != null)
+				{
+					Bezel.Bezel.instance.stage.removeEventListener(KeyboardEvent.KEY_DOWN, GV.selectorCore.pnlSkills.ehKeyDown);
+				}
+				if (GV.selectorCore.inputHandler != null)
+				{
+					Bezel.Bezel.instance.stage.removeEventListener(MouseEvent.MOUSE_UP, GV.selectorCore.inputHandler.ehCornerButtonUp);
+				}
+			}
+
+			if (SB.scMusFadingIn != null)
+			{
+				SB.scMusFadingIn.removeEventListener(Event.SOUND_COMPLETE, SB.loopSound);
+				SB.scMusFadingIn.stop();
 			}
 		}
 	}

@@ -250,12 +250,12 @@ package Bezel.GCCS
                             return function (e:MouseEvent):void
                             {
                                 GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeybindTyped, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.CLICK, discardAllMouseInput, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.MOUSE_DOWN, discardAllMouseInput, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.MOUSE_UP, discardAllMouseInput, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.MOUSE_OVER, discardAllMouseInput, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.MOUSE_WHEEL, discardAllMouseInput, true, 10, false);
+                                GV.main.stage.addEventListener(MouseEvent.CLICK, discardAllMouseInput, true, 10, true);
+                                GV.main.stage.addEventListener(MouseEvent.MOUSE_DOWN, discardAllMouseInput, true, 10, true);
+                                GV.main.stage.addEventListener(MouseEvent.MOUSE_UP, discardAllMouseInput, true, 10, true);
+                                GV.main.stage.addEventListener(MouseEvent.MOUSE_OVER, discardAllMouseInput, true, 10, true);
+                                GV.main.stage.addEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true, 10, true);
+                                GV.main.stage.addEventListener(MouseEvent.MOUSE_WHEEL, discardAllMouseInput, true, 10, true);
                                 s.button.tf.text = "???";
                                 s.button.plate.gotoAndStop(4);
 
@@ -353,12 +353,12 @@ package Bezel.GCCS
                             return function (e:MouseEvent):void
                             {
                                 GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, onNumberTyped, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.CLICK, discardAllMouseInput, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.MOUSE_DOWN, discardAllMouseInput, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.MOUSE_UP, discardAllMouseInput, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.MOUSE_OVER, discardAllMouseInput, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.MOUSE_WHEEL, discardAllMouseInput, true, 10, false);
+                                GV.main.stage.addEventListener(MouseEvent.CLICK, discardAllMouseInput, true, 10, true);
+                                GV.main.stage.addEventListener(MouseEvent.MOUSE_DOWN, discardAllMouseInput, true, 10, true);
+                                GV.main.stage.addEventListener(MouseEvent.MOUSE_UP, discardAllMouseInput, true, 10, true);
+                                GV.main.stage.addEventListener(MouseEvent.MOUSE_OVER, discardAllMouseInput, true, 10, true);
+                                GV.main.stage.addEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true, 10, true);
+                                GV.main.stage.addEventListener(MouseEvent.MOUSE_WHEEL, discardAllMouseInput, true, 10, true);
                                 s.button.tf.text = "";
                                 s.button.plate.gotoAndStop(4);
                             };
@@ -448,12 +448,12 @@ package Bezel.GCCS
                             return function (e:MouseEvent):void
                             {
                                 GV.main.stage.addEventListener(KeyboardEvent.KEY_DOWN, onStringTyped, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.CLICK, discardAllMouseInput, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.MOUSE_DOWN, discardAllMouseInput, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.MOUSE_UP, discardAllMouseInput, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.MOUSE_OVER, discardAllMouseInput, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true, 10, false);
-                                GV.main.stage.addEventListener(MouseEvent.MOUSE_WHEEL, discardAllMouseInput, true, 10, false);
+                                GV.main.stage.addEventListener(MouseEvent.CLICK, discardAllMouseInput, true, 10, true);
+                                GV.main.stage.addEventListener(MouseEvent.MOUSE_DOWN, discardAllMouseInput, true, 10, true);
+                                GV.main.stage.addEventListener(MouseEvent.MOUSE_UP, discardAllMouseInput, true, 10, true);
+                                GV.main.stage.addEventListener(MouseEvent.MOUSE_OVER, discardAllMouseInput, true, 10, true);
+                                GV.main.stage.addEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true, 10, true);
+                                GV.main.stage.addEventListener(MouseEvent.MOUSE_WHEEL, discardAllMouseInput, true, 10, true);
                                 s.button.tf.text = "";
                                 s.button.plate.gotoAndStop(4);
                             };

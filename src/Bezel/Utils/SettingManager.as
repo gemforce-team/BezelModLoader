@@ -25,17 +25,7 @@ package Bezel.Utils
         public static const MOD_KEYBIND:String = "Keybinds";
         public static const MOD_ENABLED:String = "Enabled Mods";
 
-        private static var _managers:Dictionary;
-
-        private static function get managers():Dictionary
-        {
-            if (_managers == null)
-            {
-                _managers = new Dictionary();
-                Bezel.Bezel.instance.addEventListener(Event.UNLOAD, bezel_internal::unregisterAllManagers);
-            }
-            return _managers;
-        }
+        private static var managers:Dictionary = new Dictionary();
 
         private var id:String;
 
@@ -87,15 +77,15 @@ package Bezel.Utils
         /**
          * Used internally on reload
          */
-        bezel_internal static function unregisterAllManagers(...args):void
+        bezel_internal static function unregisterAllManagers():void
         {
             logger.log("unregisterAllManagers", "Unregistering managers...");
-            for each (var manager:SettingManager in _managers)
+            for each (var manager:SettingManager in managers)
             {
                 manager.deregisterFromMainLoader();
             }
 
-            _managers = new Dictionary();
+            managers = new Dictionary();
         }
 
         /**

@@ -21,6 +21,7 @@ package Bezel
 	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
 	import flash.utils.getQualifiedClassName;
+	import flash.utils.Dictionary;
 	
 	use namespace bezel_internal;
 	use namespace mainloader_only;
@@ -31,6 +32,7 @@ package Bezel
 	 */
 	public class Bezel extends MovieClip
 	{
+		/** The installed version of Bezel */
 		public static const VERSION:String = "2.0.6";
 
 		private var _gameObjects:Object;
@@ -47,6 +49,7 @@ package Bezel
 
 		private var waitingMods:uint;
 		private var progressTotal:uint;
+		private var patchesApplied:uint;
 
 		private var initialLoad:Boolean;
 		private var coremods:Array;
@@ -62,17 +65,25 @@ package Bezel
 		private static const LOADING_MODS:String = "Loading Mods...";
 		private static const LOADING_COREMODS:String = "Loading Coremods...";
 		private static const APPLYING_COREMODS:String = "Applying Coremods...";
+		private static const ASSEMBLING_GAME:String = "Assembling Game...";
 		private static const LOADING_GAME:String = "Loading Game...";
 		private static const BINDING_MODS:String = "Binding Mods...";
 
+		/** The folder Bezel uses. */
 		public static const BEZEL_FOLDER:File = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/");
+		/** The tools folder where extra binary utilities are put */
 		public static const TOOLS_FOLDER:File = BEZEL_FOLDER.resolvePath("tools/");
+		/** The folder Lattice uses */
 		public static const LATTICE_FOLDER:File = BEZEL_FOLDER.resolvePath("Lattice/");
 
+		/** The file for Lattice to use for the edited game bytecode */
         public static const LATTICE_DEFAULT_ASM:File = LATTICE_FOLDER.resolvePath("game.basasm");
+		/** The file for Lattice to use for the clean game bytecode */
         public static const LATTICE_DEFAULT_CLEAN_ASM:File = LATTICE_FOLDER.resolvePath("game-clean.basasm");
+		/** The file for Lattice to use to cache submitted coremods */
         public static const LATTICE_DEFAULT_COREMODS:File = LATTICE_FOLDER.resolvePath("coremods.lttc");
 
+		/** The mods folder */
 		public static const MODS_FOLDER:File = File.applicationDirectory.resolvePath("Mods/");
 
 		private static const gameConfig:File = File.applicationDirectory.resolvePath("game-file.txt");
@@ -110,6 +121,9 @@ package Bezel
 		 */
 		public function get modsReloadedTimestamp():int { return _modsReloadedTimestamp; }
 		
+		/**
+		 * The unmodified game SWF
+		 */
 		bezel_internal static function get gameSwf(): File
 		{
 			if (_gameSwf == null)
@@ -122,6 +136,9 @@ package Bezel
 			return _gameSwf;
 		}
 		
+		/**
+		 * The modified game SWF for Bezel to cache its results to.
+		 */
 		bezel_internal static function get moddedSwf(): File
 		{
 			if (_moddedSwf == null)
@@ -134,15 +151,17 @@ package Bezel
 		public function Bezel()
 		{
 			_instance = this;
-			manager = getSettingManager("Bezel Mod Loader");
+			_listeners = new Object();
+			_weakListeners = new Object();
 			prepareFolders();
-			this.addEventListener(LatticeEvent.REBUILD_DONE, this.onGameBuilt);
 
 			FunctionDeferrer.deferFunction(this.startLoadFromScratch, [], this, true);
 		}
 
 		private function startLoadFromScratch():void
 		{
+			manager = getSettingManager("Bezel Mod Loader");
+
 			this._keybindManager = new KeybindManager();
 			
 			loadingStageTextField = new TextField();
@@ -247,10 +266,10 @@ package Bezel
 
 			this.lattice = new Lattice(gameSwf, moddedSwf, LATTICE_DEFAULT_ASM, LATTICE_DEFAULT_CLEAN_ASM, LATTICE_DEFAULT_COREMODS, includeDebugInstrs);
 
-			this.lattice.addEventListener(LatticeEvent.DISASSEMBLY_DONE, this.onDisassembleDone);
-			this.lattice.addEventListener(LatticeEvent.REBUILD_DONE, this.onGameBuilt);
-			var patchesApplied:int = 0;
-			this.lattice.addEventListener(LatticeEvent.SINGLE_PATCH_APPLIED, function(...args):void{ updateProgress(++patchesApplied, lattice.numberOfPatches); });
+			this.lattice.addEventListener(LatticeEvent.DISASSEMBLY_DONE, this.onDisassembleDone, false, 0, true);
+			this.lattice.addEventListener(LatticeEvent.REBUILD_DONE, this.onGameBuilt, false, 0, true);
+			this.lattice.addEventListener(LatticeEvent.SINGLE_PATCH_APPLIED, this.onSinglePatch, false, 0, true);
+			this.lattice.addEventListener(LatticeEvent.REASSEMBLY_STARTED, this.onReassembleStart, false, 0, true);
 
 			this.coremods = new Array();
 			this.prevCoremods = new Array();
@@ -283,6 +302,19 @@ package Bezel
 		private function onDisassembleDone(e:Event):void
 		{
 			FunctionDeferrer.deferFunction(this.loadMainLoader, [], this, true);
+		}
+
+		private function onSinglePatch(e:Event):void
+		{
+			updateProgress(++patchesApplied, lattice.numberOfPatches);
+		}
+
+		private function onReassembleStart(e:Event):void
+		{
+			this.loadingStageTextField.text = ASSEMBLING_GAME;
+			updateProgress(0, 1);
+			// Don't really have anything to do, but we need to do *something*
+			FunctionDeferrer.hardDeferFunction(function(...args):void{}, [], null, true);
 		}
 
 		// After we have the dissassembled game, add the MainLoader (if it exists) and load mods
@@ -328,6 +360,8 @@ package Bezel
 			{
 				this.gameLoader.load(this.gameLoadSuccess, this.gameLoadFail, true);
 			}
+
+			lattice.cleanup();
 		}
 
 		// Bind the game and Bezel to each other
@@ -553,6 +587,11 @@ package Bezel
 			}
 		}
 
+		/**
+		 * Checks whether a version of Bezel given is compatible with the current one
+		 * @param requiredVersion The version to check
+		 * @return Whether current Bezel version is compatible with the given version
+		 */
 		public static function bezelVersionCompatible(requiredVersion:String): Boolean
 		{
 			var bezelVer:Array = VERSION.split(".");
@@ -652,8 +691,8 @@ package Bezel
 
 		// After bezel loads mods from /Mods/ and aggregates all coremods, check if we need to reapply the coremods.
 		// If we do, load them into Lattice, apply them, rebuild the modded swf.
-		// Either Bezel sees that the coremods are all the same and skips calling Lattice (raises REBUILD_DONE)
-		// Or They are different and we call Lattice, which then raises REBUILD_DONE
+		// Either Bezel sees that the coremods are all the same and skips calling Lattice (deferring onGameBuilt)
+		// Or they are different and we call Lattice, which then raises REBUILD_DONE
 		private function doneModLoad(): void
 		{
 			var differentCoremods:Boolean = false;
@@ -704,6 +743,7 @@ package Bezel
 					else
 					{
 						loadingStageTextField.text = APPLYING_COREMODS;
+						patchesApplied = 0;
 						updateProgress(0, lattice.numberOfPatches);
 
 						FunctionDeferrer.hardDeferFunction(lattice.apply, [], lattice, true);
@@ -714,7 +754,7 @@ package Bezel
 			}
 			else
 			{
-				dispatchEvent(new Event(LatticeEvent.REBUILD_DONE));
+				FunctionDeferrer.hardDeferFunction(this.onGameBuilt, [null], this, false);
 			}
 		}
 
@@ -750,7 +790,13 @@ package Bezel
 			this.stage.addChild(this); // Reparent this to the stage
 			this.stage.removeChild(DisplayObject(this.gameLoader.instance));
 	
+			clearEventListeners();
+			Logger.clearLoggers();
+			lattice = null;
+			_gameObjects = null;
 			this.mainLoader.cleanupForFullReload();
+			this._mainLoader = null;
+			_keybindManager = null;
 			this.mainLoaderLoader.unload(true);
 			this.gameLoader.unload();
 		}
@@ -759,6 +805,119 @@ package Bezel
 		{
 			this.loadingProgressTextField.text = current + " / " + total;
 			this.loadingProgressBar.scaleX = Number(current)/Number(total);
+		}
+
+		private var _listeners:Object;
+		private var _weakListeners:Object;
+
+		public override function addEventListener(type:String, listener:Function, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void
+		{
+			var dict:Dictionary;
+			var vect:Vector.<Boolean>;
+			if (useWeakReference)
+			{
+				if (!(type in _weakListeners))
+				{
+					_weakListeners[type] = new Dictionary(true);
+				}
+				dict = _weakListeners[type] as Dictionary;
+			}
+			else
+			{
+				if (!(type in _listeners))
+				{
+					_listeners[type] = new Dictionary();
+				}
+				dict = _listeners[type] as Dictionary;
+			}
+
+			if (!(listener in dict))
+			{
+				dict[listener] = new <Boolean>[useCapture];
+			}
+			else
+			{
+				vect = dict[listener] as Vector.<Boolean>;
+				if (vect.length == 1 && vect[0] != useCapture)
+				{
+					vect[1] = useCapture;
+				}
+			}
+
+			super.addEventListener(type, listener, useCapture, priority, useWeakReference);
+		}
+
+		public override function removeEventListener(type:String, listener:Function, useCapture:Boolean = false):void
+		{
+			var dict:Dictionary;
+			var vect:Vector.<Boolean>;
+			if (type in _listeners)
+			{
+				dict = _listeners[type] as Dictionary;
+				if (listener in dict)
+				{
+					vect = dict[listener] as Vector.<Boolean>;
+					if (vect[0] == useCapture)
+					{
+						vect.shift();
+					}
+					else if (vect.length == 2 && vect[1] == useCapture)
+					{
+						vect.pop();
+					}
+
+					if (vect.length == 0)
+					{
+						delete dict[listener];
+					}
+				}
+			}
+			if (type in _weakListeners)
+			{
+				dict = _weakListeners[type] as Dictionary;
+				if (listener in dict)
+				{
+					vect = dict[listener] as Vector.<Boolean>;
+					if (vect[0] == useCapture)
+					{
+						vect.shift();
+					}
+					else if (vect.length == 2 && vect[1] == useCapture)
+					{
+						vect.pop();
+					}
+
+					if (vect.length == 0)
+					{
+						delete dict[listener];
+					}
+				}
+			}
+			
+			super.removeEventListener(type, listener, useCapture);
+		}
+
+		private function clearEventListeners():void
+		{
+			for (var type:String in _listeners)
+			{
+				for (var listener:Object in (_listeners[type] as Dictionary))
+				{
+					super.removeEventListener(type, listener as Function, true);
+					super.removeEventListener(type, listener as Function, false);
+				}
+			}
+			for (type in _weakListeners)
+			{
+				for (listener in (_weakListeners[type] as Dictionary))
+				{
+					super.removeEventListener(type, listener as Function, true);
+					super.removeEventListener(type, listener as Function, false);
+				}
+			}
+
+			_listeners = new Object();
+			_weakListeners = new Object();
 		}
 	}
 }

@@ -22,7 +22,7 @@ package Bezel.Utils
 
         private function init():void
         {
-            myTimer.addEventListener(TimerEvent.TIMER, this.onTimer);
+            myTimer.addEventListener(TimerEvent.TIMER, this.onTimer, false, 0, true);
         }
 
         private function onTimer(e:TimerEvent):void

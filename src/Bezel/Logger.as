@@ -90,6 +90,17 @@ package Bezel
 		{
 			writeLog(this.id, source, message);
 		}
+
+		/**
+		 * Deregisters all loggers that currently exist
+		 */
+		internal static function clearLoggers():void
+		{
+			for (var logger:String in loggers)
+			{
+				delete loggers[logger];
+			}
+		}
 	}
 
 }

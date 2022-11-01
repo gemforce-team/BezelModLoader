@@ -115,9 +115,11 @@ package Bezel
 				mainLoaderDomain = new ApplicationDomain(ApplicationDomain.currentDomain);
 			}
 			// Stop all execution and unsubscribe events, let garbage collection occur
-			this.loader.unloadAndStop(true);
 			this.instance = null;
+			this.loader.unloadAndStop(true);
 			this.loader = null;
+			this.successfulLoadCallback = null;
+			this.failedLoadCallback = null;
 		}
 
 		private function loadedSuccessfully(e:Event):void

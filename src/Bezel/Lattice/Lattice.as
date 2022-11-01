@@ -4,6 +4,8 @@ package Bezel.Lattice
     import Bezel.mainloader_only;
     import Bezel.Utils.FunctionDeferrer;
 
+    import com.cff.anebe.ir.ASMultiname;
+    import com.cff.anebe.ir.ASNamespace;
     import com.cff.anebe.AssemblyDoneEvent;
     import com.cff.anebe.BytecodeEditor;
     import com.cff.anebe.DisassemblyDoneEvent;
@@ -28,13 +30,20 @@ package Bezel.Lattice
         private var patches:Vector.<LatticePatch>;
         private var expectedPatches:Vector.<LatticePatch>;
 
+        private var patchers:Vector.<LatticePatcherEntry>;
+
         private var _asasmFiles:Object;
         private var _asasmList:Vector.<String>;
         private var swfToLoad:ByteArray;
 
         private var wasDisassembled:Boolean;
 
-        // May be populated, if an actual reassembly step was done. Check before using.
+        private function get requiresPartialAssembly():Boolean
+        {
+            return patchers.length != 0;
+        }
+
+        /** If an actual reassembly step was done, the resulting SWF data. Otherwise null. */
         public function get swfBytes():ByteArray
         {
             return swfToLoad;
@@ -71,9 +80,10 @@ package Bezel.Lattice
         private var coremods:File;
         private var includeDebugInstructions:Boolean;
 
+        /** Total number of patches and patchers submitted to this instance of Lattice */
         public function get numberOfPatches():int
         {
-            return patches.length;
+            return patches.length + patchers.length;
         }
 
         public function Lattice(origSwf:File, newSwf:File, asm:File, cleanAsm:File, coremods:File, includeDebugInstructions:Boolean)
@@ -94,15 +104,19 @@ package Bezel.Lattice
 
             this.patches = new Vector.<LatticePatch>();
             this.expectedPatches = new Vector.<LatticePatch>();
+            this.patchers = new Vector.<LatticePatcherEntry>();
 
-            bytecodeEditor.addEventListener(Events.DISASSEMBLY_DONE, this.onDisassemblyDone);
-            bytecodeEditor.addEventListener(Events.ASSEMBLY_DONE, this.onAssemblyDone);
+            bytecodeEditor.addEventListener(Events.DISASSEMBLY_DONE, this.onDisassemblyDone, false, 0, true);
+            bytecodeEditor.addEventListener(Events.ASSEMBLY_DONE, this.onAssemblyDone, false, 0, true);
+            bytecodeEditor.addEventListener(Events.PARTIAL_ASSEMBLY_DONE, this.onPartialAssemblyDone, false, 0, true);
         }
 
-        // Disassembles the file passed in into a clean asm if necessary. Prepares Lattice patches.
-        // Returns whether coremods should be reloaded, regardless of if they've changed or not.
-        // Dispatches LatticeEvents.DISASSEMBLY_DONE when finished.
-        // If this is the Lattice given by Bezel, this method SHOULD NOT be called by anything other than Bezel
+        /**
+         * Disassembles the file passed in into a clean asm if necessary. Prepares Lattice patches.
+         * Dispatches LatticeEvents.DISASSEMBLY_DONE when finished.
+         * If this is the Lattice given by Bezel, this method SHOULD NOT be called by anything other than Bezel
+         * @return Whether coremods should be reloaded, regardless of if they've changed versions or not.
+         */
         public function init():Boolean
         {
             var ret:Boolean = false;
@@ -133,7 +147,7 @@ package Bezel.Lattice
                         var contents:String = stream.readUTF();
                         var overwrite:uint = stream.readUnsignedInt();
                         var causesConflict:Boolean = stream.readBoolean();
-                        this.expectedPatches[this.expectedPatches.length] = new LatticePatch(filename, offset, overwrite, contents);
+                        this.expectedPatches[this.expectedPatches.length] = new LatticePatch(filename, offset, overwrite, contents, causesConflict);
                     }
                     stream.close();
                     dispatchEvent(new Event(LatticeEvent.DISASSEMBLY_DONE));
@@ -155,6 +169,14 @@ package Bezel.Lattice
             }
 
             return ret;
+        }
+
+        /**
+         * Performs cleanup operations (such as deleting the newly-built SWF ByteArray) for post-load.
+         */
+        public function cleanup():void
+        {
+            swfToLoad = null;
         }
 
         private function performDisassemble():void
@@ -203,8 +225,10 @@ package Bezel.Lattice
             dispatchEvent(new Event(LatticeEvent.DISASSEMBLY_DONE));
         }
 
-        // Actually applies the coremods and runs the reassembler. Dispatches LatticeEvents.REBUILD_DONE when finished.
-        // If this is the Lattice given by Bezel, this method SHOULD NOT be called by anything other than Bezel
+        /**
+         * Actually applies the coremods and runs the reassembler. Dispatches LatticeEvents.REBUILD_DONE when finished.
+         * If this is the Lattice given by Bezel, this method SHOULD NOT be called by anything other than Bezel
+         */
         public function apply():void
         {
             var comp:Function = function (patch1:LatticePatch, patch2:LatticePatch):int
@@ -270,10 +294,10 @@ package Bezel.Lattice
             expectedPatches.sort(comp);
             patches.sort(comp);
 
-            var unchangedPatches:Boolean = true;
+            var patchesChanged:Boolean = false;
             if (expectedPatches.length != patches.length)
             {
-                unchangedPatches = false;
+                patchesChanged = true;
             }
             else
             {
@@ -285,13 +309,13 @@ package Bezel.Lattice
                         expectedPatches[i].overwritten != patches[i].overwritten ||
                         expectedPatches[i].causesConflict != patches[i].causesConflict)
                     {
-                        unchangedPatches = false;
+                        patchesChanged = true;
                         break;
                     }
                 }
             }
 
-            if (!unchangedPatches)
+            if (patchesChanged)
             {
                 var stream:FileStream = new FileStream();
                 stream.open(coremods, FileMode.WRITE);
@@ -304,9 +328,16 @@ package Bezel.Lattice
                     stream.writeBoolean(patch.causesConflict);
                 }
                 stream.close();
+            }
 
+            if (patchesChanged || !newSwf.exists || !asm.exists)
+            {
                 checkConflicts();
-                doPatchAndReassemble();
+                doTextPatchAndReassemble();
+            }
+            else if (requiresPartialAssembly)
+            {
+                doPatchersAndReassemble();
             }
             else
             {
@@ -332,19 +363,27 @@ package Bezel.Lattice
                 }
             }
 
+            var conflicts:uint = 0;
+
             for each (patch in patches)
             {
                 if (patch.filename in replaced && Dictionary(replaced[patch.filename])[patch.offset] != null && Dictionary(replaced[patch.filename])[patch.offset] != patch)
                 {
                     if (patch.causesConflict && (patch.overwritten != 0 || (patch.offset != 0 && Dictionary(replaced[patch.filename])[patch.offset - 1] != null)))
                     {
-                        throw new Error("Lattice (for " + origSwf.nativePath + "): Modifications at line " + patch.offset + " conflict");
+                        logger.log("checkConflicts", "Lattice (for " + origSwf.nativePath + "): Modifications at line " + patch.offset + " conflict");
+                        conflicts++;
                     }
                 }
             }
+
+            if (conflicts != 0)
+            {
+                throw new Error(conflicts + " Lattice patch conflict" + (conflicts == 1 ? "" : "s") + " occurred! Check Bezel log for details");
+            }
         }
 
-        private function doPatchAndReassemble():void
+        private function doTextPatchAndReassemble():void
         {
             var dataAsStrings:Object = new Object();
             var doSinglePatch:Function = function (i:int):void
@@ -381,21 +420,53 @@ package Bezel.Lattice
                     }
                     stream.close();
 
-                    var replaceBytes:ByteArray = null;
-
-                    if (!wasDisassembled)
-                    {
-                        replaceBytes = new ByteArray();
-                        stream.open(origSwf, FileMode.READ);
-                        stream.readBytes(replaceBytes);
-                        stream.close();
-                    }
-
-                    bytecodeEditor.AssembleAsync(_asasmFiles, includeDebugInstructions, replaceBytes);
+                    doPatchersAndReassemble();
                 }
             };
 
             doSinglePatch(0);
+        }
+
+        private function doPatchersAndReassemble():void
+        {
+            var replaceBytes:ByteArray = null;
+
+            if (!wasDisassembled)
+            {
+                replaceBytes = new ByteArray();
+                var stream:FileStream = new FileStream();
+                stream.open(origSwf, FileMode.READ);
+                stream.readBytes(replaceBytes);
+                stream.close();
+            }
+
+            if (requiresPartialAssembly)
+            {
+                bytecodeEditor.PartialAssembleAsync(_asasmFiles, includeDebugInstructions, replaceBytes);
+            }
+            else
+            {
+                bytecodeEditor.AssembleAsync(_asasmFiles, includeDebugInstructions, replaceBytes);
+            }
+        }
+
+        private function onPartialAssemblyDone(e:Event):void
+        {
+            var doSinglePatcher:Function = function (i:uint):void
+            {
+                if (i < patchers.length)
+                {
+                    patchers[i].patcher.patchClass(bytecodeEditor.GetClass(patchers[i].name, patchers[i].idx));
+                    dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));
+                    FunctionDeferrer.deferFunction(doSinglePatcher, [i + 1], null, true);
+                }
+                else
+                {
+                    bytecodeEditor.FinishAssembleAsync();
+                }
+            };
+
+            doSinglePatcher(0);
         }
 
         private function onAssemblyDone(e:AssemblyDoneEvent):void
@@ -410,6 +481,37 @@ package Bezel.Lattice
             bytecodeEditor.Cleanup();
 
             dispatchEvent(new Event(LatticeEvent.REBUILD_DONE));
+        }
+
+        /**
+         * Submits a patcher to be run after text-based coremods are changed
+         * @param patcher Patcher class, which will have its patchClass function called with the found class.
+         * @param className Name of class to be patched. If a string, it's interpreted as a qualified name that will look in PackageNamespaces.
+         * If an ASMultiname, it's interpreted as a full identifier. Note that an ASMultiname passed in must be a QName.
+         * @param indexIfMoreThanOne If there are multiple classes that match the name, disambiguates between them.
+         */
+        public function submitPatcher(patcher:LatticePatcher, className:*, indexIfMoreThanOne:uint = 0):void
+        {
+            if (className is String)
+            {
+                (className as String).replace("::", ".");
+                var nsArr:Array = (className as String).split('.');
+                var clazz:String = nsArr.pop();
+                var ns:String = nsArr.join('.');
+                patchers.push(new LatticePatcherEntry(patcher, new ASMultiname(ASMultiname.TYPE_QNAME, clazz, new ASNamespace(ASNamespace.TYPE_PACKAGE, ns)), indexIfMoreThanOne));
+            }
+            else if (className is ASMultiname)
+            {
+                if (className == null || (className as ASMultiname).type != ASMultiname.TYPE_QNAME)
+                {
+                    throw new ArgumentError("Class name must be a QName");
+                }
+                patchers.push(new LatticePatcherEntry(patcher, className, indexIfMoreThanOne));
+            }
+            else
+            {
+                throw new ArgumentError("Class name must be either a QName or a String");
+            }
         }
 
         /**

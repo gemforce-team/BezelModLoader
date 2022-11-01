@@ -40,12 +40,12 @@ package Bezel.GCCS
 	{
 		internal static function register():void
 		{
-			Bezel.Bezel.instance.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
+			Bezel.Bezel.instance.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown, false, 0, true);
 		}
 
 		internal static function unregister():void
 		{
-			Bezel.Bezel.instance.stage.removeEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown);
+			Bezel.Bezel.instance.stage.removeEventListener(KeyboardEvent.KEY_DOWN, stageKeyDown, false);
 		}
 
 		// Called after the gem's info panel has been formed but before it's returned to the game for rendering
