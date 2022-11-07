@@ -31,7 +31,7 @@ package Bezel.GCFW
             {
                 if (instructions[i].opcode == ASInstruction.OP_callpropvoid && (instructions[i].args[0] as ASMultiname).name == "close")
                 {
-                    instructions.splice(i + 1, 0,
+                    instructions.splice(GCFWCoreMod.nextNotDebug(instructions, i), 0,
                         ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCFW"), "GCFWEventHandlers")),
                         ASInstruction.CallPropVoid(ASQName(PackageInternalNs("Bezel.GCFW"), "saveSave"), 0)
                         );

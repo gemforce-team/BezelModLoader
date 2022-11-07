@@ -280,27 +280,29 @@ package Bezel.GCFW
             }
         }
 
-        internal static function localIndex(instr:ASInstruction):uint
+        internal static function nextNotDebug(instructions:Vector.<ASInstruction>, idx:uint):uint
         {
-            if (instr.opcode == ASInstruction.OP_getlocal || instr.opcode == ASInstruction.OP_setlocal)
+            for (var i:uint = idx + 1; i < instructions.length; i++)
             {
-                return instr.args[0] as uint;
+                var instr:ASInstruction = instructions[i];
+                if (instr.opcode != ASInstruction.OP_debug && instr.opcode != ASInstruction.OP_debugfile && instr.opcode != ASInstruction.OP_debugline)
+                {
+                    return i;
+                }
             }
-            else if (instr.opcode == ASInstruction.OP_getlocal0 || instr.opcode == ASInstruction.OP_setlocal0)
+
+            return 0xFFFFFFFF;
+        }
+
+        internal static function prevNotDebug(instructions:Vector.<ASInstruction>, idx:uint):uint
+        {
+            for (var i:uint = idx; i > 0; i--)
             {
-                return 0;
-            }
-            else if (instr.opcode == ASInstruction.OP_getlocal1 || instr.opcode == ASInstruction.OP_setlocal1)
-            {
-                return 1;
-            }
-            else if (instr.opcode == ASInstruction.OP_getlocal2 || instr.opcode == ASInstruction.OP_setlocal2)
-            {
-                return 2;
-            }
-            else if (instr.opcode == ASInstruction.OP_getlocal3 || instr.opcode == ASInstruction.OP_setlocal3)
-            {
-                return 3;
+                var instr:ASInstruction = instructions[i-1];
+                if (instr.opcode != ASInstruction.OP_debug && instr.opcode != ASInstruction.OP_debugfile && instr.opcode != ASInstruction.OP_debugline)
+                {
+                    return i - 1;
+                }
             }
 
             return 0xFFFFFFFF;

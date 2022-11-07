@@ -46,7 +46,7 @@ package Bezel.GCFW
                 var instr:ASInstruction = instructions[i];
                 if (instr.opcode == ASInstruction.OP_getproperty && (instr.args[0] as ASMultiname).name == "b")
                 {
-                    instructions.splice(i - 1, 100000,
+                    instructions.splice(i - 1, instructions.length,
                         ASInstruction.GetLocal1(),
                         ASInstruction.SetProperty(ASQName(PrivateNamespace("com.giab.common.data:ENumber"), "a")),
                         ASInstruction.ReturnVoid());

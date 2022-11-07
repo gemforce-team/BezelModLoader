@@ -23,8 +23,11 @@ package Bezel.GCFW
             {
                 if (instructions[i].opcode == ASInstruction.OP_ifne)
                 {
-                    editInstr = instructions[i];
-                    insertIndex = i + 2; // Insert after this instruction and the returnvoid with it
+                    insertIndex = GCFWCoreMod.nextNotDebug(instructions, GCFWCoreMod.nextNotDebug(instructions, i)); // Insert after this instruction and the returnvoid with it
+                    if (instructions[i].args[0] == instructions[insertIndex])
+                    {
+                        editInstr = instructions[i];
+                    }
                     break;
                 }
             }
@@ -37,7 +40,10 @@ package Bezel.GCFW
             var jumpLabel:ASInstruction = ASInstruction.Label();
             var firstInstr:ASInstruction = ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCFW"), "GCFWEventHandlers"));
 
-            editInstr.args[0] = firstInstr;
+            if (editInstr != null)
+            {
+                editInstr.args[0] = firstInstr;
+            }
 
             instructions.splice(insertIndex, 0,
                 firstInstr,

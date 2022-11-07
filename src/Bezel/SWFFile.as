@@ -79,7 +79,7 @@ package Bezel
 
 		/**
 		 * Loads the SWF from the disk.
-		 @param successCallback Function to call on load success. Should take an SWFFile argument.
+		 * @param successCallback Function to call on load success. Should take an SWFFile argument.
 		 * @param failureCallback Function to call on load fail. Should take an Event argument.
 		 * @param intoMainLoaderDomain Where to load the file: into the main loader domain or its own. This should only be set to true for the main game loaded by Bezel.
 		 */

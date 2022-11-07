@@ -23,7 +23,7 @@ package Bezel.GCFW
                 var instruction:ASInstruction = instructions[i];
                 if (properLocalIndex == 0xFFFFFFFF && instruction.opcode == ASInstruction.OP_callpropvoid && (instruction.args[0] as ASMultiname).name == "addChild")
                 {
-                    properLocalIndex = GCFWCoreMod.localIndex(instructions[i - 1]);
+                    properLocalIndex = instructions[GCFWCoreMod.prevNotDebug(instructions, i)].localIndex();
                 }
 
                 if (properLocalIndex != 0xFFFFFFFF && instruction.opcode == ASInstruction.OP_getlex && (instruction.args[0] as ASMultiname).name == "GV")

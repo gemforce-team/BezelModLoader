@@ -29,7 +29,7 @@ package Bezel.GCFW
             {
                 if (instructions[i].opcode == ASInstruction.OP_ifne)
                 {
-                    insertIndex = i + 1; // Insert after this instruction
+                    insertIndex = GCFWCoreMod.nextNotDebug(instructions, i); // Insert after this instruction
                     break;
                 }
             }
