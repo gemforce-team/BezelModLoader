@@ -19,9 +19,9 @@ package Bezel
 	import flash.text.TextFormat;
 	import flash.text.TextFormatAlign;
 	import flash.utils.ByteArray;
-	import flash.utils.getTimer;
-	import flash.utils.getQualifiedClassName;
 	import flash.utils.Dictionary;
+	import flash.utils.getQualifiedClassName;
+	import flash.utils.getTimer;
 	
 	use namespace bezel_internal;
 	use namespace mainloader_only;

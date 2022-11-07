@@ -1,10 +1,10 @@
 package Bezel.Utils
 {
-    import flash.utils.Timer;
-    import flash.events.TimerEvent;
-    import flash.utils.getTimer;
-
     import Bezel.bezel_internal;
+
+    import flash.events.TimerEvent;
+    import flash.utils.Timer;
+    import flash.utils.getTimer;
 
     /**
      * Utility to delay function calls until later. "Later" may mean either the next frame or sometime in this one.

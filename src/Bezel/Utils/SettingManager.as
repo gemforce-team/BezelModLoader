@@ -1,16 +1,15 @@
 package Bezel.Utils
 {
 
-    import Bezel.Logger;
-    import flash.errors.IllegalOperationError;
     import Bezel.Bezel;
-    import flash.utils.Dictionary;
-
+    import Bezel.Logger;
     import Bezel.bezel_internal;
+
+    import flash.errors.IllegalOperationError;
     import flash.filesystem.File;
-    import flash.filesystem.FileStream;
     import flash.filesystem.FileMode;
-    import flash.events.Event;
+    import flash.filesystem.FileStream;
+    import flash.utils.Dictionary;
 
     /**
      * Manages settings for Bezel mods. Currently only works for numerical, boolean, and string settings.

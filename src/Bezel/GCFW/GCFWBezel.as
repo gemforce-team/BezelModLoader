@@ -1,10 +1,13 @@
 package Bezel.GCFW
 {
 	import Bezel.Bezel;
+	import Bezel.Lattice.Lattice;
 	import Bezel.Logger;
 	import Bezel.MainLoader;
 	import Bezel.Utils.Keybind;
+	import Bezel.Utils.SettingManager;
 
+	import com.giab.common.utils.Key;
 	import com.giab.games.gcfw.GV;
 	import com.giab.games.gcfw.Main;
 	import com.giab.games.gcfw.Mods;
@@ -43,15 +46,12 @@ package Bezel.GCFW
 	import com.giab.games.gcfw.constants.WizLockType;
 	import com.giab.games.gcfw.constants.WizStashStatus;
 
-	import flash.display.MovieClip;
 	import flash.desktop.NativeApplication;
+	import flash.display.MovieClip;
 	import flash.events.Event;
-	import flash.events.UncaughtErrorEvent;
-	import Bezel.Utils.SettingManager;
-	import Bezel.Lattice.Lattice;
-	import com.giab.common.utils.Key;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.events.UncaughtErrorEvent;
 
 	/**
 	 * The MainLoader for GemCraft: Frostborn Wrath.

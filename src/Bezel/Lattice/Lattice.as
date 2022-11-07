@@ -1,15 +1,16 @@
 package Bezel.Lattice
 {
     import Bezel.Logger;
-    import Bezel.mainloader_only;
     import Bezel.Utils.FunctionDeferrer;
+    import Bezel.mainloader_only;
 
-    import com.cff.anebe.ir.ASMultiname;
-    import com.cff.anebe.ir.ASNamespace;
     import com.cff.anebe.AssemblyDoneEvent;
     import com.cff.anebe.BytecodeEditor;
     import com.cff.anebe.DisassemblyDoneEvent;
     import com.cff.anebe.Events;
+    import com.cff.anebe.ir.ASClass;
+    import com.cff.anebe.ir.ASMultiname;
+    import com.cff.anebe.ir.ASNamespace;
 
     import flash.events.Event;
     import flash.events.EventDispatcher;
@@ -18,6 +19,7 @@ package Bezel.Lattice
     import flash.filesystem.FileStream;
     import flash.utils.ByteArray;
     import flash.utils.Dictionary;
+    import flash.utils.getQualifiedClassName;
 
     /**
      * Coremod handling system: accepts and applies changes to game assembly
@@ -456,7 +458,13 @@ package Bezel.Lattice
             {
                 if (i < patchers.length)
                 {
-                    patchers[i].patcher.patchClass(bytecodeEditor.GetClass(patchers[i].name, patchers[i].idx));
+                    logger.log("onPartialAssemblyDone", "Patching " + patchers[i].name.ns.name + "." + patchers[i].name.name + " with an instance of " + getQualifiedClassName(patchers[i].patcher));
+                    var clazz:ASClass = bytecodeEditor.GetClass(patchers[i].name, patchers[i].idx);
+                    if (clazz == null)
+                    {
+                        throw new Error("Class " + patchers[i].name.ns.name + "." + patchers[i].name.name + " does not exist in the partial reassembly to be patched by an instance of " + getQualifiedClassName(patchers[i].patcher));
+                    }
+                    patchers[i].patcher.patchClass(clazz);
                     dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));
                     FunctionDeferrer.deferFunction(doSinglePatcher, [i + 1], null, true);
                 }

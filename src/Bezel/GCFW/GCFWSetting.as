@@ -1,7 +1,8 @@
 package Bezel.GCFW
 {
-    import flash.display.MovieClip;
     import Bezel.Utils.SettingManager;
+
+    import flash.display.MovieClip;
 
     /**
      * ...
