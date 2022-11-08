@@ -1,4 +1,4 @@
-package Bezel.GCFW
+package Bezel.GCCS
 {
     import Bezel.Lattice.LatticePatcher;
 
@@ -12,7 +12,7 @@ package Bezel.GCFW
     import com.cff.anebe.ir.namespaces.PackageInternalNs;
     import com.cff.anebe.ir.namespaces.PackageNamespace;
 
-    internal class GCFWScrOptionsPatcher implements LatticePatcher
+    internal class GCCSScrOptionsPatcher implements LatticePatcher
     {
         public function patchClass(clazz:ASClass):void
         {
@@ -31,9 +31,9 @@ package Bezel.GCFW
                 var instr:ASInstruction = instructions[i];
                 if (instr.opcode == ASInstruction.OP_pushscope)
                 {
-                    instructions.splice(GCFWCoreMod.nextNotDebug(instructions, i), 0,
-                        ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCFW"), "GCFWSettingsHandler")),
-                        ASInstruction.CallPropVoid(ASQName(PackageInternalNs("Bezel.GCFW"), "toggleCustomSettingsFromGame"), 0)
+                    instructions.splice(GCCSCoreMod.nextNotDebug(instructions, i), 0,
+                        ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCCS"), "GCCSSettingsHandler")),
+                        ASInstruction.CallPropVoid(ASQName(PackageInternalNs("Bezel.GCCS"), "toggleCustomSettingsFromGame"), 0)
                         );
 
                     clazz.setInstanceTrait(switchOptionsTrait);
@@ -60,7 +60,7 @@ package Bezel.GCFW
                 if (instr.opcode == ASInstruction.OP_lookupswitch)
                 {
                     var def:ASInstruction = instr.args[0] as ASInstruction;
-                    replaceLoc = GCFWCoreMod.nextNotDebug(instructions, instructions.indexOf(def)); // We want to remove the pushfalse afterwards
+                    replaceLoc = GCCSCoreMod.nextNotDebug(instructions, instructions.indexOf(def)); // We want to remove the pushfalse afterwards
                     if (instructions[replaceLoc].opcode != ASInstruction.OP_pushfalse)
                     {
                         throw new Error("Could not find a pushfalse to overwrite in ScrOptions::renderPanelInfoPanel");
@@ -80,11 +80,11 @@ package Bezel.GCFW
             }
 
             instructions.splice(replaceLoc, 1,
-                ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCFW"), "GCFWSettingsHandler")),
+                ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCCS"), "GCCSSettingsHandler")),
                 ASInstruction.GetLocal1(),
-                ASInstruction.GetLex(ASQName(PackageNamespace("com.giab.games.gcfw"), "GV")),
+                ASInstruction.GetLex(ASQName(PackageNamespace("com.giab.games.gccs.steam"), "GV")),
                 ASInstruction.GetProperty(ASQName(PackageNamespace(""), "mcInfoPanel")),
-                ASInstruction.CallProperty(ASQName(PackageInternalNs("Bezel.GCFW"), "renderInfoPanel"), 2)
+                ASInstruction.CallProperty(ASQName(PackageInternalNs("Bezel.GCCS"), "renderInfoPanel"), 2)
                 );
 
             if (fixupLoc != 0xFFFFFFFF)
@@ -107,7 +107,7 @@ package Bezel.GCFW
                 var instr:ASInstruction = instructions[i];
                 if (instructions[i].opcode == ASInstruction.OP_pushbyte)
                 {
-                    iLocal = instructions[GCFWCoreMod.nextNotDebug(instructions, i)].localIndex();
+                    iLocal = instructions[GCCSCoreMod.nextNotDebug(instructions, i)].localIndex();
                     break;
                 }
             }
@@ -126,7 +126,7 @@ package Bezel.GCFW
                     var nextIfFalse:uint = i;
                     do
                     {
-                        nextIfFalse = GCFWCoreMod.nextNotDebug(instructions, nextIfFalse);
+                        nextIfFalse = GCCSCoreMod.nextNotDebug(instructions, nextIfFalse);
                     }
                     while (instructions[nextIfFalse].opcode != ASInstruction.OP_iffalse);
 
@@ -148,8 +148,8 @@ package Bezel.GCFW
                         newDup,
                         ASInstruction.IfFalse(instructions[nextIfFalse]),
                         ASInstruction.Pop(),
-                        ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCFW"), "GCFWSettingsHandler")),
-                        ASInstruction.GetProperty(ASQName(PackageInternalNs("Bezel.GCFW"), "IS_CHOOSING_KEYBIND")),
+                        ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCCS"), "GCCSSettingsHandler")),
+                        ASInstruction.GetProperty(ASQName(PackageInternalNs("Bezel.GCCS"), "IS_CHOOSING_KEYBIND")),
                         ASInstruction.Not()
                         );
 
@@ -160,7 +160,7 @@ package Bezel.GCFW
                         instr = instructions[j];
                         if (instr.opcode == ASInstruction.OP_callpropvoid && (instr.args[0] as ASMultiname).name == "gotoAndStop")
                         {
-                            afterCheckColor = GCFWCoreMod.nextNotDebug(instructions, j);
+                            afterCheckColor = GCCSCoreMod.nextNotDebug(instructions, j);
                             break;
                         }
                     }
