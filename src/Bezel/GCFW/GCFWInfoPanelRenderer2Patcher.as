@@ -18,6 +18,7 @@ package Bezel.GCFW
             var instructions:Vector.<ASInstruction> = infoPanelGemTrait.funcOrMethod.body.instructions;
             var properLocalIndex:uint = 0xFFFFFFFF;
             var insertAfterInstruction:uint = 0xFFFFFFFF;
+            var fixJumpsTo:ASInstruction;
             for (var i:int = instructions.length - 1; i >= 0; i--)
             {
                 var instruction:ASInstruction = instructions[i];
@@ -28,6 +29,7 @@ package Bezel.GCFW
 
                 if (properLocalIndex != 0xFFFFFFFF && instruction.opcode == ASInstruction.OP_getlex && (instruction.args[0] as ASMultiname).name == "GV")
                 {
+                    fixJumpsTo = instruction;
                     insertAfterInstruction = i;
                     break;
                 }
@@ -43,13 +45,23 @@ package Bezel.GCFW
                 throw new Error("Could not find the proper instruction to insert after");
             }
 
+            var firstNewInstr:ASInstruction = ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCFW"), "GCFWEventHandlers"));
+
             instructions.splice(insertAfterInstruction, 0,
-                ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCFW"), "GCFWEventHandlers")),
+                firstNewInstr,
                 ASInstruction.EfficientGetLocal(properLocalIndex),
                 ASInstruction.GetLocal1(),
                 ASInstruction.GetLex(ASQName(PackageNamespace("com.giab.common.utils"), "NumberFormatter")),
                 ASInstruction.CallPropVoid(ASQName(PackageInternalNs("Bezel.GCFW"), "ingameGemInfoPanelFormed"), 3)
                 );
+
+            for each (instruction in instructions)
+            {
+                if (instruction.args != null && instruction.args.length > 0 && instruction.args[0] == fixJumpsTo)
+                {
+                    instruction.args[0] = firstNewInstr;
+                }
+            }
 
             clazz.setInstanceTrait(infoPanelGemTrait);
         }
