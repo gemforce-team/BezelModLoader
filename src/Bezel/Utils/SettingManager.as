@@ -133,14 +133,7 @@ package Bezel.Utils
             if (identifier == null || identifier == "")
                 throw new ArgumentError("SettingManager identifier can't be null or empty");
 
-            if (identifier in managers)
-                return managers[identifier];
-            else
-            {
-                managers[identifier] = new SettingManager(identifier, new SettingManagerInstantiationBlocker());
-                // writeLog("Logger", "getLogger", "Created a new logger: " + identifier);
-                return managers[identifier];
-            }
+            return managers[identifier] || (managers[identifier] = new SettingManager(identifier, new SettingManagerInstantiationBlocker()));
         }
 
         /**

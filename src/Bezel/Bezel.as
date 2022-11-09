@@ -816,32 +816,18 @@ package Bezel
 			var vect:Vector.<Boolean>;
 			if (useWeakReference)
 			{
-				if (!(type in _weakListeners))
-				{
-					_weakListeners[type] = new Dictionary(true);
-				}
-				dict = _weakListeners[type] as Dictionary;
+				dict = _weakListeners[type] || (_weakListeners[type] = new Dictionary(true));
 			}
 			else
 			{
-				if (!(type in _listeners))
-				{
-					_listeners[type] = new Dictionary();
-				}
-				dict = _listeners[type] as Dictionary;
+				dict = _listeners[type] || (_listeners[type] = new Dictionary(true));
 			}
 
-			if (!(listener in dict))
+			vect = dict[listener] || (dict[listener] = new <Boolean>[useCapture]);
+
+			if (vect.length == 1 && vect[0] != useCapture)
 			{
-				dict[listener] = new <Boolean>[useCapture];
-			}
-			else
-			{
-				vect = dict[listener] as Vector.<Boolean>;
-				if (vect.length == 1 && vect[0] != useCapture)
-				{
-					vect[1] = useCapture;
-				}
+				vect[1] = useCapture;
 			}
 
 			super.addEventListener(type, listener, useCapture, priority, useWeakReference);

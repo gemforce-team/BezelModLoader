@@ -354,13 +354,10 @@ package Bezel.Lattice
             {
                 if (patch.causesConflict && patch.overwritten != 0)
                 {
-                    if (!(patch.filename in replaced))
-                    {
-                        replaced[patch.filename] = new Dictionary();
-                    }
+                    var dict:Dictionary = replaced[patch.filename] || (replaced[patch.filename] = new Dictionary());
                     for (var i:int = patch.offset; i != patch.offset + patch.overwritten; ++i)
                     {
-                        replaced[patch.filename][i] = patch;
+                        dict[i] = patch;
                     }
                 }
             }
@@ -369,9 +366,10 @@ package Bezel.Lattice
 
             for each (patch in patches)
             {
-                if (patch.filename in replaced && Dictionary(replaced[patch.filename])[patch.offset] != null && Dictionary(replaced[patch.filename])[patch.offset] != patch)
+                dict = replaced[patch.filename];
+                if (patch.filename in replaced && dict[patch.offset] != null && dict[patch.offset] != patch)
                 {
-                    if (patch.causesConflict && (patch.overwritten != 0 || (patch.offset != 0 && Dictionary(replaced[patch.filename])[patch.offset - 1] != null)))
+                    if (patch.causesConflict && (patch.overwritten != 0 || (patch.offset != 0 && dict[patch.offset - 1] != null)))
                     {
                         logger.log("checkConflicts", "Lattice (for " + origSwf.nativePath + "): Modifications at line " + patch.offset + " conflict");
                         conflicts++;
@@ -393,12 +391,9 @@ package Bezel.Lattice
                 var patch:LatticePatch = patches[i];
                 logger.log("doPatch", "Patching line " + patch.offset + " of " + patch.filename);
 
-                if (!(patch.filename in dataAsStrings))
-                {
-                    dataAsStrings[patch.filename] = asasmFiles[patch.filename].split('\n');
-                }
-                var lines:Array = dataAsStrings[patch.filename];
-                dataAsStrings[patch.filename] = lines.slice(0, patch.offset).concat(patch.contents.split('\n'), lines.slice(patch.offset + patch.overwritten));
+                var strings:Array = dataAsStrings[patch.filename] || (dataAsStrings[patch.filename] = asasmFiles[patch.filename].split('\n'));
+
+                dataAsStrings[patch.filename] = strings.slice(0, patch.offset).concat(patch.contents.split('\n'), strings.slice(patch.offset + patch.overwritten));
 
                 dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));
 
@@ -454,12 +449,17 @@ package Bezel.Lattice
 
         private function onPartialAssemblyDone(e:Event):void
         {
+            var types:Object = new Object();
             var doSinglePatcher:Function = function (i:uint):void
             {
                 if (i < patchers.length)
                 {
+                    var name:ASMultiname = patchers[i].name;
+                    var patcher:LatticePatcher = patchers[i].patcher;
                     logger.log("onPartialAssemblyDone", "Patching " + patchers[i].name.ns.name + "." + patchers[i].name.name + " with an instance of " + getQualifiedClassName(patchers[i].patcher));
-                    var clazz:ASClass = bytecodeEditor.GetClass(patchers[i].name, patchers[i].idx);
+                    var namespaces:Object = types[name.ns.type] || (types[name.ns.type] = new Object());
+                    var classes:Object = namespaces[name.ns.name] || (namespaces[name.ns.name] = new Object());
+                    var clazz:ASClass = classes[name.name] as ASClass || (classes[name.name] = bytecodeEditor.GetClass(patchers[i].name, patchers[i].idx));
                     if (clazz == null)
                     {
                         throw new Error("Class " + patchers[i].name.ns.name + "." + patchers[i].name.name + " does not exist in the partial reassembly to be patched by an instance of " + getQualifiedClassName(patchers[i].patcher));
