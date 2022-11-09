@@ -14,7 +14,7 @@ package Bezel.Utils
 		private var _ctrl:Boolean;
 		private var _alt:Boolean;
 		private var _shift:Boolean;
-		internal var _stringRep:String;
+		private var _stringRep:String;
 
 		/**
 		 * The key (as in flash.ui.Keyboard)

@@ -35,7 +35,6 @@ package Bezel.Lattice
         private var patchers:Vector.<LatticePatcherEntry>;
 
         private var _asasmFiles:Object;
-        private var _asasmList:Vector.<String>;
         private var swfToLoad:ByteArray;
 
         private var wasDisassembled:Boolean;
@@ -156,6 +155,7 @@ package Bezel.Lattice
                 }
                 catch (e:Error)
                 {
+                    stream.close();
                     logger.log("init", "Previous coremod info not openable or corrupt. Removing and starting Lattice disassembly.");
                     performDisassemble();
                     ret = true;
