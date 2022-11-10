@@ -388,17 +388,16 @@ package Bezel.Lattice
             var dataAsStrings:Object = new Object();
             var doSinglePatch:Function = function (i:int):void
             {
-                var patch:LatticePatch = patches[i];
-                logger.log("doPatch", "Patching line " + patch.offset + " of " + patch.filename);
-
-                var strings:Array = dataAsStrings[patch.filename] || (dataAsStrings[patch.filename] = asasmFiles[patch.filename].split('\n'));
-
-                dataAsStrings[patch.filename] = strings.slice(0, patch.offset).concat(patch.contents.split('\n'), strings.slice(patch.offset + patch.overwritten));
-
-                dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));
-
-                if (i + 1 < patches.length)
+                if (i < patches.length)
                 {
+                    var patch:LatticePatch = patches[i];
+                    logger.log("doPatch", "Patching line " + patch.offset + " of " + patch.filename);
+
+                    var strings:Array = dataAsStrings[patch.filename] || (dataAsStrings[patch.filename] = asasmFiles[patch.filename].split('\n'));
+
+                    dataAsStrings[patch.filename] = strings.slice(0, patch.offset).concat(patch.contents.split('\n'), strings.slice(patch.offset + patch.overwritten));
+
+                    dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));
                     FunctionDeferrer.deferFunction(doSinglePatch, [i + 1], null, true);
                 }
                 else
