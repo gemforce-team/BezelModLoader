@@ -14,6 +14,8 @@ fn main() -> Result<(), i32> {
     println!("cargo:rerun-if-changed=../BezelLibrary.as3proj");
     println!("cargo:rerun-if-changed=../GCCSMainLoader.as3proj");
     println!("cargo:rerun-if-changed=../GCFWMainLoader.as3proj");
+    println!("cargo:rerun-if-changed=ANEBytecodeEditor.ane");
+    println!("cargo:rerun-if-changed=ANEBytecodeEditor.swc");
     println!("cargo:rerun-if-env-changed=AIRSDK");
 
     println!("{:?}", env::vars().collect::<Vec<(String, String)>>());

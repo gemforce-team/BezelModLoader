@@ -728,17 +728,17 @@ package Bezel
 
 				var loadSingleCoremod:Function = function(idx:int):void
 				{
-					var coremod:Object = coremods[idx];
-					stream.writeUTF(coremod.name);
-					stream.writeUTF(coremod.version);
-
-					logger.log("doneModLoad", "Loading coremods for " + coremod.name);
-					coremod.load(lattice);
-					updateProgress(idx+1, coremods.length);
-
-					if (idx+1 < coremods.length)
+					if (idx < coremods.length)
 					{
-						FunctionDeferrer.deferFunction(loadSingleCoremod, [idx+1], null, true);
+						var coremod:Object = coremods[idx];
+						stream.writeUTF(coremod.name);
+						stream.writeUTF(coremod.version);
+
+						logger.log("doneModLoad", "Loading coremods for " + coremod.name);
+						coremod.load(lattice);
+						updateProgress(idx + 1, coremods.length);
+
+						FunctionDeferrer.deferFunction(loadSingleCoremod, [idx + 1], null, true);
 					}
 					else
 					{

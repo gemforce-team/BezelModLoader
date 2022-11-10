@@ -438,11 +438,11 @@ package Bezel.Lattice
 
             if (requiresPartialAssembly)
             {
-                bytecodeEditor.PartialAssembleAsync(_asasmFiles, includeDebugInstructions, replaceBytes);
+                bytecodeEditor.PartialAssembleAsync(asasmFiles, includeDebugInstructions, replaceBytes);
             }
             else
             {
-                bytecodeEditor.AssembleAsync(_asasmFiles, includeDebugInstructions, replaceBytes);
+                bytecodeEditor.AssembleAsync(asasmFiles, includeDebugInstructions, replaceBytes);
             }
         }
 
