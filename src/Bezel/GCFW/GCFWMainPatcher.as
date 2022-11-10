@@ -45,7 +45,9 @@ package Bezel.GCFW
                 var instruction:ASInstruction = instructions[i];
                 if (instruction.opcode == ASInstruction.OP_constructsuper)
                 {
-                    instructions.splice(i - 1, 2);
+                    var deleteFrom:int = GCFWCoreMod.prevNotDebug(instructions, i);
+                    instructions.splice(deleteFrom, i - deleteFrom + 1);
+                    i -= i - deleteFrom + 1;
                 }
                 if (instruction.opcode == ASInstruction.OP_getproperty && (instruction.args[0] as ASMultiname).name == "uncaughtErrorHandler")
                 {
