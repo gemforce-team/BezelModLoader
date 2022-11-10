@@ -6,6 +6,7 @@ package Bezel.GCCS
     import com.cff.anebe.ir.ASInstruction;
     import com.cff.anebe.ir.ASMethod;
     import com.cff.anebe.ir.ASMethodBody;
+    import com.cff.anebe.ir.ASMultiname;
     import com.cff.anebe.ir.multinames.ASQName;
     import com.cff.anebe.ir.namespaces.PackageNamespace;
     import com.cff.anebe.ir.traits.TraitMethod;
@@ -22,9 +23,11 @@ package Bezel.GCCS
         // Both moves constructor logic to a new method
         private function patchConstructor(clazz:ASClass):void
         {
-            var oldConstructor:ASMethod = clazz.getConstructor();
-            var oldBody:ASMethodBody = oldConstructor.body;
-            oldConstructor.body = new ASMethodBody(2, 2, 12, 14, new <ASInstruction>[
+            var constructor:ASMethod = clazz.getConstructor();
+            var initFromBezel:ASMethod = new ASMethod(null, ASQName(PackageNamespace(""), "void"), "com.giab.games.gccs.steam:Main/initFromBezel", constructor.flags, null, null, constructor.body);
+
+            constructor.flags = new <String>[];
+            constructor.body = new ASMethodBody(2, 1, 0, 1, new <ASInstruction>[
                     ASInstruction.GetLocal0(),
                     ASInstruction.PushScope(),
                     ASInstruction.GetLocal0(),
@@ -35,34 +38,30 @@ package Bezel.GCCS
                     ASInstruction.ConstructSuper(0),
                     ASInstruction.ReturnVoid(),
                 ]);
-            oldConstructor.flags = new <String>[];
+            clazz.setConstructor(constructor);
 
-            var instructionsToKeep:Vector.<ASInstruction> = oldBody.instructions;
-            while (instructionsToKeep[0].opcode != ASInstruction.OP_constructsuper)
+            var instructions:Vector.<ASInstruction> = initFromBezel.body.instructions;
+            for (var i:int = 0; i < instructions.length; i++)
             {
-                instructionsToKeep.shift();
+                var instruction:ASInstruction = instructions[i];
+                var deleteFrom:int;
+                if (instruction.opcode == ASInstruction.OP_constructsuper)
+                {
+                    deleteFrom = GCCSCoreMod.prevNotDebug(instructions, i);
+                    instructions.splice(deleteFrom, i - deleteFrom + 1);
+                }
+                if (instruction.opcode == ASInstruction.OP_initproperty && (instruction.args[0] as ASMultiname).name == "steamworks")
+                {
+                    deleteFrom = GCCSCoreMod.prevNotDebug(instructions, GCCSCoreMod.prevNotDebug(instructions, GCCSCoreMod.prevNotDebug(instructions, i)));
+                    instructions.splice(deleteFrom, i - deleteFrom + 1);
+                }
             }
-            instructionsToKeep.shift();
-
-            var newConstructor:ASMethod = new ASMethod(null, ASQName(PackageNamespace(""), "void"), "com.giab.games.gcfw:Main/initFromBezel", new <String>["NEED_ACTIVATION"], null, null, null);
-
-            instructionsToKeep.splice(0, 0, ASInstruction.GetLocal0(),
-                ASInstruction.PushScope(),
-                ASInstruction.NewActivation(),
-                ASInstruction.Dup(),
-                ASInstruction.SetLocal1(),
-                ASInstruction.PushScope()
-                );
-            instructionsToKeep.splice(instructionsToKeep.length - 1, 0,
+            instructions.splice(instructions.length - 1, 0,
                 ASInstruction.GetLocal0(),
                 ASInstruction.PushNull(),
                 ASInstruction.CallPropVoid(ASQName(PackageNamespace(""), "doEnterFramePreloader"), 1)
                 );
-
-            newConstructor.body = new ASMethodBody(oldBody.maxStack, oldBody.localCount, 11, 13, instructionsToKeep, oldBody.exceptions, oldBody.traits, oldBody.errors);
-
-            clazz.setConstructor(oldConstructor);
-            clazz.setInstanceTrait(TraitMethod(ASQName(PackageNamespace(""), "initFromBezel"), newConstructor));
+            clazz.setInstanceTrait(TraitMethod(ASQName(PackageNamespace(""), "initFromBezel"), initFromBezel));
         }
 
         private function addBezelVar(clazz:ASClass):void

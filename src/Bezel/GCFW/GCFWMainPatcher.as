@@ -26,45 +26,33 @@ package Bezel.GCFW
         // Both moves constructor logic to a new method and patches usage of uncaughtErrorHandler
         private function patchConstructor(clazz:ASClass):void
         {
-            var oldConstructor:ASMethod = clazz.getConstructor();
-            var oldBody:ASMethodBody = oldConstructor.body;
-            oldConstructor.body = new ASMethodBody(2, 2, 12, 14, new <ASInstruction>[
+            var constructor:ASMethod = clazz.getConstructor();
+            var initFromBezel:ASMethod = new ASMethod(null, ASQName(PackageNamespace(""), "void"), "com.giab.games.gcfw:Main/initFromBezel", constructor.flags, null, null, constructor.body);
+
+            constructor.flags = new <String>[];
+            constructor.body = new ASMethodBody(1, 1, 0, 1, new <ASInstruction>[
                     ASInstruction.GetLocal0(),
                     ASInstruction.PushScope(),
                     ASInstruction.GetLocal0(),
                     ASInstruction.ConstructSuper(0),
                     ASInstruction.ReturnVoid(),
                 ]);
-            oldConstructor.flags = new <String>[];
+            clazz.setConstructor(constructor);
 
-            var instructionsToKeep:Vector.<ASInstruction> = oldBody.instructions;
-            while (instructionsToKeep[0].opcode != ASInstruction.OP_constructsuper)
+            var instructions:Vector.<ASInstruction> = initFromBezel.body.instructions;
+            for (var i:int = 0; i < instructions.length; i++)
             {
-                instructionsToKeep.shift();
-            }
-            instructionsToKeep.shift();
-
-            for each (var instr:ASInstruction in instructionsToKeep)
-            {
-                if (instr.opcode == ASInstruction.OP_getproperty && (instr.args[0] as ASMultiname).name == "uncaughtErrorHandler")
+                var instruction:ASInstruction = instructions[i];
+                if (instruction.opcode == ASInstruction.OP_constructsuper)
                 {
-                    (instr.args[0] as ASMultiname).ns = PackageNamespace("");
+                    instructions.splice(i - 1, 2);
+                }
+                if (instruction.opcode == ASInstruction.OP_getproperty && (instruction.args[0] as ASMultiname).name == "uncaughtErrorHandler")
+                {
+                    (instruction.args[0] as ASMultiname).ns = PackageNamespace("");
                 }
             }
-
-            var newConstructor:ASMethod = new ASMethod(null, ASQName(PackageNamespace(""), "void"), "com.giab.games.gcfw:Main/initFromBezel", new <String>["NEED_ACTIVATION"], null, null, null);
-
-            newConstructor.body = new ASMethodBody(oldBody.maxStack, oldBody.localCount, 11, 13, new <ASInstruction>[
-                    ASInstruction.GetLocal0(),
-                    ASInstruction.PushScope(),
-                    ASInstruction.NewActivation(),
-                    ASInstruction.Dup(),
-                    ASInstruction.SetLocal1(),
-                    ASInstruction.PushScope(),
-                ].concat(instructionsToKeep), oldBody.exceptions, oldBody.traits, oldBody.errors);
-
-            clazz.setConstructor(oldConstructor);
-            clazz.setInstanceTrait(TraitMethod(ASQName(PackageNamespace(""), "initFromBezel"), newConstructor));
+            clazz.setInstanceTrait(TraitMethod(ASQName(PackageNamespace(""), "initFromBezel"), initFromBezel));
         }
 
         private function addBezelVar(clazz:ASClass):void
