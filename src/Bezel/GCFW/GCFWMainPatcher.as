@@ -47,7 +47,7 @@ package Bezel.GCFW
                 {
                     var deleteFrom:int = GCFWCoreMod.prevNotDebug(instructions, i);
                     instructions.splice(deleteFrom, i - deleteFrom + 1);
-                    i -= i - deleteFrom + 1;
+                    i = deleteFrom - 1;
                 }
                 if (instruction.opcode == ASInstruction.OP_getproperty && (instruction.args[0] as ASMultiname).name == "uncaughtErrorHandler")
                 {

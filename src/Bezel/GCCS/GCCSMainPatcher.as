@@ -49,13 +49,13 @@ package Bezel.GCCS
                 {
                     deleteFrom = GCCSCoreMod.prevNotDebug(instructions, i);
                     instructions.splice(deleteFrom, i - deleteFrom + 1);
-                    i -= i - deleteFrom + 1;
+                    i = deleteFrom - 1;
                 }
                 if (instruction.opcode == ASInstruction.OP_initproperty && (instruction.args[0] as ASMultiname).name == "steamworks")
                 {
                     deleteFrom = GCCSCoreMod.prevNotDebug(instructions, GCCSCoreMod.prevNotDebug(instructions, GCCSCoreMod.prevNotDebug(instructions, i)));
                     instructions.splice(deleteFrom, i - deleteFrom + 1);
-                    i -= i - deleteFrom + 1;
+                    i = deleteFrom - 1;
                 }
             }
             instructions.splice(instructions.length - 1, 0,
