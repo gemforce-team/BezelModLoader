@@ -33,7 +33,7 @@ package Bezel
 	public class Bezel extends MovieClip
 	{
 		/** The installed version of Bezel */
-		public static const VERSION:String = "2.0.7";
+		public static const VERSION:String = "2.1.0";
 
 		private var _gameObjects:Object;
 		private var _mainLoader:MainLoader;
