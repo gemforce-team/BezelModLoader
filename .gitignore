@@ -8,6 +8,7 @@ bin-release/
 .settings/
 automation/output/
 .vscode/
+!.vscode/tasks.json
 
 # Executables
 *.swf

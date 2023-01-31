@@ -1,0 +1,52 @@
+{
+	"compilerOptions": {
+		"source-path": [
+			"src"
+		],
+		"output": "obj/BezelModLoader.swf",
+		"default-frame-rate": 30,
+		"default-background-color": "#000000",
+		"default-size": {
+			"width": 800,
+			"height": 600
+		},
+		"target-player": "17.0",
+		"advanced-telemetry": true,
+		"omit-trace-statements": true,
+		"warnings": true,
+		"verbose-stacktraces": false,
+		"define": [
+			{
+				"name": "CONFIG::debug",
+				"value": true
+			},
+			{
+				"name": "CONFIG::release",
+				"value": false
+			}
+		],
+		"external-library-path": [
+			"${BezelLibs}/gc-cs-steam.swc",
+			"${BezelLibs}/GemCraft.Frostborn.Wrath.swc",
+			"${BezelLibs}/ANEBytecodeEditor.swc",
+			"${BezelLibs}/FRESteamWorks.swc"
+		]
+	},
+	"files": [
+		"src/Bezel/Bezel.as"
+	],
+	"modules": [
+		{
+			"file": "src/Bezel/GCFW/GCFWBezel.as",
+			"optimize": true,
+			"output": "obj/GCFWMainLoader.swf"
+		},
+		{
+			"file": "src/Bezel/GCCS/GCCSBezel.as",
+			"optimize": true,
+			"output": "obj/GCCSMainLoader.swf"
+		}
+	],
+	"config": "air",
+	"type": "app"
+}

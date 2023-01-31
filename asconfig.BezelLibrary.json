@@ -1,0 +1,37 @@
+{
+	"compilerOptions": {
+		"include-sources": [
+			"src"
+		],
+		"output": "obj/BezelModLoader.swc",
+		"default-frame-rate": 30,
+		"default-background-color": "#000000",
+		"default-size": {
+			"width": 800,
+			"height": 600
+		},
+		"target-player": "17.0",
+		"advanced-telemetry": true,
+		"omit-trace-statements": true,
+		"warnings": true,
+		"verbose-stacktraces": true,
+		"define": [
+			{
+				"name": "CONFIG::debug",
+				"value": true
+			},
+			{
+				"name": "CONFIG::release",
+				"value": false
+			}
+		],
+		"external-library-path": [
+			"${BezelLibs}/gc-cs-steam.swc",
+			"${BezelLibs}/GemCraft.Frostborn.Wrath.swc",
+			"${BezelLibs}/ANEBytecodeEditor.swc",
+			"${BezelLibs}/FRESteamWorks.swc"
+		]
+	},
+	"config": "air",
+	"type": "lib"
+}

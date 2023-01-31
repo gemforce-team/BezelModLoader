@@ -1,0 +1,83 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Package Bezel: Release",
+			"type": "cargo",
+			"options": {
+				"cwd": "installer"
+			},
+			"command": "build",
+			"args": [
+				"--release"
+			],
+			"group": "build",
+			"dependsOn": [
+				"Compile Bezel: Release",
+				"Compile Bezel: Library"
+			],
+			"presentation": {
+				"echo": true,
+				"reveal": "silent",
+				"clear": true
+			}
+		},
+		{
+			"label": "Package Bezel: Debug",
+			"type": "cargo",
+			"options": {
+				"cwd": "installer"
+			},
+			"command": "build",
+			"args": [
+				"--release"
+			],
+			"group": "build",
+			"dependsOn": [
+				"Compile Bezel: Debug",
+				"Compile Bezel: Library"
+			],
+			"presentation": {
+				"echo": true,
+				"reveal": "silent",
+				"clear": true
+			}
+		},
+		{
+			"type": "actionscript",
+			"debug": false,
+			"group": "build",
+			"label": "Compile Bezel: Release",
+			"presentation": {
+				"echo": true,
+				"reveal": "silent",
+				"clear": true
+			}
+		},
+		{
+			"type": "actionscript",
+			"debug": true,
+			"asconfig": "asconfig.debug.json",
+			"group": "build",
+			"label": "Compile Bezel: Debug",
+			"presentation": {
+				"echo": true,
+				"reveal": "silent",
+				"clear": true
+			}
+		},
+		{
+			"type": "actionscript",
+			"debug": true,
+			"asconfig": "asconfig.BezelLibrary.json",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "Compile Bezel: Library",
+			"presentation": {
+				"echo": true,
+				"reveal": "silent",
+				"clear": true
+			}
+		}
+	]
+}

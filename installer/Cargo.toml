@@ -8,9 +8,9 @@ edition = "2021"
 [profile.release]
 strip = true
 
-[build-dependencies]
-registry = "1.2.2"
-walkdir = "2.3.2"
+# [build-dependencies]
+# registry = "1.2.2"
+# walkdir = "2.3.2"
 
 [dependencies]
 xml-doc = "0.2.0"
