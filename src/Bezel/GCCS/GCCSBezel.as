@@ -179,6 +179,7 @@ package Bezel.GCCS
 			config["Build tower"] = new Keybind("t");
 			config["Build trap"] = new Keybind("r");
 			config["Build wall"] = new Keybind("w");
+			config["Build amplifier"] = new Keybind("a");
 			config["Combine gems"] = new Keybind("g");
 			config["Switch time speed"] = new Keybind("q");
 			config["Pause time"] = new Keybind("space");

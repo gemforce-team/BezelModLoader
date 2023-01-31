@@ -44,6 +44,42 @@ package Bezel.GCCS
             throw new Error("Could not patch ScrOptions::switchOptions");
         }
 
+        private function removeHotkeyRenderCall(instructions:Vector.<ASInstruction>, searchString:String):void
+        {
+            var hotkeyLoc:uint = 0xFFFFFFFF;
+            for (var i:uint = instructions.length; i > 0; i--)
+            {
+                var instr:ASInstruction = instructions[i - 1];
+
+                if (instr.opcode == ASInstruction.OP_pushstring && instr.args[0] == searchString)
+                {
+                    hotkeyLoc = i - 1;
+                    break;
+                }
+            }
+
+            if (hotkeyLoc == 0xFFFFFFFF)
+            {
+                throw new Error("Could not find hotkey string '" + searchString + "'");
+            }
+
+            var removeLoc:uint = GCCSCoreMod.prevNotDebug(instructions, GCCSCoreMod.prevNotDebug(instructions, hotkeyLoc));
+
+            var removeEnd:uint = 0xFFFFFFFF;
+
+            for (i = removeLoc; i < instructions.length; i++)
+            {
+                instr = instructions[i];
+                if (instr.opcode == ASInstruction.OP_callpropvoid && (instr.args[0] as ASMultiname).name == "addTextfield")
+                {
+                    removeEnd = i;
+                    break;
+                }
+            }
+
+            instructions.splice(removeLoc, removeEnd - removeLoc + 1);
+        }
+
         private function patchRenderInfoPanel(clazz:ASClass):void
         {
             var renderInfoPanelTrait:ASTrait = clazz.getInstanceTrait(ASQName(PackageNamespace(""), "renderPanelInfoPanel"));
@@ -91,6 +127,9 @@ package Bezel.GCCS
             {
                 instructions[fixupLoc].args[0] = instructions[replaceLoc];
             }
+
+            // Get rid of the hotkey function
+            removeHotkeyRenderCall(instructions, "Hot key: . (dot)");
 
             clazz.setInstanceTrait(renderInfoPanelTrait);
         }

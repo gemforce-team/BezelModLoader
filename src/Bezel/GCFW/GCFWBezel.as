@@ -201,7 +201,6 @@ package Bezel.GCFW
 			config["Drop gem to inventory"] = new Keybind("tab");
 			config["Duplicate gem"] = new Keybind("d");
 			config["Upgrade gem"] = new Keybind("u");
-			config["Show/hide info panels"] = new Keybind("period");
 			config["Cast freeze strike spell"] = new Keybind("number_1");
 			config["Cast whiteout strike spell"] = new Keybind("number_2");
 			config["Cast ice shards strike spell"] = new Keybind("number_3");

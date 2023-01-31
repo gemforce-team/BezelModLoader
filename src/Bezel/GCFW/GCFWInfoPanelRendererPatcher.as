@@ -132,7 +132,7 @@ package Bezel.GCFW
             replaceHotkeyRenderCall(instructions, "numpad 6", "Create Bleeding gem");
 
             replaceHotkeyRenderCall(instructions, "w", "Build wall");
-            replaceHotkeyRenderCall(instructions, "t", "Build lantern");
+            replaceHotkeyRenderCall(instructions, "t", "Build tower");
             replaceHotkeyRenderCall(instructions, "a", "Build amplifier");
             replaceHotkeyRenderCall(instructions, "r", "Build trap");
             replaceHotkeyRenderCall(instructions, "l", "Build lantern");

@@ -20,8 +20,8 @@ package Bezel.GCFW
 
         private function removeWaveStoneHotkey(clazz:ASClass):void
         {
-            var infoPanelGemTrait:ASTrait = clazz.getInstanceTrait(ASQName(PackageNamespace(""), "renderWaveStoneInfoPanel"));
-            var instructions:Vector.<ASInstruction> = infoPanelGemTrait.funcOrMethod.body.instructions;
+            var infoPanelStoneTrait:ASTrait = clazz.getInstanceTrait(ASQName(PackageNamespace(""), "renderWaveStoneInfoPanel"));
+            var instructions:Vector.<ASInstruction> = infoPanelStoneTrait.funcOrMethod.body.instructions;
 
             var hotkeyLoc:uint = 0xFFFFFFFF;
             for (var i:uint = instructions.length; i > 0; i--)
@@ -55,6 +55,8 @@ package Bezel.GCFW
             }
 
             instructions.splice(removeLoc, removeEnd - removeLoc + 1);
+
+            clazz.setInstanceTrait(infoPanelStoneTrait);
         }
 
         private function addGemInfoPanelFormedHook(clazz:ASClass):void
