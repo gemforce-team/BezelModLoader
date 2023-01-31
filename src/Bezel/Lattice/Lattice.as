@@ -10,7 +10,8 @@ package Bezel.Lattice
     import com.cff.anebe.Events;
     import com.cff.anebe.ir.ASClass;
     import com.cff.anebe.ir.ASMultiname;
-    import com.cff.anebe.ir.ASNamespace;
+    import com.cff.anebe.ir.multinames.ASQName;
+    import com.cff.anebe.ir.namespaces.PackageNamespace;
 
     import flash.events.Event;
     import flash.events.EventDispatcher;
@@ -233,68 +234,8 @@ package Bezel.Lattice
          */
         public function apply():void
         {
-            var comp:Function = function (patch1:LatticePatch, patch2:LatticePatch):int
-            {
-                if (patch1.filename < patch2.filename)
-                {
-                    return -1;
-                }
-                else if (patch2.filename < patch1.filename)
-                {
-                    return 1;
-                }
-                else
-                {
-                    if (patch1.offset < patch2.offset)
-                    {
-                        return 1;
-                    }
-                    else if (patch2.offset < patch1.offset)
-                    {
-                        return -1;
-                    }
-                    else
-                    {
-                        if (!patch1.causesConflict && patch2.causesConflict)
-                        {
-                            return -1;
-                        }
-                        else if (patch1.causesConflict && !patch2.causesConflict)
-                        {
-                            return 1;
-                        }
-                        else
-                        {
-                            if (patch1.overwritten < patch2.overwritten)
-                            {
-                                return 1;
-                            }
-                            else if (patch2.overwritten < patch1.overwritten)
-                            {
-                                return -1;
-                            }
-                            else
-                            {
-                                if (patch1.contents < patch2.contents)
-                                {
-                                    return -1;
-                                }
-                                else if (patch2.contents < patch1.contents)
-                                {
-                                    return 1;
-                                }
-                                else
-                                {
-                                    return 0;
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-
-            expectedPatches.sort(comp);
-            patches.sort(comp);
+            expectedPatches.sort(LatticePatch.compare);
+            patches.sort(LatticePatch.compare);
 
             var patchesChanged:Boolean = false;
             if (expectedPatches.length != patches.length)
@@ -383,44 +324,43 @@ package Bezel.Lattice
             }
         }
 
+        private function doSinglePatch(dataAsStrings:Object, i:int):void
+        {
+            if (i < patches.length)
+            {
+                var patch:LatticePatch = patches[i];
+                logger.log("doPatch", "Patching line " + patch.offset + " of " + patch.filename);
+
+                var strings:Array = dataAsStrings[patch.filename] || (dataAsStrings[patch.filename] = asasmFiles[patch.filename].split('\n'));
+
+                dataAsStrings[patch.filename] = strings.slice(0, patch.offset).concat(patch.contents.split('\n'), strings.slice(patch.offset + patch.overwritten));
+
+                dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));
+                FunctionDeferrer.deferFunction(doSinglePatch, [dataAsStrings, i + 1], null, true);
+            }
+            else
+            {
+                for (var filename:String in dataAsStrings)
+                {
+                    asasmFiles[filename] = dataAsStrings[filename].join('\n');
+                }
+
+                var stream:FileStream = new FileStream();
+                stream.open(asm, FileMode.WRITE);
+                for (var file:String in asasmFiles)
+                {
+                    writeNTString(stream, file);
+                    writeNTString(stream, asasmFiles[file]);
+                }
+                stream.close();
+
+                doPatchersAndReassemble();
+            }
+        }
+
         private function doTextPatchAndReassemble():void
         {
-            var dataAsStrings:Object = new Object();
-            var doSinglePatch:Function = function (i:int):void
-            {
-                if (i < patches.length)
-                {
-                    var patch:LatticePatch = patches[i];
-                    logger.log("doPatch", "Patching line " + patch.offset + " of " + patch.filename);
-
-                    var strings:Array = dataAsStrings[patch.filename] || (dataAsStrings[patch.filename] = asasmFiles[patch.filename].split('\n'));
-
-                    dataAsStrings[patch.filename] = strings.slice(0, patch.offset).concat(patch.contents.split('\n'), strings.slice(patch.offset + patch.overwritten));
-
-                    dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));
-                    FunctionDeferrer.deferFunction(doSinglePatch, [i + 1], null, true);
-                }
-                else
-                {
-                    for (var filename:String in dataAsStrings)
-                    {
-                        asasmFiles[filename] = dataAsStrings[filename].join('\n');
-                    }
-
-                    var stream:FileStream = new FileStream();
-                    stream.open(asm, FileMode.WRITE);
-                    for (var file:String in asasmFiles)
-                    {
-                        writeNTString(stream, file);
-                        writeNTString(stream, asasmFiles[file]);
-                    }
-                    stream.close();
-
-                    doPatchersAndReassemble();
-                }
-            };
-
-            doSinglePatch(0);
+            doSinglePatch(new Object(), 0);
         }
 
         private function doPatchersAndReassemble():void
@@ -446,34 +386,33 @@ package Bezel.Lattice
             }
         }
 
+        private function doSinglePatcher(types:Object, i:uint):void
+        {
+            if (i < patchers.length)
+            {
+                var name:ASMultiname = patchers[i].name;
+                var patcher:LatticePatcher = patchers[i].patcher;
+                logger.log("onPartialAssemblyDone", "Patching " + name.ns.name + "." + name.name + " with an instance of " + getQualifiedClassName(patcher));
+                var namespaces:Object = types[name.ns.type] || (types[name.ns.type] = new Object());
+                var classes:Object = namespaces[name.ns.name] || (namespaces[name.ns.name] = new Object());
+                var clazz:ASClass = classes[name.name] as ASClass || (classes[name.name] = bytecodeEditor.GetClass(name));
+                if (clazz == null)
+                {
+                    throw new Error("Class " + name.ns.name + "." + name.name + " does not exist in the partial reassembly to be patched by an instance of " + getQualifiedClassName(patcher));
+                }
+                patcher.patchClass(clazz);
+                dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));
+                FunctionDeferrer.deferFunction(doSinglePatcher, [types, i + 1], null, true);
+            }
+            else
+            {
+                bytecodeEditor.FinishAssembleAsync();
+            }
+        }
+
         private function onPartialAssemblyDone(e:Event):void
         {
-            var types:Object = new Object();
-            var doSinglePatcher:Function = function (i:uint):void
-            {
-                if (i < patchers.length)
-                {
-                    var name:ASMultiname = patchers[i].name;
-                    var patcher:LatticePatcher = patchers[i].patcher;
-                    logger.log("onPartialAssemblyDone", "Patching " + name.ns.name + "." + name.name + " with an instance of " + getQualifiedClassName(patcher));
-                    var namespaces:Object = types[name.ns.type] || (types[name.ns.type] = new Object());
-                    var classes:Object = namespaces[name.ns.name] || (namespaces[name.ns.name] = new Object());
-                    var clazz:ASClass = classes[name.name] as ASClass || (classes[name.name] = bytecodeEditor.GetClass(name, patchers[i].idx));
-                    if (clazz == null)
-                    {
-                        throw new Error("Class " + name.ns.name + "." + name.name + " does not exist in the partial reassembly to be patched by an instance of " + getQualifiedClassName(patcher));
-                    }
-                    patcher.patchClass(clazz);
-                    dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));
-                    FunctionDeferrer.deferFunction(doSinglePatcher, [i + 1], null, true);
-                }
-                else
-                {
-                    bytecodeEditor.FinishAssembleAsync();
-                }
-            };
-
-            doSinglePatcher(0);
+            doSinglePatcher(new Object(), 0);
         }
 
         private function onAssemblyDone(e:AssemblyDoneEvent):void
@@ -505,7 +444,7 @@ package Bezel.Lattice
                 var nsArr:Array = (className as String).split('.');
                 var clazz:String = nsArr.pop();
                 var ns:String = nsArr.join('.');
-                patchers.push(new LatticePatcherEntry(patcher, new ASMultiname(ASMultiname.TYPE_QNAME, clazz, new ASNamespace(ASNamespace.TYPE_PACKAGE, ns)), indexIfMoreThanOne));
+                patchers.push(new LatticePatcherEntry(patcher, ASQName(PackageNamespace(ns), clazz), indexIfMoreThanOne));
             }
             else if (className is ASMultiname)
             {

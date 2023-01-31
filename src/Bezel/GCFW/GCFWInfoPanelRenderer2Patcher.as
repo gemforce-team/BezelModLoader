@@ -14,6 +14,51 @@ package Bezel.GCFW
     {
         public function patchClass(clazz:ASClass):void
         {
+            addGemInfoPanelFormedHook(clazz);
+            removeWaveStoneHotkey(clazz);
+        }
+
+        private function removeWaveStoneHotkey(clazz:ASClass):void
+        {
+            var infoPanelGemTrait:ASTrait = clazz.getInstanceTrait(ASQName(PackageNamespace(""), "renderWaveStoneInfoPanel"));
+            var instructions:Vector.<ASInstruction> = infoPanelGemTrait.funcOrMethod.body.instructions;
+
+            var hotkeyLoc:uint = 0xFFFFFFFF;
+            for (var i:uint = instructions.length; i > 0; i--)
+            {
+                var instr:ASInstruction = instructions[i - 1];
+
+                if (instr.opcode == ASInstruction.OP_pushstring && instr.args[0] == "(Hot key: N)")
+                {
+                    hotkeyLoc = i - 1;
+                    break;
+                }
+            }
+
+            if (hotkeyLoc == 0xFFFFFFFF)
+            {
+                throw new Error("Could not find hotkey string '(Hot key: N)'");
+            }
+
+            var removeLoc:uint = GCFWCoreMod.prevNotDebug(instructions, GCFWCoreMod.prevNotDebug(instructions, hotkeyLoc));
+
+            var removeEnd:uint = 0xFFFFFFFF;
+
+            for (i = removeLoc; i < instructions.length; i++)
+            {
+                instr = instructions[i];
+                if (instr.opcode == ASInstruction.OP_callpropvoid && (instr.args[0] as ASMultiname).name == "addTextfield")
+                {
+                    removeEnd = i;
+                    break;
+                }
+            }
+
+            instructions.splice(removeLoc, removeEnd - removeLoc + 1);
+        }
+
+        private function addGemInfoPanelFormedHook(clazz:ASClass):void
+        {
             var infoPanelGemTrait:ASTrait = clazz.getInstanceTrait(ASQName(PackageNamespace(""), "renderInfoPanelGem"));
             var instructions:Vector.<ASInstruction> = infoPanelGemTrait.funcOrMethod.body.instructions;
             var properLocalIndex:uint = 0xFFFFFFFF;

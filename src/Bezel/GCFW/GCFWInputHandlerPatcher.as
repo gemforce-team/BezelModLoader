@@ -61,7 +61,8 @@ package Bezel.GCFW
         {
             var onRightClickTrait:ASTrait = clazz.getInstanceTrait(ASQName(PackageNamespace(""), "rightClickOnScene"));
             var instructions:Vector.<ASInstruction> = onRightClickTrait.funcOrMethod.body.instructions;
-            onRightClickTrait.funcOrMethod.body.localCount += 4;
+            onRightClickTrait.funcOrMethod.body.localCount += 6;
+            onRightClickTrait.funcOrMethod.body.maxStack += 3;
 
             var insertIndex:uint = 0xFFFFFFFF;
 

@@ -138,10 +138,10 @@ package Bezel.GCFW
 				// And reparent
 				// Bezel.Bezel.instance.addChild(GV.main);
 			}
-			else if (Bezel.Bezel.instance.keybindManager.getHotkeyValue(GCFWBezel.HARD_RELOAD_HOTKEY).matches(e))
-			{
-				Bezel.Bezel.instance.triggerFullReload();
-			}
+			// else if (Bezel.Bezel.instance.keybindManager.getHotkeyValue(GCFWBezel.HARD_RELOAD_HOTKEY).matches(e))
+			// {
+			// Bezel.Bezel.instance.triggerFullReload();
+			// }
 		}
 
 		// Called after the game is done loading its data

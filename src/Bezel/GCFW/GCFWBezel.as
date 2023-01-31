@@ -192,6 +192,7 @@ package Bezel.GCFW
 			config["Build pylon"] = new Keybind("p");
 			config["Build trap"] = new Keybind("r");
 			config["Build wall"] = new Keybind("w");
+			config["Build amplifier"] = new Keybind("a");
 			config["Combine gems"] = new Keybind("g");
 			config["Switch time speed"] = new Keybind("q");
 			config["Pause time"] = new Keybind("space");
@@ -217,6 +218,8 @@ package Bezel.GCFW
 			config["Down arrow function"] = new Keybind("down");
 			config["Left arrow function"] = new Keybind("left");
 			config["Right arrow function"] = new Keybind("right");
+			config["Toggle 'Show info panels'"] = new Keybind("period");
+			config["Toggle 'Hide monsters while time is frozen'"] = new Keybind("comma");
 
 			return config;
 		}
