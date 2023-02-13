@@ -110,8 +110,18 @@ fn main() {
     let ane_swc = include_bytes!("../ANEBytecodeEditor.swc");
     let swf = include_bytes!("../../obj/BezelModLoader.swf");
     let swc = include_bytes!("../../obj/BezelModLoader.swc");
-    let gccs_loader = include_bytes!("../../obj/GCCSMainLoader.swf");
-    let gcfw_loader = include_bytes!("../../obj/GCFWMainLoader.swf");
+    let loaders = [
+        (
+            "GemCraft Chasing Shadows",
+            "gc-cs-steam.swf",
+            include_bytes!("../../obj/GCCSMainLoader.swf").as_slice(),
+        ),
+        (
+            "GemCraft Frostborn Wrath",
+            "GemCraft Frostborn Wrath.swf",
+            include_bytes!("../../obj/GCFWMainLoader.swf").as_slice(),
+        ),
+    ];
     // ANE needs to be extracted from the byte array
     let mut ane = zip::ZipArchive::new(Cursor::new(ane))
         .unwrap_or_else(|e| wait_exit(Some(ErrorCode::CouldNotOpenZip(e))));
@@ -242,6 +252,7 @@ fn main() {
 
     if let Some(bezel_libs) = std::env::var_os("BezelLibs") {
         let bezel_libs = Path::new(&bezel_libs);
+        let mut can_write = true;
         if !bezel_libs.exists() {
             if let Err(e) = std::fs::create_dir(bezel_libs) {
                 println!(
@@ -249,23 +260,24 @@ fn main() {
                     bezel_libs.as_os_str().to_string_lossy(),
                     e
                 );
-            } else {
-                std::fs::write(bezel_libs.join("BezelModLoader.swc"), swc)
-                    .unwrap_or_else(|e| wait_exit(Some(ErrorCode::CouldntWriteBezel(e))));
-                std::fs::write(bezel_libs.join("ANEBytecodeEditor.swc"), ane_swc)
-                    .unwrap_or_else(|e| wait_exit(Some(ErrorCode::CouldntWriteBezel(e))));
+                can_write = false;
             }
+        }
+        if can_write {
+            std::fs::write(bezel_libs.join("BezelModLoader.swc"), swc)
+                .unwrap_or_else(|e| wait_exit(Some(ErrorCode::CouldntWriteBezel(e))));
+            std::fs::write(bezel_libs.join("ANEBytecodeEditor.swc"), ane_swc)
+                .unwrap_or_else(|e| wait_exit(Some(ErrorCode::CouldntWriteBezel(e))));
         }
     }
 
-    if game_content_path == Path::new("GemCraft Frostborn Wrath.swf") {
-        println!("Found GemCraft Frostborn Wrath. Exporting its MainLoader");
-        std::fs::write("Bezel/MainLoader.swf", gcfw_loader)
-            .unwrap_or_else(|e| wait_exit(Some(ErrorCode::CouldntWriteBezel(e))));
-    } else if game_content_path == Path::new("gc-cs-steam.swf") {
-        println!("Found GemCraft Chasing Shadows. Exporting its MainLoader");
-        std::fs::write("Bezel/MainLoader.swf", gccs_loader)
-            .unwrap_or_else(|e| wait_exit(Some(ErrorCode::CouldntWriteBezel(e))));
+    for loader in loaders {
+        if game_content_path == Path::new(loader.1) {
+            println!("Found {}. Exporting its MainLoader", loader.0);
+            std::fs::write("Bezel/MainLoader.swf", loader.2)
+                .unwrap_or_else(|e| wait_exit(Some(ErrorCode::CouldntWriteBezel(e))));
+            break;
+        }
     }
 
     ane.extract(metadata_folder.join("extensions/com.cff.anebe.ANEBytecodeEditor"))
