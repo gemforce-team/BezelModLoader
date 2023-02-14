@@ -11,16 +11,11 @@ package Bezel.GCFW
 
     import flash.display.MovieClip;
     import flash.display.Sprite;
-    import flash.events.KeyboardEvent;
     import flash.events.MouseEvent;
     import flash.text.TextFormat;
     import flash.ui.Keyboard;
     import flash.utils.describeType;
 
-    /**
-     * ...
-     * @author Chris
-     */
     internal class GCFWSettingsHandler
     {
         private static const newSettings:Vector.<GCFWSetting> = new Vector.<GCFWSetting>();

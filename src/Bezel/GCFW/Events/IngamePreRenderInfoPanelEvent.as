@@ -1,11 +1,7 @@
 package Bezel.GCFW.Events
 {
-	/**
-	 * ...
-	 * @author Hellrage
-	 */
-
 	import Bezel.GCFW.Events.Persistence.IngamePreRenderInfoPanelEventArgs;
+
 	import flash.events.Event;
 
 	public class IngamePreRenderInfoPanelEvent extends Event

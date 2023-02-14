@@ -5,10 +5,6 @@ package Bezel.GCFW
     import flash.display.MovieClip;
     import flash.text.TextField;
 
-    /**
-     * ...
-     * @author Chris
-     */
     internal class SettingsButtonShim extends MovieClip
     {
         public var tf:TextField;

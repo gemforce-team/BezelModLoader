@@ -6,13 +6,11 @@ package Bezel.Lattice
     {
         public var patcher:LatticePatcher;
         public var name:ASMultiname;
-        public var idx:uint;
 
-        public function LatticePatcherEntry(patcher:LatticePatcher, name:ASMultiname, idx:uint)
+        public function LatticePatcherEntry(patcher:LatticePatcher, name:ASMultiname)
         {
             this.patcher = patcher;
             this.name = name;
-            this.idx = idx;
         }
     }
 }

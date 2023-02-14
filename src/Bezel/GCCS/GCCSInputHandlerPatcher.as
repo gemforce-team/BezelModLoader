@@ -4,11 +4,11 @@ package Bezel.GCCS
 
     import com.cff.anebe.ir.ASClass;
     import com.cff.anebe.ir.ASInstruction;
+    import com.cff.anebe.ir.ASMethodBody;
     import com.cff.anebe.ir.ASTrait;
     import com.cff.anebe.ir.multinames.ASQName;
     import com.cff.anebe.ir.namespaces.PackageInternalNs;
     import com.cff.anebe.ir.namespaces.PackageNamespace;
-    import com.cff.anebe.ir.ASMethodBody;
 
     internal class GCCSInputHandlerPatcher implements LatticePatcher
     {

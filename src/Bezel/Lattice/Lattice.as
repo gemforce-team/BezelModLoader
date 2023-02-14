@@ -28,12 +28,12 @@ package Bezel.Lattice
      */
     public class Lattice extends EventDispatcher
     {
-        private var bytecodeEditor:BytecodeEditor = new BytecodeEditor();
+        private const bytecodeEditor:BytecodeEditor = new BytecodeEditor();
 
-        private var patches:Vector.<LatticePatch>;
-        private var expectedPatches:Vector.<LatticePatch>;
+        private const patches:Vector.<LatticePatch> = new <LatticePatch>[];
+        private const expectedPatches:Vector.<LatticePatch> = new <LatticePatch>[];
 
-        private var patchers:Vector.<LatticePatcherEntry>;
+        private const patchers:Vector.<LatticePatcherEntry> = new <LatticePatcherEntry>[];
 
         private var _asasmFiles:Object;
         private var swfToLoad:ByteArray;
@@ -73,7 +73,7 @@ package Bezel.Lattice
             return _asasmFiles;
         }
 
-        private static const logger:Logger = Logger.getLogger("Lattice");
+        private const logger:Logger = Logger.getLogger("Lattice");
 
         private var origSwf:File;
         private var newSwf:File;
@@ -88,6 +88,15 @@ package Bezel.Lattice
             return patches.length + patchers.length;
         }
 
+        /**
+         * Builds a Lattice instance for editing an SWF
+         * @param origSwf The SWF from which data should be taken and edited
+         * @param newSwf The output for the edited SWF
+         * @param asm The output for the cached edited SWF disassembly
+         * @param cleanAsm The output for the cached unedited SWF disassembly
+         * @param coremods The output for the caching of coremod versions
+         * @param includeDebugInstructions Whether, on rebuild, to include debug instructions in the SWF
+         */
         public function Lattice(origSwf:File, newSwf:File, asm:File, cleanAsm:File, coremods:File, includeDebugInstructions:Boolean)
         {
             if (origSwf == null || newSwf == null || asm == null || cleanAsm == null || coremods == null)
@@ -103,10 +112,6 @@ package Bezel.Lattice
                 this.coremods = coremods;
                 this.includeDebugInstructions = includeDebugInstructions;
             }
-
-            this.patches = new Vector.<LatticePatch>();
-            this.expectedPatches = new Vector.<LatticePatch>();
-            this.patchers = new Vector.<LatticePatcherEntry>();
 
             bytecodeEditor.addEventListener(Events.DISASSEMBLY_DONE, this.onDisassemblyDone, false, 0, true);
             bytecodeEditor.addEventListener(Events.ASSEMBLY_DONE, this.onAssemblyDone, false, 0, true);
@@ -179,7 +184,11 @@ package Bezel.Lattice
          */
         public function cleanup():void
         {
+            bytecodeEditor.Cleanup();
             swfToLoad = null;
+            patches.length = 0;
+            expectedPatches.length = 0;
+            patchers.length = 0;
         }
 
         private function performDisassemble():void
@@ -394,11 +403,12 @@ package Bezel.Lattice
                 var patcher:LatticePatcher = patchers[i].patcher;
                 logger.log("onPartialAssemblyDone", "Patching " + name.ns.name + "." + name.name + " with an instance of " + getQualifiedClassName(patcher));
                 var namespaces:Object = types[name.ns.type] || (types[name.ns.type] = new Object());
-                var classes:Object = namespaces[name.ns.name] || (namespaces[name.ns.name] = new Object());
-                var clazz:ASClass = classes[name.name] as ASClass || (classes[name.name] = bytecodeEditor.GetClass(name));
+                var classes:Object = namespaces[name.ns.name] || (namespaces[name.ns.name] = new Dictionary());
+                var disambiguated:Object = classes[name.ns.secondaryName] || (classes[name.ns.secondaryName] = new Object());
+                var clazz:ASClass = disambiguated[name.name] as ASClass || (disambiguated[name.name] = bytecodeEditor.GetClass(name));
                 if (clazz == null)
                 {
-                    throw new Error("Class " + name.ns.name + "." + name.name + " does not exist in the partial reassembly to be patched by an instance of " + getQualifiedClassName(patcher));
+                    throw new Error("Class " + name + " does not exist in the partial reassembly to be patched by an instance of " + getQualifiedClassName(patcher));
                 }
                 patcher.patchClass(clazz);
                 dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));
@@ -430,13 +440,12 @@ package Bezel.Lattice
         }
 
         /**
-         * Submits a patcher to be run after text-based coremods are changed
+         * Submits a patcher to be run after text-based patches are applied.
          * @param patcher Patcher class, which will have its patchClass function called with the found class.
          * @param className Name of class to be patched. If a string, it's interpreted as a qualified name that will look in PackageNamespaces.
          * If an ASMultiname, it's interpreted as a full identifier. Note that an ASMultiname passed in must be a QName.
-         * @param indexIfMoreThanOne If there are multiple classes that match the name, disambiguates between them.
          */
-        public function submitPatcher(patcher:LatticePatcher, className:*, indexIfMoreThanOne:uint = 0):void
+        public function submitPatcher(patcher:LatticePatcher, className:*):void
         {
             if (className is String)
             {
@@ -444,7 +453,7 @@ package Bezel.Lattice
                 var nsArr:Array = (className as String).split('.');
                 var clazz:String = nsArr.pop();
                 var ns:String = nsArr.join('.');
-                patchers.push(new LatticePatcherEntry(patcher, ASQName(PackageNamespace(ns), clazz), indexIfMoreThanOne));
+                patchers.push(new LatticePatcherEntry(patcher, ASQName(PackageNamespace(ns), clazz)));
             }
             else if (className is ASMultiname)
             {
@@ -452,7 +461,7 @@ package Bezel.Lattice
                 {
                     throw new ArgumentError("Class name must be a QName");
                 }
-                patchers.push(new LatticePatcherEntry(patcher, className, indexIfMoreThanOne));
+                patchers.push(new LatticePatcherEntry(patcher, className));
             }
             else
             {
@@ -471,7 +480,7 @@ package Bezel.Lattice
         }
 
         /**
-         * Inserts and optionally removes assembly at a given line offset within a passed-in GCFW assembly filename.
+         * Inserts and optionally removes assembly at a given line offset within a passed-in assembly filename.
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
          * followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param offset Offset at which to insert the contents. Note that this is zero-indexed: value 1 will be inserted AFTER line 1
@@ -489,7 +498,7 @@ package Bezel.Lattice
         }
 
         /**
-         * Retrieves the contents of the passed-in GCFW assembly filename.
+         * Retrieves the contents of the passed-in assembly filename.
          * @param filename File to retrieve. If retrieving a class, this will be the fully qualified name of the class with periods replaced by /,
          * followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          */
@@ -503,7 +512,7 @@ package Bezel.Lattice
         }
 
         /**
-         * Finds a regex within a passed-in GCFW assembly filename
+         * Finds a regex within a passed-in assembly filename.
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
          * followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param pattern Pattern to search for. Can be a multiline regex
@@ -538,7 +547,7 @@ package Bezel.Lattice
         }
 
         /**
-         * Finds and replaces a regex within a passed-in GCFW assembly filename. Note that $ replacement codes can be used in the replacement string.
+         * Finds and replaces a regex within a passed-in assembly filename. Note that $ replacement codes can be used in the replacement string.
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
          * followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param pattern Pattern to search for. Can be a multiline regex
@@ -574,7 +583,7 @@ package Bezel.Lattice
         }
 
         /**
-         * Copies out code found via a regex within a passed-in GCFW assembly filename
+         * Copies out code found via a regex within a passed-in assembly filename.
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
          * followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param pattern Pattern to search for. Can be a multiline regex
@@ -594,7 +603,7 @@ package Bezel.Lattice
         }
 
         /**
-         * Copies out code from the passed-in GCFW assembly filename
+         * Copies out code from the passed-in assembly filename.
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
          * followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param offset Offset from which to pull the contents. Note that this is zero-indexed: value 1 will retrieve lines 2-offset+lines
@@ -612,7 +621,7 @@ package Bezel.Lattice
         }
 
         /**
-         * Copies out code from the passed-in GCFW assembly filename, removing it from its original position.
+         * Copies out code from the passed-in assembly filename, removing it from its original position.
          * @param filename File to edit. If editing a class, this will be the fully qualified name of the class with periods replaced by /,
          * followed by ".class.asasm". Example: com.giab.games.gcfw.Main becomes "com/giab/games/gcfw/Main.class.asasm"
          * @param offset Offset from which to pull the contents. Note that this is zero-indexed: value 1 will retrieve lines 2-offset+lines

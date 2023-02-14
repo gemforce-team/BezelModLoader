@@ -4,6 +4,7 @@ package Bezel.GCCS
 
     import com.cff.anebe.ir.ASClass;
     import com.cff.anebe.ir.ASInstruction;
+    import com.cff.anebe.ir.ASMethodBody;
     import com.cff.anebe.ir.ASMultiname;
     import com.cff.anebe.ir.ASNamespace;
     import com.cff.anebe.ir.ASTrait;
@@ -11,7 +12,6 @@ package Bezel.GCCS
     import com.cff.anebe.ir.multinames.MultinameL;
     import com.cff.anebe.ir.namespaces.PackageInternalNs;
     import com.cff.anebe.ir.namespaces.PackageNamespace;
-    import com.cff.anebe.ir.ASMethodBody;
 
     internal class GCCSScrOptionsPatcher implements LatticePatcher
     {

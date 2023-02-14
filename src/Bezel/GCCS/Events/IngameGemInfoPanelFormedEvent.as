@@ -1,11 +1,7 @@
 package Bezel.GCCS.Events
 {
-	/**
-	 * ...
-	 * @author Hellrage
-	 */
-
 	import Bezel.GCCS.Events.Persistence.IngameGemInfoPanelFormedEventArgs;
+
 	import flash.events.Event;
 
 	public class IngameGemInfoPanelFormedEvent extends Event

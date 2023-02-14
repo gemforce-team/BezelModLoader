@@ -1,10 +1,5 @@
 package Bezel.GCCS.Events
 {
-	/**
-	 * ...
-	 * @author piepie62
-	 */
-
 	import flash.events.Event;
 
 	public class IngameNewSceneEvent extends Event

@@ -1,11 +1,7 @@
 package Bezel.GCFW.Events
 {
-	/**
-	 * ...
-	 * @author Hellrage
-	 */
-
 	import Bezel.GCFW.Events.Persistence.IngameClickOnSceneEventArgs;
+
 	import flash.events.Event;
 
 	public class IngameRightClickOnSceneEvent extends Event

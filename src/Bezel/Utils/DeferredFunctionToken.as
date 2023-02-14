@@ -1,10 +1,5 @@
 package Bezel.Utils
 {
-    /**
-     * ...
-     * @author Chris
-     */
-
     internal class DeferredFunctionToken
     {
         public var func:Function;

@@ -1,6 +1,5 @@
 package Bezel.Utils
 {
-
     import Bezel.Bezel;
     import Bezel.Logger;
     import Bezel.bezel_internal;

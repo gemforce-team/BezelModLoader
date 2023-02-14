@@ -29,11 +29,6 @@ package Bezel.GCFW
 
 	use namespace mainloader_only;
 
-	/**
-	 * ...
-	 * @author Chris
-	 */
-
 	internal class GCFWEventHandlers
 	{
 		internal static function register():void

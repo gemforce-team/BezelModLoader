@@ -1,6 +1,5 @@
 package Bezel.Lattice
 {
-
 	import com.cff.anebe.ir.ASClass;
 
 	/**

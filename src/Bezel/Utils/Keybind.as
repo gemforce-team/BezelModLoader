@@ -148,5 +148,4 @@ package Bezel.Utils
 			return this._stringRep;
 		}
 	}
-
 }

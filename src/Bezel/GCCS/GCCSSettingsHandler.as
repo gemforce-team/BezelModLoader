@@ -17,10 +17,6 @@ package Bezel.GCCS
     import flash.ui.Keyboard;
     import flash.utils.describeType;
 
-    /**
-     * ...
-     * @author Chris
-     */
     internal class GCCSSettingsHandler
     {
         private static const newSettings:Vector.<GCCSSetting> = new Vector.<GCCSSetting>();
@@ -61,7 +57,7 @@ package Bezel.GCCS
         {
             for (var i:int = newSettings.length; i > 0; i--)
             {
-                if (newSettings[i - 1].mod as String == mod && (name == null || newSettings[i - 1].name as String == name))
+                if (newSettings[i - 1].mod as String == mod && (name == null || newSettings[i - 1].name == name))
                 {
                     newSettings.splice(i - 1, 1);
                 }

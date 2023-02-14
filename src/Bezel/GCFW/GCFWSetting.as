@@ -1,19 +1,15 @@
 package Bezel.GCFW
 {
+    import Bezel.Utils.Keybind;
     import Bezel.Utils.SettingManager;
 
-    import flash.display.MovieClip;
-    import flash.events.MouseEvent;
     import com.giab.games.gcfw.GV;
     import com.giab.games.gcfw.mcDyn.McOptPanel;
-    import flash.events.KeyboardEvent;
-    import flash.ui.Keyboard;
-    import Bezel.Utils.Keybind;
 
-    /**
-     * ...
-     * @author Chris
-     */
+    import flash.display.MovieClip;
+    import flash.events.KeyboardEvent;
+    import flash.events.MouseEvent;
+    import flash.ui.Keyboard;
 
     internal class GCFWSetting
     {

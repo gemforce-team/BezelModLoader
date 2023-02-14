@@ -102,7 +102,6 @@ package Bezel
 			}
 		}
 	}
-
 }
 
 // Hack I found online: this is a way to implement singletons.

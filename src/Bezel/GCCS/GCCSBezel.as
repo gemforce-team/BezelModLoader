@@ -1,9 +1,11 @@
 package Bezel.GCCS
 {
 	import Bezel.Bezel;
+	import Bezel.Lattice.Lattice;
 	import Bezel.Logger;
 	import Bezel.MainLoader;
 	import Bezel.Utils.Keybind;
+	import Bezel.Utils.SettingManager;
 
 	import com.giab.games.gccs.steam.GV;
 	import com.giab.games.gccs.steam.Mods;
@@ -42,11 +44,9 @@ package Bezel.GCCS
 	import com.giab.games.gccs.steam.constants.WaveFormation;
 	import com.giab.games.gccs.steam.constants.WizLockType;
 
-	import flash.display.MovieClip;
 	import flash.desktop.NativeApplication;
+	import flash.display.MovieClip;
 	import flash.events.Event;
-	import Bezel.Utils.SettingManager;
-	import Bezel.Lattice.Lattice;
 
 	/*
 	 * The MainLoader for GemCraft: Chasing Shadows.
@@ -252,5 +252,4 @@ package Bezel.GCCS
 			}
 		}
 	}
-
 }

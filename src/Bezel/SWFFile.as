@@ -1,6 +1,5 @@
 package Bezel
 {
-
 	import flash.display.Loader;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -128,5 +127,4 @@ package Bezel
 			successfulLoadCallback(this);
 		}
 	}
-
 }

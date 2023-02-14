@@ -1,11 +1,7 @@
 package Bezel.GCFW.Events
 {
-	/**
-	 * ...
-	 * @author Hellrage
-	 */
-
 	import Bezel.GCFW.Events.Persistence.IngameKeyDownEventArgs;
+
 	import flash.events.Event;
 
 	public class IngameKeyDownEvent extends Event

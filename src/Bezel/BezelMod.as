@@ -1,6 +1,5 @@
 package Bezel
 {
-
 	/**
 	 * Defines the interface of a normal mod
 	 * @author Chris
@@ -33,5 +32,4 @@ package Bezel
 		function bind(bezel:Bezel, gameObjects:Object):void;
 		function unload():void;
 	}
-
 }

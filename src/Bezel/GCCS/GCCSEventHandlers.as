@@ -19,9 +19,9 @@ package Bezel.GCCS
 
 	import com.giab.games.gccs.steam.GV;
 	import com.giab.games.gccs.steam.SB;
-	import com.giab.games.gccs.steam.mcStat.McMainMenu;
-	import com.giab.games.gccs.steam.mcDyn.McInfoPanel;
 	import com.giab.games.gccs.steam.entity.Gem;
+	import com.giab.games.gccs.steam.mcDyn.McInfoPanel;
+	import com.giab.games.gccs.steam.mcStat.McMainMenu;
 
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
@@ -30,11 +30,6 @@ package Bezel.GCCS
 	import flash.utils.getTimer;
 
 	use namespace mainloader_only;
-
-	/**
-	 * ...
-	 * @author Chris
-	 */
 
 	internal class GCCSEventHandlers
 	{

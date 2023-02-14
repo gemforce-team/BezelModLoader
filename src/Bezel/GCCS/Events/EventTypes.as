@@ -3,7 +3,7 @@ package Bezel.GCCS.Events
 	import flash.errors.IllegalOperationError;
 
 	/**
-	 * Event types for use mainly with GCFW and GCCS. Other MainLoaders may use these, too, but some may not apply
+	 * Event types for use with GCCS.
 	 * @author Chris
 	 */
 	public class EventTypes
@@ -21,7 +21,5 @@ package Bezel.GCCS.Events
 		{
 			throw new IllegalOperationError("Illegal instantiation!");
 		}
-
 	}
-
 }

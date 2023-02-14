@@ -286,5 +286,4 @@ package Bezel.GCFW
 			}
 		}
 	}
-
 }

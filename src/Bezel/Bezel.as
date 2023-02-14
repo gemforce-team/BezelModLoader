@@ -45,19 +45,19 @@ package Bezel
 
 		private var lattice:Lattice;
 		private var logger:Logger;
-		private var mods:Object;
+		private const mods:Object = {};
 
 		private var waitingMods:uint;
 		private var progressTotal:uint;
 		private var patchesApplied:uint;
 
 		private var initialLoad:Boolean;
-		private var coremods:Array;
-		private var prevCoremods:Array;
+		private const coremods:Array = [];
+		private const prevCoremods:Array = [];
 		
-		private var loadingStageTextField:TextField;
-		private var loadingProgressTextField:TextField;
-		private var loadingProgressBar:Sprite;
+		private const loadingStageTextField:TextField = new TextField();
+		private const loadingProgressTextField:TextField = new TextField();
+		private const loadingProgressBar:Sprite = new Sprite();
 
 		private var manager:SettingManager;
 
@@ -151,8 +151,6 @@ package Bezel
 		public function Bezel()
 		{
 			_instance = this;
-			_listeners = new Object();
-			_weakListeners = new Object();
 			prepareFolders();
 
 			FunctionDeferrer.deferFunction(this.startLoadFromScratch, [], this, true);
@@ -164,7 +162,6 @@ package Bezel
 
 			this._keybindManager = new KeybindManager();
 			
-			loadingStageTextField = new TextField();
 			loadingStageTextField.selectable = false;
 			var textFormat:TextFormat = loadingStageTextField.defaultTextFormat;
 			textFormat.align = TextFormatAlign.CENTER;
@@ -190,7 +187,6 @@ package Bezel
 
 			this.addChild(emptyLoadingBar);
 
-			loadingProgressBar = new Sprite();
 			loadingProgressBar.graphics.beginFill(0x800000);
 			loadingProgressBar.graphics.drawRect(0, 0, emptyLoadingBar.width - emptyLoadingBarWidth * 2, emptyLoadingBar.height - emptyLoadingBarWidth * 2);
 
@@ -200,7 +196,6 @@ package Bezel
 
 			this.addChild(loadingProgressBar);
 
-			loadingProgressTextField = new TextField();
 			loadingProgressTextField.selectable = false;
 			loadingProgressTextField.defaultTextFormat = textFormat;
 			loadingProgressTextField.textColor = 0xFFFFFF;
@@ -222,7 +217,6 @@ package Bezel
 			this.initialLoad = true;
 
 			this.logger = Logger.getLogger("Bezel");
-			this.mods = new Object();
 
 			this.logger.log("Bezel", "Bezel Mod Loader " + prettyVersion());
 
@@ -270,9 +264,6 @@ package Bezel
 			this.lattice.addEventListener(LatticeEvent.REBUILD_DONE, this.onGameBuilt, false, 0, true);
 			this.lattice.addEventListener(LatticeEvent.SINGLE_PATCH_APPLIED, this.onSinglePatch, false, 0, true);
 			this.lattice.addEventListener(LatticeEvent.REASSEMBLY_STARTED, this.onReassembleStart, false, 0, true);
-
-			this.coremods = new Array();
-			this.prevCoremods = new Array();
 
 			// Initializes Lattice. This method raises DISASSEMBLY_DONE
 			var reloadCoremods:Boolean = this.lattice.init();
@@ -687,7 +678,6 @@ package Bezel
 			}
 			this.removeChildren();
 			this.addChild(DisplayObject(mainLoader));
-			mods = new Array();
 			loadMods();
 		}
 
@@ -780,7 +770,6 @@ package Bezel
 		{
 			FunctionDeferrer.clear();
 			this._modsReloadedTimestamp = getTimer();
-			SettingManager.unregisterAllManagers();
 			if (mainLoader != null)
 			{
 				mainLoader.deregisterOption(SettingManager.MOD_KEYBIND, null);
@@ -792,20 +781,24 @@ package Bezel
 				delete mods[name];
 			}
 			this.removeChildren();
-			mods = new Array();
 		
 			this.stage.addChild(this); // Reparent this to the stage
 			this.stage.removeChild(DisplayObject(this.gameLoader.instance));
 	
 			clearEventListeners();
-			Logger.clearLoggers();
-			lattice = null;
-			_gameObjects = null;
+			this._gameObjects = null;
 			this.mainLoader.cleanupForFullReload();
 			this._mainLoader = null;
-			_keybindManager = null;
+			this._keybindManager = null;
+			this.lattice = null;
+			Logger.clearLoggers();
+			this.logger = null;
+			this.coremods.length = 0;
+			this.prevCoremods.length = 0;
 			this.mainLoaderLoader.unload(true);
 			this.gameLoader.unload();
+			SettingManager.unregisterAllManagers();
+			this.manager = null;
 		}
 
 		private function updateProgress(current:int, total:int):void
@@ -814,8 +807,8 @@ package Bezel
 			this.loadingProgressBar.scaleX = Number(current)/Number(total);
 		}
 
-		private var _listeners:Object;
-		private var _weakListeners:Object;
+		private const _listeners:Object = new Object();
+		private const _weakListeners:Object = new Object();
 
 		public override function addEventListener(type:String, listener:Function, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void
 		{
@@ -899,6 +892,7 @@ package Bezel
 					super.removeEventListener(type, listener as Function, true);
 					super.removeEventListener(type, listener as Function, false);
 				}
+				delete _listeners[type];
 			}
 			for (type in _weakListeners)
 			{
@@ -907,10 +901,8 @@ package Bezel
 					super.removeEventListener(type, listener as Function, true);
 					super.removeEventListener(type, listener as Function, false);
 				}
+				delete _weakListeners[type];
 			}
-
-			_listeners = new Object();
-			_weakListeners = new Object();
 		}
 
 		private static function doNothingFunction(...args):void

@@ -1,12 +1,8 @@
 package Bezel.GCCS
 {
-    import flash.display.MovieClip;
     import Bezel.Utils.SettingManager;
 
-    /**
-     * ...
-     * @author Chris
-     */
+    import flash.display.MovieClip;
 
     internal class GCCSSetting
     {

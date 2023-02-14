@@ -1,18 +1,14 @@
 package Bezel.GCCS.Events
 {
-	/**
-	 * ...
-	 * @author piepie62
-	 */
+	import com.giab.games.gccs.steam.struct.PlayerProgressData;
 
 	import flash.events.Event;
-	import com.giab.games.gccs.steam.struct.PlayerProgressData;
 
 	public class LoadSaveEvent extends Event
 	{
-
 		private var _save:PlayerProgressData;
 
+		/** The save that is being loaded */
 		public function get save():PlayerProgressData
 		{
 			return _save;
