@@ -4,6 +4,7 @@ package Bezel.GCFW
 
     import com.cff.anebe.ir.ASClass;
     import com.cff.anebe.ir.ASInstruction;
+    import com.cff.anebe.ir.ASMethodBody;
     import com.cff.anebe.ir.ASTrait;
     import com.cff.anebe.ir.multinames.ASQName;
     import com.cff.anebe.ir.namespaces.PackageInternalNs;
@@ -16,37 +17,31 @@ package Bezel.GCFW
             addPreRenderPanelHookAndRemoveHotkeys(clazz);
         }
 
-        private function replaceHotkeyRenderCall(instructions:Vector.<ASInstruction>, keybind:String, keybindName:String):void
+        private function replaceHotkeyRenderCall(body:ASMethodBody, keybind:String, keybindName:String):void
         {
             var hotkeyFirstIdx:int;
             var hotkeyLastIdx:int;
             var re:RegExp = new RegExp("hot key: " + keybind, "i");
-            var hotkeyLoc:uint = 0xFFFFFFFF;
-            for (var i:uint = instructions.length; i > 0; i--)
+
+            var origHotkeyString:String;
+            var hotkeyEndString:String;
+
+            body.streamInstructions(true)
+                .findNext(function (instr:ASInstruction):Boolean
             {
-                var instr:ASInstruction = instructions[i - 1];
-
-                if (instr.opcode == ASInstruction.OP_pushstring && re.test(instr.args[0] as String))
-                {
-                    hotkeyLoc = i - 1;
-                    hotkeyFirstIdx = (instr.args[0] as String).search(re) + 9;
-                    hotkeyLastIdx = hotkeyFirstIdx + keybind.length;
-                    break;
-                }
-            }
-
-            if (hotkeyLoc == 0xFFFFFFFF)
+                return instr.opcode == ASInstruction.OP_pushstring && re.test(instr.args[0] as String);
+            })
+                .then(function (instr:ASInstruction):void
             {
-                throw new Error("Could not find hotkey string 'hot key: " + keybind + "'");
-            }
+                hotkeyFirstIdx = (instr.args[0] as String).search(re) + 9;
+                hotkeyLastIdx = hotkeyFirstIdx + keybind.length;
 
-            var origHotkeyString:String = instr.args[0] as String;
-
-            instr.args[0] = origHotkeyString.slice(0, hotkeyFirstIdx);
-
-            var hotkeyEndString:String = origHotkeyString.slice(hotkeyLastIdx);
-
-            instructions.splice(hotkeyLoc + 1, 0,
+                origHotkeyString = instr.args[0] as String;
+                instr.args[0] = origHotkeyString.slice(0, hotkeyFirstIdx);
+                hotkeyEndString = origHotkeyString.slice(hotkeyLastIdx);
+            })
+                .backtrack(1)
+                .insert(
                 ASInstruction.GetLex(ASQName(PackageNamespace("Bezel"), "Bezel")),
                 ASInstruction.GetProperty(ASQName(PackageNamespace(""), "instance")),
                 ASInstruction.GetProperty(ASQName(PackageNamespace(""), "keybindManager")),
@@ -56,44 +51,38 @@ package Bezel.GCFW
                 ASInstruction.CallProperty(ASQName(PackageNamespace(""), "toUpperCase"), 0),
                 ASInstruction.Add(),
                 ASInstruction.PushString(origHotkeyString.slice(hotkeyLastIdx)),
-                ASInstruction.Add());
+                ASInstruction.Add()
+                );
         }
 
         private function addPreRenderPanelHookAndRemoveHotkeys(clazz:ASClass):void
         {
             var infoPanelTrait:ASTrait = clazz.getInstanceTrait(ASQName(PackageNamespace(""), "renderInfoPanel"));
-            var instructions:Vector.<ASInstruction> = infoPanelTrait.funcOrMethod.body.instructions;
-
-            var insertIndex:uint = 0xFFFFFFFF;
-            var editInstr:ASInstruction;
-
-            for (var i:int = 0; i < instructions.length; i++)
-            {
-                if (instructions[i].opcode == ASInstruction.OP_ifne)
-                {
-                    insertIndex = GCFWCoreMod.nextNotDebug(instructions, GCFWCoreMod.nextNotDebug(instructions, i)); // Insert after this instruction and the returnvoid with it
-                    if (instructions[i].args[0] == instructions[insertIndex])
-                    {
-                        editInstr = instructions[i];
-                    }
-                    break;
-                }
-            }
-
-            if (insertIndex == 0xFFFFFFFF)
-            {
-                throw new Error("Could not patch ingamePreRenderInfoPanel");
-            }
+            var body:ASMethodBody = infoPanelTrait.funcOrMethod.body;
 
             var jumpLabel:ASInstruction = ASInstruction.Label();
             var firstInstr:ASInstruction = ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCFW"), "GCFWEventHandlers"));
+            var editInstr:ASInstruction;
 
-            if (editInstr != null)
+            body.streamInstructions()
+                .findNext(function (instr:ASInstruction):Boolean
             {
-                editInstr.args[0] = firstInstr;
-            }
-
-            instructions.splice(insertIndex, 0,
+                var ret:Boolean = instr.opcode == ASInstruction.OP_ifne;
+                return ret;
+            })
+                .then(function (instr:ASInstruction):void
+            {
+                editInstr = instr;
+            })
+                .advance(2)
+                .then(function (instr:ASInstruction):void
+            {
+                if (editInstr.args[0] == instr)
+                {
+                    body.redirectJumps(instr, firstInstr);
+                }
+            })
+                .insert(
                 firstInstr,
                 ASInstruction.CallProperty(ASQName(PackageInternalNs("Bezel.GCFW"), "ingamePreRenderInfoPanel"), 0),
                 ASInstruction.IfTrue(jumpLabel),
@@ -101,42 +90,42 @@ package Bezel.GCFW
                 jumpLabel
                 );
 
-            replaceHotkeyRenderCall(instructions, "space", "Pause time");
-            replaceHotkeyRenderCall(instructions, "space", "Pause time");
-            replaceHotkeyRenderCall(instructions, "space", "Pause time");
+            replaceHotkeyRenderCall(body, "space", "Pause time");
+            replaceHotkeyRenderCall(body, "space", "Pause time");
+            replaceHotkeyRenderCall(body, "space", "Pause time");
 
-            replaceHotkeyRenderCall(instructions, "q", "Switch time speed");
-            replaceHotkeyRenderCall(instructions, "q", "Switch time speed");
-            replaceHotkeyRenderCall(instructions, "q", "Switch time speed");
-            replaceHotkeyRenderCall(instructions, "q", "Switch time speed");
+            replaceHotkeyRenderCall(body, "q", "Switch time speed");
+            replaceHotkeyRenderCall(body, "q", "Switch time speed");
+            replaceHotkeyRenderCall(body, "q", "Switch time speed");
+            replaceHotkeyRenderCall(body, "q", "Switch time speed");
 
-            replaceHotkeyRenderCall(instructions, "x", "Destroy gem for mana");
+            replaceHotkeyRenderCall(body, "x", "Destroy gem for mana");
 
-            replaceHotkeyRenderCall(instructions, "1", "Cast freeze strike spell");
-            replaceHotkeyRenderCall(instructions, "2", "Cast whiteout strike spell");
-            replaceHotkeyRenderCall(instructions, "3", "Cast ice shards strike spell");
-            replaceHotkeyRenderCall(instructions, "4", "Cast bolt enhancement spell");
-            replaceHotkeyRenderCall(instructions, "5", "Cast beam enhancement spell");
-            replaceHotkeyRenderCall(instructions, "6", "Cast barrage enhancement spell");
+            replaceHotkeyRenderCall(body, "1", "Cast freeze strike spell");
+            replaceHotkeyRenderCall(body, "2", "Cast whiteout strike spell");
+            replaceHotkeyRenderCall(body, "3", "Cast ice shards strike spell");
+            replaceHotkeyRenderCall(body, "4", "Cast bolt enhancement spell");
+            replaceHotkeyRenderCall(body, "5", "Cast beam enhancement spell");
+            replaceHotkeyRenderCall(body, "6", "Cast barrage enhancement spell");
 
-            replaceHotkeyRenderCall(instructions, "b", "Throw gem bombs");
-            replaceHotkeyRenderCall(instructions, "g", "Combine gems");
-            replaceHotkeyRenderCall(instructions, "d", "Duplicate gem");
-            replaceHotkeyRenderCall(instructions, "u", "Upgrade gem");
+            replaceHotkeyRenderCall(body, "b", "Throw gem bombs");
+            replaceHotkeyRenderCall(body, "g", "Combine gems");
+            replaceHotkeyRenderCall(body, "d", "Duplicate gem");
+            replaceHotkeyRenderCall(body, "u", "Upgrade gem");
 
-            replaceHotkeyRenderCall(instructions, "numpad 1", "Create Armor Tearing gem");
-            replaceHotkeyRenderCall(instructions, "numpad 2", "Create Poison gem");
-            replaceHotkeyRenderCall(instructions, "numpad 3", "Create Slowing gem");
-            replaceHotkeyRenderCall(instructions, "numpad 4", "Create Critical Hit gem");
-            replaceHotkeyRenderCall(instructions, "numpad 5", "Create Mana Leeching gem");
-            replaceHotkeyRenderCall(instructions, "numpad 6", "Create Bleeding gem");
+            replaceHotkeyRenderCall(body, "numpad 1", "Create Armor Tearing gem");
+            replaceHotkeyRenderCall(body, "numpad 2", "Create Poison gem");
+            replaceHotkeyRenderCall(body, "numpad 3", "Create Slowing gem");
+            replaceHotkeyRenderCall(body, "numpad 4", "Create Critical Hit gem");
+            replaceHotkeyRenderCall(body, "numpad 5", "Create Mana Leeching gem");
+            replaceHotkeyRenderCall(body, "numpad 6", "Create Bleeding gem");
 
-            replaceHotkeyRenderCall(instructions, "w", "Build wall");
-            replaceHotkeyRenderCall(instructions, "t", "Build tower");
-            replaceHotkeyRenderCall(instructions, "a", "Build amplifier");
-            replaceHotkeyRenderCall(instructions, "r", "Build trap");
-            replaceHotkeyRenderCall(instructions, "l", "Build lantern");
-            replaceHotkeyRenderCall(instructions, "p", "Build pylon");
+            replaceHotkeyRenderCall(body, "w", "Build wall");
+            replaceHotkeyRenderCall(body, "t", "Build tower");
+            replaceHotkeyRenderCall(body, "a", "Build amplifier");
+            replaceHotkeyRenderCall(body, "r", "Build trap");
+            replaceHotkeyRenderCall(body, "l", "Build lantern");
+            replaceHotkeyRenderCall(body, "p", "Build pylon");
 
             clazz.setInstanceTrait(infoPanelTrait);
         }

@@ -40,29 +40,27 @@ package Bezel.GCCS
                 ]);
             clazz.setConstructor(constructor);
 
-            var instructions:Vector.<ASInstruction> = initFromBezel.body.instructions;
-            for (var i:int = 0; i < instructions.length; i++)
+            initFromBezel.body.streamInstructions()
+                .findNext(function (instr:ASInstruction):Boolean
             {
-                var instruction:ASInstruction = instructions[i];
-                var deleteFrom:int;
-                if (instruction.opcode == ASInstruction.OP_constructsuper)
-                {
-                    deleteFrom = GCCSCoreMod.prevNotDebug(instructions, i);
-                    instructions.splice(deleteFrom, i - deleteFrom + 1);
-                    i = deleteFrom - 1;
-                }
-                if (instruction.opcode == ASInstruction.OP_initproperty && (instruction.args[0] as ASMultiname).name == "steamworks")
-                {
-                    deleteFrom = GCCSCoreMod.prevNotDebug(instructions, GCCSCoreMod.prevNotDebug(instructions, GCCSCoreMod.prevNotDebug(instructions, i)));
-                    instructions.splice(deleteFrom, i - deleteFrom + 1);
-                    i = deleteFrom - 1;
-                }
-            }
-            instructions.splice(instructions.length - 1, 0,
+                return (instr.opcode == ASInstruction.OP_initproperty || instr.opcode == ASInstruction.OP_setproperty) && (instr.args[0] as ASMultiname).name == "steamworks";
+            })
+                .backtrack(3)
+                .deleteNext(4)
+                .findNext(function (instr:ASInstruction):Boolean
+            {
+                return instr.opcode == ASInstruction.OP_constructsuper;
+            })
+                .backtrack(1)
+                .deleteNext(2)
+                .advance(0xFFFFFFFF)
+                .backtrack(1)
+                .insert(
                 ASInstruction.GetLocal0(),
                 ASInstruction.PushNull(),
                 ASInstruction.CallPropVoid(ASQName(PackageNamespace(""), "doEnterFramePreloader"), 1)
                 );
+
             clazz.setInstanceTrait(TraitMethod(ASQName(PackageNamespace(""), "initFromBezel"), initFromBezel));
         }
 

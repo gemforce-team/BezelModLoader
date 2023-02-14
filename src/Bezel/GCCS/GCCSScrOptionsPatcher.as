@@ -11,6 +11,7 @@ package Bezel.GCCS
     import com.cff.anebe.ir.multinames.MultinameL;
     import com.cff.anebe.ir.namespaces.PackageInternalNs;
     import com.cff.anebe.ir.namespaces.PackageNamespace;
+    import com.cff.anebe.ir.ASMethodBody;
 
     internal class GCCSScrOptionsPatcher implements LatticePatcher
     {
@@ -26,96 +27,71 @@ package Bezel.GCCS
             var switchOptionsTrait:ASTrait = clazz.getInstanceTrait(ASQName(PackageNamespace(""), "switchOptions"));
             var instructions:Vector.<ASInstruction> = switchOptionsTrait.funcOrMethod.body.instructions;
 
-            for (var i:int = 0; i < instructions.length; i++)
+            switchOptionsTrait.funcOrMethod.body.streamInstructions()
+                .findNext(function (instr:ASInstruction):Boolean
             {
-                var instr:ASInstruction = instructions[i];
-                if (instr.opcode == ASInstruction.OP_pushscope)
-                {
-                    instructions.splice(GCCSCoreMod.nextNotDebug(instructions, i), 0,
-                        ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCCS"), "GCCSSettingsHandler")),
-                        ASInstruction.CallPropVoid(ASQName(PackageInternalNs("Bezel.GCCS"), "toggleCustomSettingsFromGame"), 0)
-                        );
+                return instr.opcode == ASInstruction.OP_pushscope;
+            })
+                .advance(1)
+                .insert(
+                ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCCS"), "GCCSSettingsHandler")),
+                ASInstruction.CallPropVoid(ASQName(PackageInternalNs("Bezel.GCCS"), "toggleCustomSettingsFromGame"), 0)
+                );
 
-                    clazz.setInstanceTrait(switchOptionsTrait);
-                    return;
-                }
-            }
-
-            throw new Error("Could not patch ScrOptions::switchOptions");
+            clazz.setInstanceTrait(switchOptionsTrait);
         }
 
-        private function removeHotkeyRenderCall(instructions:Vector.<ASInstruction>, searchString:String):void
+        private function removeHotkeyRenderCall(body:ASMethodBody, searchString:String):void
         {
-            var hotkeyLoc:uint = 0xFFFFFFFF;
-            for (var i:uint = instructions.length; i > 0; i--)
+            body.streamInstructions(true)
+                .findNext(function (instr:ASInstruction):Boolean
             {
-                var instr:ASInstruction = instructions[i - 1];
-
-                if (instr.opcode == ASInstruction.OP_pushstring && instr.args[0] == searchString)
-                {
-                    hotkeyLoc = i - 1;
-                    break;
-                }
-            }
-
-            if (hotkeyLoc == 0xFFFFFFFF)
+                return instr.opcode == ASInstruction.OP_pushstring && instr.args[0] == searchString;
+            })
+                .reverse()
+                .backtrack(2)
+                .deleteUntil(function (instr:ASInstruction):Boolean
             {
-                throw new Error("Could not find hotkey string '" + searchString + "'");
-            }
-
-            var removeLoc:uint = GCCSCoreMod.prevNotDebug(instructions, GCCSCoreMod.prevNotDebug(instructions, hotkeyLoc));
-
-            var removeEnd:uint = 0xFFFFFFFF;
-
-            for (i = removeLoc; i < instructions.length; i++)
-            {
-                instr = instructions[i];
-                if (instr.opcode == ASInstruction.OP_callpropvoid && (instr.args[0] as ASMultiname).name == "addTextfield")
-                {
-                    removeEnd = i;
-                    break;
-                }
-            }
-
-            instructions.splice(removeLoc, removeEnd - removeLoc + 1);
+                return instr.opcode == ASInstruction.OP_callpropvoid && (instr.args[0] as ASMultiname).name == "addTextfield";
+            })
+                .deleteNext(1);
         }
 
         private function patchRenderInfoPanel(clazz:ASClass):void
         {
             var renderInfoPanelTrait:ASTrait = clazz.getInstanceTrait(ASQName(PackageNamespace(""), "renderPanelInfoPanel"));
-            var instructions:Vector.<ASInstruction> = renderInfoPanelTrait.funcOrMethod.body.instructions;
+            var body:ASMethodBody = renderInfoPanelTrait.funcOrMethod.body;
 
             // Find the location to put in the new info panel stuff
             var replaceLoc:uint = 0xFFFFFFFF;
             var fixupLoc:uint = 0xFFFFFFFF;
 
-            for (var i:int = 0; i < instructions.length; i++)
-            {
-                var instr:ASInstruction = instructions[i];
-                // Get the new location
-                if (instr.opcode == ASInstruction.OP_lookupswitch)
-                {
-                    var def:ASInstruction = instr.args[0] as ASInstruction;
-                    replaceLoc = GCCSCoreMod.nextNotDebug(instructions, instructions.indexOf(def)); // We want to remove the pushfalse afterwards
-                    if (instructions[replaceLoc].opcode != ASInstruction.OP_pushfalse)
-                    {
-                        throw new Error("Could not find a pushfalse to overwrite in ScrOptions::renderPanelInfoPanel");
-                    }
-                    if (def.opcode != ASInstruction.OP_label) // But if we don't have a label instruction here we also need to fix it up
-                    {
-                        replaceLoc--;
-                        fixupLoc = i;
-                    }
-                    break;
-                }
-            }
+            var defaultTarget:ASInstruction;
 
-            if (replaceLoc == 0xFFFFFFFF)
-            {
-                throw new Error("Could not patch ScrOptions::renderPanelInfoPanel");
-            }
+            var newLabel:ASInstruction = ASInstruction.Label();
 
-            instructions.splice(replaceLoc, 1,
+            body.streamInstructions()
+                .findNext(function (instr:ASInstruction):Boolean
+            {
+                return instr.opcode == ASInstruction.OP_lookupswitch;
+            })
+                .then(function (instr:ASInstruction):void
+            {
+                defaultTarget = instr.args[0];
+                instr.args[0] = newLabel;
+            })
+                .backtrack(0xFFFFFFFF)
+                .findNext(function (instr:ASInstruction):Boolean
+            {
+                return defaultTarget == instr;
+            })
+                .findNext(function (instr:ASInstruction):Boolean
+            {
+                return instr.opcode == ASInstruction.OP_pushfalse;
+            })
+                .deleteNext(1)
+                .insert(
+                newLabel,
                 ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCCS"), "GCCSSettingsHandler")),
                 ASInstruction.GetLocal1(),
                 ASInstruction.GetLex(ASQName(PackageNamespace("com.giab.games.gccs.steam"), "GV")),
@@ -123,13 +99,8 @@ package Bezel.GCCS
                 ASInstruction.CallProperty(ASQName(PackageInternalNs("Bezel.GCCS"), "renderInfoPanel"), 2)
                 );
 
-            if (fixupLoc != 0xFFFFFFFF)
-            {
-                instructions[fixupLoc].args[0] = instructions[replaceLoc];
-            }
-
             // Get rid of the hotkey function
-            removeHotkeyRenderCall(instructions, "Hot key: . (dot)");
+            removeHotkeyRenderCall(body, "Hot key: . (dot)");
 
             clazz.setInstanceTrait(renderInfoPanelTrait);
         }
@@ -137,127 +108,111 @@ package Bezel.GCCS
         private function patchEnterFrame(clazz:ASClass):void
         {
             var enterFrameTrait:ASTrait = clazz.getInstanceTrait(ASQName(PackageNamespace(""), "doEnterFrame"));
-            var instructions:Vector.<ASInstruction> = enterFrameTrait.funcOrMethod.body.instructions;
 
             var iLocal:uint = 0xFFFFFFFF;
 
-            for (var i:uint = 0; i < instructions.length; i++)
+            var newDup:ASInstruction = ASInstruction.Dup();
+            var ifFalseDoNotColorPlate:ASInstruction;
+
+            var nextIfFalse:ASInstruction;
+
+            enterFrameTrait.funcOrMethod.body.streamInstructions()
+                .findNext(function (instr:ASInstruction):Boolean
             {
-                var instr:ASInstruction = instructions[i];
-                if (instructions[i].opcode == ASInstruction.OP_pushbyte)
-                {
-                    iLocal = instructions[GCCSCoreMod.nextNotDebug(instructions, i)].localIndex();
-                    break;
-                }
-            }
-
-            if (iLocal == 0xFFFFFFFF)
+                return instr.opcode == ASInstruction.OP_pushbyte;
+            })
+                .advance(1)
+                .then(function (instr:ASInstruction):void
             {
-                throw new Error("Could not find the index of the loop variable in doEnterFrame");
-            }
-
-            for (i = 0; i < instructions.length; i++)
+                iLocal = instr.localIndex();
+            })
+                .findNext(function (instr:ASInstruction):Boolean
             {
-                instr = instructions[i];
-                if (instr.opcode == ASInstruction.OP_getproperty && (instr.args[0] as ASMultiname).name == "height")
-                {
-                    // First, add the IS_CHOOSING_KEYBIND check
-                    var nextIfFalse:uint = i;
-                    do
-                    {
-                        nextIfFalse = GCCSCoreMod.nextNotDebug(instructions, nextIfFalse);
-                    }
-                    while (instructions[nextIfFalse].opcode != ASInstruction.OP_iffalse);
+                return instr.opcode == ASInstruction.OP_getproperty && (instr.args[0] as ASMultiname).name == "height";
+            })
+                .reverse()
+                .findNext(function (instr:ASInstruction):Boolean
+            {
+                return instr.opcode == ASInstruction.OP_iffalse;
+            })
+                .then(function (instr:ASInstruction):void
+            {
+                instr.args[0] = newDup;
+            })
+                .reverse()
+                .advance(1)
+                .findNext(function (instr:ASInstruction):Boolean
+            {
+                return instr.opcode == ASInstruction.OP_iffalse;
+            })
+                .then(function (instr:ASInstruction):void
+            {
+                nextIfFalse = ASInstruction.IfFalse(instr);
+            })
+                .insert(
+                newDup,
+                nextIfFalse,
+                ASInstruction.Pop(),
+                ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCCS"), "GCCSSettingsHandler")),
+                ASInstruction.GetProperty(ASQName(PackageInternalNs("Bezel.GCCS"), "IS_CHOOSING_KEYBIND")),
+                ASInstruction.Not()
+                )
+                .findNext(function (instr:ASInstruction):Boolean
+            {
+                return instr.opcode == ASInstruction.OP_callpropvoid && (instr.args[0] as ASMultiname).name == "gotoAndStop";
+            })
+                .advance(1)
+                .then(function (instr:ASInstruction):void
+            {
+                ifFalseDoNotColorPlate = ASInstruction.IfFalse(instr);
+            })
+                .reverse()
+                .findNext(function (instr:ASInstruction):Boolean
+            {
+                return instr.opcode == ASInstruction.OP_getproperty && (instr.args[0] as ASMultiname).name == "IS_CHOOSING_KEYBIND";
+            })
+                .reverse()
+                .advance(3)
+                .insert(
+                ASInstruction.GetLocal0(),
+                ASInstruction.GetProperty(ASQName(PackageNamespace(""), "mc")),
+                ASInstruction.GetProperty(ASQName(PackageNamespace(""), "arrCntContents")),
+                ASInstruction.EfficientGetLocal(iLocal),
+                ASInstruction.GetProperty(MultinameL(new <ASNamespace>[PackageNamespace("")])),
+                ASInstruction.GetProperty(ASQName(PackageNamespace(""), "btn")),
+                ASInstruction.GetProperty(ASQName(PackageNamespace(""), "parent")),
+                ASInstruction.PushNull(),
+                ASInstruction.Equals(),
+                ASInstruction.Not(),
+                ASInstruction.Dup(),
+                ASInstruction.IfTrue(ifFalseDoNotColorPlate),
+                ASInstruction.Pop(),
+                ASInstruction.GetLocal0(),
+                ASInstruction.GetProperty(ASQName(PackageNamespace(""), "mc")),
+                ASInstruction.GetProperty(ASQName(PackageNamespace(""), "arrCntContents")),
+                ASInstruction.EfficientGetLocal(iLocal),
+                ASInstruction.GetProperty(MultinameL(new <ASNamespace>[PackageNamespace("")])),
+                ASInstruction.GetProperty(ASQName(PackageNamespace(""), "knob")),
+                ASInstruction.GetProperty(ASQName(PackageNamespace(""), "parent")),
+                ASInstruction.PushNull(),
+                ASInstruction.Equals(),
+                ASInstruction.Not(),
+                ASInstruction.Dup(),
+                ASInstruction.IfTrue(ifFalseDoNotColorPlate),
+                ASInstruction.Pop(),
+                ASInstruction.GetLocal0(),
+                ASInstruction.GetProperty(ASQName(PackageNamespace(""), "mc")),
+                ASInstruction.GetProperty(ASQName(PackageNamespace(""), "arrCntContents")),
+                ASInstruction.EfficientGetLocal(iLocal),
+                ASInstruction.GetProperty(MultinameL(new <ASNamespace>[PackageNamespace("")])),
+                ASInstruction.GetLocal0(),
+                ASInstruction.GetProperty(ASQName(PackageNamespace(""), "mc")),
+                ASInstruction.GetProperty(ASQName(PackageNamespace(""), "pnlDefaultSize")),
+                ASInstruction.Equals(),
+                ifFalseDoNotColorPlate
+                );
 
-                    var newDup:ASInstruction = ASInstruction.Dup();
-                    var origIfFalse:ASInstruction = instructions[nextIfFalse];
-
-                    for (var j:uint = i; j > 0; j--)
-                    {
-                        instr = instructions[j];
-                        if (instr.opcode == ASInstruction.OP_iffalse)
-                        {
-                            origIfFalse = instr;
-                            instr.args[0] = newDup;
-                            break;
-                        }
-                    }
-
-                    instructions.splice(nextIfFalse, 0,
-                        newDup,
-                        ASInstruction.IfFalse(instructions[nextIfFalse]),
-                        ASInstruction.Pop(),
-                        ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCCS"), "GCCSSettingsHandler")),
-                        ASInstruction.GetProperty(ASQName(PackageInternalNs("Bezel.GCCS"), "IS_CHOOSING_KEYBIND")),
-                        ASInstruction.Not()
-                        );
-
-                    var afterCheckColor:uint = 0xFFFFFFFF;
-
-                    for (j = nextIfFalse; j < instructions.length; j++)
-                    {
-                        instr = instructions[j];
-                        if (instr.opcode == ASInstruction.OP_callpropvoid && (instr.args[0] as ASMultiname).name == "gotoAndStop")
-                        {
-                            afterCheckColor = GCCSCoreMod.nextNotDebug(instructions, j);
-                            break;
-                        }
-                    }
-
-                    if (afterCheckColor == 0xFFFFFFFF)
-                    {
-                        throw new Error("Could not find place to wait for after checking color");
-                    }
-
-                    var ifFalseDoNotColorPlate:ASInstruction = ASInstruction.IfFalse(instructions[afterCheckColor]);
-
-                    // Next, add the button/knob visibility check - after the just added IS_CHOOSING_KEYBIND check and the original iffalse
-                    instructions.splice(nextIfFalse + 1 + 6, 0,
-                        ASInstruction.GetLocal0(),
-                        ASInstruction.GetProperty(ASQName(PackageNamespace(""), "mc")),
-                        ASInstruction.GetProperty(ASQName(PackageNamespace(""), "arrCntContents")),
-                        ASInstruction.EfficientGetLocal(iLocal),
-                        ASInstruction.GetProperty(MultinameL(new <ASNamespace>[PackageNamespace("")])),
-                        ASInstruction.GetProperty(ASQName(PackageNamespace(""), "btn")),
-                        ASInstruction.GetProperty(ASQName(PackageNamespace(""), "parent")),
-                        ASInstruction.PushNull(),
-                        ASInstruction.Equals(),
-                        ASInstruction.Not(),
-                        ASInstruction.Dup(),
-                        ASInstruction.IfTrue(ifFalseDoNotColorPlate),
-                        ASInstruction.Pop(),
-                        ASInstruction.GetLocal0(),
-                        ASInstruction.GetProperty(ASQName(PackageNamespace(""), "mc")),
-                        ASInstruction.GetProperty(ASQName(PackageNamespace(""), "arrCntContents")),
-                        ASInstruction.EfficientGetLocal(iLocal),
-                        ASInstruction.GetProperty(MultinameL(new <ASNamespace>[PackageNamespace("")])),
-                        ASInstruction.GetProperty(ASQName(PackageNamespace(""), "knob")),
-                        ASInstruction.GetProperty(ASQName(PackageNamespace(""), "parent")),
-                        ASInstruction.PushNull(),
-                        ASInstruction.Equals(),
-                        ASInstruction.Not(),
-                        ASInstruction.Dup(),
-                        ASInstruction.IfTrue(ifFalseDoNotColorPlate),
-                        ASInstruction.Pop(),
-                        ASInstruction.GetLocal0(),
-                        ASInstruction.GetProperty(ASQName(PackageNamespace(""), "mc")),
-                        ASInstruction.GetProperty(ASQName(PackageNamespace(""), "arrCntContents")),
-                        ASInstruction.EfficientGetLocal(iLocal),
-                        ASInstruction.GetProperty(MultinameL(new <ASNamespace>[PackageNamespace("")])),
-                        ASInstruction.GetLocal0(),
-                        ASInstruction.GetProperty(ASQName(PackageNamespace(""), "mc")),
-                        ASInstruction.GetProperty(ASQName(PackageNamespace(""), "pnlDefaultSize")),
-                        ASInstruction.Equals(),
-                        ifFalseDoNotColorPlate
-                        );
-
-                    clazz.setInstanceTrait(enterFrameTrait);
-
-                    return;
-                }
-            }
-
-            throw new Error("Could not patch ScrOptions::doEnterPatch");
+            clazz.setInstanceTrait(enterFrameTrait);
         }
     }
 }

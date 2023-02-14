@@ -26,23 +26,19 @@ package Bezel.GCCS
         private function patchSave(clazz:ASClass):void
         {
             var saveTrait:ASTrait = clazz.getInstanceTrait(ASQName(PackageNamespace(""), "saveGameData"));
-            var instructions:Vector.<ASInstruction> = saveTrait.funcOrMethod.body.instructions;
 
-            for (var i:int = 0; i < instructions.length; i++)
+            saveTrait.funcOrMethod.body.streamInstructions()
+                .findNext(function (instr:ASInstruction):Boolean
             {
-                if (instructions[i].opcode == ASInstruction.OP_callpropvoid && (instructions[i].args[0] as ASMultiname).name == "close")
-                {
-                    instructions.splice(GCCSCoreMod.nextNotDebug(instructions, i), 0,
-                        ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers")),
-                        ASInstruction.CallPropVoid(ASQName(PackageInternalNs("Bezel.GCCS"), "saveSave"), 0)
-                        );
+                return instr.opcode == ASInstruction.OP_callpropvoid && (instr.args[0] as ASMultiname).name == "close";
+            })
+                .advance(1)
+                .insert(
+                ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCCS"), "GCCSEventHandlers")),
+                ASInstruction.CallPropVoid(ASQName(PackageInternalNs("Bezel.GCCS"), "saveSave"), 0)
+                );
 
-                    clazz.setInstanceTrait(saveTrait);
-                    return;
-                }
-            }
-
-            throw new Error("Could not patch saveSave");
+            clazz.setInstanceTrait(saveTrait);
         }
 
         private function patchLoad(clazz:ASClass, name:String):void

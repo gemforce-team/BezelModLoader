@@ -39,24 +39,20 @@ package Bezel.GCFW
         private function patchS(clazz:ASClass):void
         {
             var sTrait:ASTrait = clazz.getInstanceTrait(ASQName(PackageNamespace(""), "s"));
-            var instructions:Vector.<ASInstruction> = sTrait.funcOrMethod.body.instructions;
 
-            for (var i:int = 0; i < instructions.length; i++)
+            sTrait.funcOrMethod.body.streamInstructions()
+                .findNext(function (instr:ASInstruction):Boolean
             {
-                var instr:ASInstruction = instructions[i];
-                if (instr.opcode == ASInstruction.OP_getproperty && (instr.args[0] as ASMultiname).name == "b")
-                {
-                    instructions.splice(i - 1, instructions.length,
-                        ASInstruction.GetLocal1(),
-                        ASInstruction.SetProperty(ASQName(PrivateNamespace("com.giab.common.data:ENumber"), "a")),
-                        ASInstruction.ReturnVoid());
+                return instr.opcode == ASInstruction.OP_getproperty && (instr.args[0] as ASMultiname).name == "b";
+            })
+                .backtrack(1)
+                .splice(-1, true,
+                ASInstruction.GetLocal1(),
+                ASInstruction.SetProperty(ASQName(PrivateNamespace("com.giab.common.data:ENumber"), "a")),
+                ASInstruction.ReturnVoid()
+                );
 
-                    clazz.setInstanceTrait(sTrait);
-                    return;
-                }
-            }
-
-            throw new Error("Couldn't patch ENumber::s");
+            clazz.setInstanceTrait(sTrait);
         }
     }
 }

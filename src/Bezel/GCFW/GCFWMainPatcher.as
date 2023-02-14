@@ -39,21 +39,22 @@ package Bezel.GCFW
                 ]);
             clazz.setConstructor(constructor);
 
-            var instructions:Vector.<ASInstruction> = initFromBezel.body.instructions;
-            for (var i:int = 0; i < instructions.length; i++)
+            initFromBezel.body.streamInstructions()
+                .findNext(function (instr:ASInstruction):Boolean
             {
-                var instruction:ASInstruction = instructions[i];
-                if (instruction.opcode == ASInstruction.OP_constructsuper)
-                {
-                    var deleteFrom:int = GCFWCoreMod.prevNotDebug(instructions, i);
-                    instructions.splice(deleteFrom, i - deleteFrom + 1);
-                    i = deleteFrom - 1;
-                }
-                if (instruction.opcode == ASInstruction.OP_getproperty && (instruction.args[0] as ASMultiname).name == "uncaughtErrorHandler")
-                {
-                    (instruction.args[0] as ASMultiname).ns = PackageNamespace("");
-                }
-            }
+                return instr.opcode == ASInstruction.OP_constructsuper;
+            })
+                .backtrack(1)
+                .deleteNext(2)
+                .findNext(function (instr:ASInstruction):Boolean
+            {
+                return instr.opcode == ASInstruction.OP_getproperty && (instr.args[0] as ASMultiname).name == "uncaughtErrorHandler";
+            })
+                .then(function (instr:ASInstruction):void
+            {
+                (instr.args[0] as ASMultiname).ns = PackageNamespace("");
+            });
+
             clazz.setInstanceTrait(TraitMethod(ASQName(PackageNamespace(""), "initFromBezel"), initFromBezel));
         }
 
@@ -69,20 +70,23 @@ package Bezel.GCFW
             handler.name.ns = PackageNamespace("");
             handler.funcOrMethod.name = "com.giab.games.gcfw:Main/uncaughtErrorHandler";
 
-            for each (var instr:ASInstruction in handler.funcOrMethod.body.instructions)
+            handler.funcOrMethod.body.streamInstructions()
+                .findNext(function (instr:ASInstruction):Boolean
             {
-                if (instr.opcode == ASInstruction.OP_pushstring)
-                {
-                    if ((instr.args[0] as String).search("an error has occurred") != -1)
-                    {
-                        instr.args[0] = "Unfortunately, an error has occured in the game:\n(game version stamp: ";
-                    }
-                    else if ((instr.args[0] as String).search("Could you please copy this message") != -1)
-                    {
-                        instr.args[0] = "\n\nTHE GAME IS MODDED!\n\nPlease check the log in \"%AppData%/Roaming/com.giab.games.gcfw.steam/Local Store/Bezel Mod Loader\" for additional info!\n\nYou can ask for help in GemCraft's discord #modding channel.\n\nThank you for your help and sorry for the inconvenience!";
-                    }
-                }
-            }
+                return instr.opcode == ASInstruction.OP_pushstring && (instr.args[0] as String).search("an error has occured") != -1;
+            })
+                .then(function (instr:ASInstruction):void
+            {
+                instr.args[0] = "Unfortunately, an error has occurred in the game:\n(game version stamp: ";
+            })
+                .findNext(function (instr:ASInstruction):Boolean
+            {
+                return instr.opcode == ASInstruction.OP_pushstring && (instr.args[0] as String).search("Could you please copy this message") != -1;
+            })
+                .then(function (instr:ASInstruction):void
+            {
+                instr.args[0] = "\n\nTHE GAME IS MODDED!\n\nPlease check the log in \"%AppData%/Roaming/com.giab.games.gcfw.steam/Local Store/Bezel Mod Loader\" for additional info!\n\nYou can ask for help in GemCraft's discord #modding channel.\n\nThank you for your help and sorry for the inconvenience!";
+            });
 
             clazz.setInstanceTrait(handler);
         }
