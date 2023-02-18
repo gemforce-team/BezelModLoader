@@ -217,7 +217,7 @@ package Bezel.GCFW
 			config["Down arrow function"] = new Keybind("down");
 			config["Left arrow function"] = new Keybind("left");
 			config["Right arrow function"] = new Keybind("right");
-			config["Toggle 'Show info panels'"] = new Keybind("period");
+			config["Show/hide info panels"] = new Keybind("period");
 			config["Toggle 'Hide monsters while time is frozen'"] = new Keybind("comma");
 
 			return config;
