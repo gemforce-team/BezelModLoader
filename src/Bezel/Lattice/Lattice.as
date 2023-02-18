@@ -9,7 +9,11 @@ package Bezel.Lattice
     import com.cff.anebe.DisassemblyDoneEvent;
     import com.cff.anebe.Events;
     import com.cff.anebe.ir.ASClass;
+    import com.cff.anebe.ir.ASInstruction;
+    import com.cff.anebe.ir.ASMethod;
+    import com.cff.anebe.ir.ASMethodBody;
     import com.cff.anebe.ir.ASMultiname;
+    import com.cff.anebe.ir.ASScript;
     import com.cff.anebe.ir.multinames.ASQName;
     import com.cff.anebe.ir.namespaces.PackageNamespace;
 
@@ -34,11 +38,14 @@ package Bezel.Lattice
         private const expectedPatches:Vector.<LatticePatch> = new <LatticePatch>[];
 
         private const patchers:Vector.<LatticePatcherEntry> = new <LatticePatcherEntry>[];
+        private const inserters:Vector.<LatticeInserter> = new <LatticeInserter>[];
 
         private var _asasmFiles:Object;
         private var swfToLoad:ByteArray;
 
-        private var wasDisassembled:Boolean;
+        private var wasDisassembled:Boolean = false;
+
+        private var doingPatchers:Boolean = false;
 
         private function get requiresPartialAssembly():Boolean
         {
@@ -85,7 +92,7 @@ package Bezel.Lattice
         /** Total number of patches and patchers submitted to this instance of Lattice */
         public function get numberOfPatches():int
         {
-            return patches.length + patchers.length;
+            return patches.length + patchers.length + inserters.length;
         }
 
         /**
@@ -189,6 +196,7 @@ package Bezel.Lattice
             patches.length = 0;
             expectedPatches.length = 0;
             patchers.length = 0;
+            inserters.length = 0;
         }
 
         private function performDisassemble():void
@@ -267,6 +275,8 @@ package Bezel.Lattice
                 }
             }
 
+            expectedPatches.length = 0;
+
             if (patchesChanged)
             {
                 var stream:FileStream = new FileStream();
@@ -280,6 +290,10 @@ package Bezel.Lattice
                     stream.writeBoolean(patch.causesConflict);
                 }
                 stream.close();
+            }
+            else
+            {
+                patches.length = 0;
             }
 
             if (patchesChanged || !newSwf.exists || !asm.exists)
@@ -416,12 +430,35 @@ package Bezel.Lattice
             }
             else
             {
+                FunctionDeferrer.deferFunction(doSingleInserter, [0], null, true);
+            }
+        }
+
+        private function doSingleInserter(i:uint):void
+        {
+            if (i < inserters.length)
+            {
+                var newScript:ASScript = bytecodeEditor.CreateAndInsertScript(new ASMethod(null, null, "", null, null, null, new ASMethodBody(
+                    2, 1, 1, 2, new <ASInstruction>[
+                        ASInstruction.GetLocal0(),
+                        ASInstruction.PushScope(),
+                        ASInstruction.ReturnVoid()
+                    ]
+                    )));
+                inserters[i].doInsert(newScript);
+                dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));
+                FunctionDeferrer.deferFunction(doSingleInserter, [i + 1], null, true);
+            }
+            else
+            {
+                doingPatchers = false;
                 bytecodeEditor.FinishAssembleAsync();
             }
         }
 
         private function onPartialAssemblyDone(e:Event):void
         {
+            doingPatchers = true;
             doSinglePatcher(new Object(), 0);
         }
 
@@ -470,6 +507,16 @@ package Bezel.Lattice
         }
 
         /**
+         * Submits an inserter to be run after text-based patches are applied.
+         * Inserters will be run after patchers.
+         * @param inserter Inserter class, which will have its doInsert function called with a new script
+         */
+        public function submitInserter(inserter:LatticeInserter):void
+        {
+            inserters.push(inserter);
+        }
+
+        /**
          * Returns whether a file exists in the disassembly.
          * @param filename File to search for
          * @return Whether or not it exists
@@ -490,6 +537,10 @@ package Bezel.Lattice
          */
         public function patchFile(filename:String, offset:int, replaceLines:int, contents:String):void
         {
+            if (doingPatchers)
+            {
+                throw new Error("Cannot submit text patches while doing patcher steps");
+            }
             if (!(filename in this.asasmFiles))
             {
                 throw new Error("File '" + filename + "' not in disassembly");
@@ -504,6 +555,10 @@ package Bezel.Lattice
          */
         public function retrieveFile(filename:String):String
         {
+            if (doingPatchers)
+            {
+                throw new Error("Cannot submit text patches while doing patcher steps");
+            }
             if (!(filename in this.asasmFiles))
             {
                 throw new Error("File '" + filename + "' not in disassembly");
@@ -521,6 +576,10 @@ package Bezel.Lattice
          */
         public function findPattern(filename:String, pattern:RegExp, searchFrom:int = 0):int
         {
+            if (doingPatchers)
+            {
+                throw new Error("Cannot submit text patches while doing patcher steps");
+            }
             if (!(filename in this.asasmFiles))
             {
                 throw new Error("File '" + filename + "' not in disassembly");
@@ -557,6 +616,10 @@ package Bezel.Lattice
          */
         public function replacePattern(filename:String, pattern:RegExp, replacement:*, searchFrom:int = 0):Boolean
         {
+            if (doingPatchers)
+            {
+                throw new Error("Cannot submit text patches while doing patcher steps");
+            }
             if (!(filename in this.asasmFiles))
             {
                 throw new Error("File '" + filename + "' not in disassembly");
@@ -592,6 +655,10 @@ package Bezel.Lattice
          */
         public function retrievePattern(filename:String, pattern:RegExp, searchFrom:int = 0):Object
         {
+            if (doingPatchers)
+            {
+                throw new Error("Cannot submit text patches while doing patcher steps");
+            }
             if (!(filename in this.asasmFiles))
             {
                 throw new Error("File '" + filename + "' not in disassembly");
@@ -612,6 +679,10 @@ package Bezel.Lattice
          */
         public function retrieveCode(filename:String, offset:int, lines:int):String
         {
+            if (doingPatchers)
+            {
+                throw new Error("Cannot submit text patches while doing patcher steps");
+            }
             if (!(filename in this.asasmFiles))
             {
                 throw new Error("File '" + filename + "' not in disassembly");
@@ -630,6 +701,10 @@ package Bezel.Lattice
          */
         public function extractCode(filename:String, offset:int, lines:int):String
         {
+            if (doingPatchers)
+            {
+                throw new Error("Cannot submit text patches while doing patcher steps");
+            }
             if (!(filename in this.asasmFiles))
             {
                 throw new Error("File '" + filename + "' not in disassembly");
@@ -667,6 +742,10 @@ package Bezel.Lattice
          */
         public function listFiles():Vector.<String>
         {
+            if (doingPatchers)
+            {
+                throw new Error("Cannot submit text patches while doing patcher steps");
+            }
             var ret:Vector.<String> = new <String>[];
             for (var file:String in asasmFiles)
             {
@@ -691,6 +770,10 @@ package Bezel.Lattice
          */
         mainloader_only function DANGEROUS_patchFile(filename:String, offset:int, replaceLines:int, contents:String):void
         {
+            if (doingPatchers)
+            {
+                throw new Error("Cannot submit text patches while doing patcher steps");
+            }
             if (!(filename in this.asasmFiles))
             {
                 throw new Error("File '" + filename + "' not in disassembly");

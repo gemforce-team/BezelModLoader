@@ -9,6 +9,8 @@ package Bezel
 	import flash.system.ApplicationDomain;
 	import flash.system.LoaderContext;
 	import flash.utils.ByteArray;
+	import flash.events.AsyncErrorEvent;
+	import flash.events.SecurityErrorEvent;
 
 	/**
 	 * Represents an SWF file on disk
@@ -54,6 +56,8 @@ package Bezel
 			this.failedLoadCallback = failureCallback;
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loadedSuccessfully);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, failedLoadCallback);
+			loader.contentLoaderInfo.addEventListener(AsyncErrorEvent.ASYNC_ERROR, failedLoadCallback);
+			loader.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, failedLoadCallback);
 
 			var context:LoaderContext;
 
@@ -104,6 +108,8 @@ package Bezel
 		{
 			this.loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, loadedSuccessfully);
 			this.loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, failedLoadCallback);
+			this.loader.contentLoaderInfo.removeEventListener(AsyncErrorEvent.ASYNC_ERROR, failedLoadCallback);
+			this.loader.contentLoaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, failedLoadCallback);
 			// Make sure the mod cleans up its event subscribers and resources
 			if (this.instance is BezelMod)
 			{

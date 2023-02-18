@@ -22,6 +22,7 @@ package Bezel
 	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
+	import flash.events.ErrorEvent;
 	
 	use namespace bezel_internal;
 	use namespace mainloader_only;
@@ -390,9 +391,10 @@ package Bezel
 			this.initialLoad = false;
 		}
 
-		private function gameLoadFail(e:Event): void
+		private function gameLoadFail(e:ErrorEvent): void
 		{
 			this.logger.log("gameLoadFail", "Loading game failed");
+			throw new Error("Game load failed due to an error of type: " + e.type);
 		}
 
 		private function bindSingleMod(vecMods:Vector.<SWFFile>, i:int):void
