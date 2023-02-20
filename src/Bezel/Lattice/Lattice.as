@@ -44,6 +44,7 @@ package Bezel.Lattice
         private var swfToLoad:ByteArray;
 
         private var wasDisassembled:Boolean = false;
+        private var wasPatched:Boolean = false;
 
         private var doingPatchers:Boolean = false;
 
@@ -78,6 +79,23 @@ package Bezel.Lattice
             }
 
             return _asasmFiles;
+        }
+
+        private function readPatchedASASM():void
+        {
+            _asasmFiles = new Object();
+
+            var asmStream:FileStream = new FileStream();
+            asmStream.open(asm, FileMode.READ);
+            var bytes:ByteArray = new ByteArray();
+            asmStream.readBytes(bytes);
+            asmStream.close();
+
+            while (bytes.bytesAvailable != 0)
+            {
+                var name:String = readNTString(bytes);
+                this._asasmFiles[name] = readNTString(bytes);
+            }
         }
 
         private const logger:Logger = Logger.getLogger("Lattice");
@@ -383,6 +401,7 @@ package Bezel.Lattice
 
         private function doTextPatchAndReassemble():void
         {
+            wasPatched = true;
             doSinglePatch(new Object(), 0);
         }
 
@@ -397,6 +416,11 @@ package Bezel.Lattice
                 stream.open(origSwf, FileMode.READ);
                 stream.readBytes(replaceBytes);
                 stream.close();
+            }
+
+            if (!wasPatched)
+            {
+                readPatchedASASM();
             }
 
             if (requiresPartialAssembly)
