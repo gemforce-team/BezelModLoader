@@ -461,28 +461,35 @@ package Bezel
 		// Tries to load every .swf in /Mods/ directory as a mod
 		private function loadMods(): void
 		{
-			var enabledMods:SettingManager = this.getSettingManager("Enabled Mods");
-
-			var fileList:Array = MODS_FOLDER.getDirectoryListing();
 			var modFiles:Vector.<String> = new Vector.<String>();
-			for(var f:int = 0; f < fileList.length; f++)
+			if (!MODS_FOLDER.exists)
 			{
-				var fileName:String = fileList[f].name;
-				//logger.log("loadMods", "Looking at " + fileName);
-				if (fileName.substring(fileName.length - 4, fileName.length) == ".swf")
+				logger.log("", "No mods folder found, not loading any mods");
+			}
+			else
+			{
+				var enabledMods:SettingManager = this.getSettingManager("Enabled Mods");
+
+				var fileList:Array = MODS_FOLDER.getDirectoryListing();
+				for(var f:int = 0; f < fileList.length; f++)
 				{
-					enabledMods.registerBoolean(fileName, null, true, "Requires restart");
-					if (enabledMods.retrieveBoolean(fileName))
+					var fileName:String = fileList[f].name;
+					//logger.log("loadMods", "Looking at " + fileName);
+					if (fileName.substring(fileName.length - 4, fileName.length) == ".swf")
 					{
-						modFiles[modFiles.length] = fileName;
+						enabledMods.registerBoolean(fileName, null, true, "Requires restart");
+						if (enabledMods.retrieveBoolean(fileName))
+						{
+							modFiles[modFiles.length] = fileName;
+						}
 					}
 				}
-			}
 
-			waitingMods = progressTotal = modFiles.length;
-			
-			updateProgress(0, progressTotal);
-			this.loadingStageTextField.text = LOADING_MODS;
+				waitingMods = progressTotal = modFiles.length;
+				
+				updateProgress(0, progressTotal);
+				this.loadingStageTextField.text = LOADING_MODS;
+			}
 			
 			if (modFiles.length == 0)
 			{
