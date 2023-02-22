@@ -23,10 +23,10 @@ package Bezel
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
 	import flash.events.ErrorEvent;
-	
+
 	use namespace bezel_internal;
 	use namespace mainloader_only;
-	
+
 	/**
 	 * Loader class for Bezel Mod Loader
 	 * @author Hellrage
@@ -41,12 +41,13 @@ package Bezel
 		private var _keybindManager:KeybindManager;
 		private var _modsReloadedTimestamp:int;
 		private static var _instance:Bezel;
-        private static var _gameSwf:File;
+		private static var _gameSwf:File;
 		private static var _moddedSwf:File;
 
 		private var lattice:Lattice;
 		private var logger:Logger;
-		private const mods:Object = {};
+		private const mods:Object = new Object();
+		private const libs:Vector.<String> = new <String>[];
 
 		private var waitingMods:uint;
 		private var progressTotal:uint;
@@ -55,7 +56,7 @@ package Bezel
 		private var initialLoad:Boolean;
 		private const coremods:Array = [];
 		private const prevCoremods:Array = [];
-		
+
 		private const loadingStageTextField:TextField = new TextField();
 		private const loadingProgressTextField:TextField = new TextField();
 		private const loadingProgressBar:Sprite = new Sprite();
@@ -63,6 +64,7 @@ package Bezel
 		private var manager:SettingManager;
 
 		private static const DISASSEMBLING_GAME:String = "Disassembling Game...";
+		private static const LOADING_LIBS:String = "Loading Mod Libraries...";
 		private static const LOADING_MODS:String = "Loading Mods...";
 		private static const LOADING_COREMODS:String = "Loading Coremods...";
 		private static const APPLYING_COREMODS:String = "Applying Coremods...";
@@ -72,27 +74,32 @@ package Bezel
 
 		/** The folder Bezel uses. */
 		public static const BEZEL_FOLDER:File = File.applicationStorageDirectory.resolvePath("Bezel Mod Loader/");
+
 		/** The tools folder where extra binary utilities are put */
 		public static const TOOLS_FOLDER:File = BEZEL_FOLDER.resolvePath("tools/");
+
 		/** The folder Lattice uses */
 		public static const LATTICE_FOLDER:File = BEZEL_FOLDER.resolvePath("Lattice/");
 
 		/** The file for Lattice to use for the edited game bytecode */
-        public static const LATTICE_DEFAULT_ASM:File = LATTICE_FOLDER.resolvePath("game.basasm");
+		public static const LATTICE_DEFAULT_ASM:File = LATTICE_FOLDER.resolvePath("game.basasm");
+
 		/** The file for Lattice to use for the clean game bytecode */
-        public static const LATTICE_DEFAULT_CLEAN_ASM:File = LATTICE_FOLDER.resolvePath("game-clean.basasm");
+		public static const LATTICE_DEFAULT_CLEAN_ASM:File = LATTICE_FOLDER.resolvePath("game-clean.basasm");
+
 		/** The file for Lattice to use to cache submitted coremods */
-        public static const LATTICE_DEFAULT_COREMODS:File = LATTICE_FOLDER.resolvePath("coremods.lttc");
+		public static const LATTICE_DEFAULT_COREMODS:File = LATTICE_FOLDER.resolvePath("coremods.lttc");
 
 		/** The mods folder */
 		public static const MODS_FOLDER:File = File.applicationDirectory.resolvePath("Mods/");
+		public static const LIBS_FOLDER:File = File.applicationDirectory.resolvePath("Libs/");
 
 		private static const gameConfig:File = File.applicationDirectory.resolvePath("game-file.txt");
 		private static const BEZEL_COREMODS:File = BEZEL_FOLDER.resolvePath("coremods.bzl");
 		private static const mainLoaderFile:File = File.applicationDirectory.resolvePath("Bezel/MainLoader.swf");
 
 		[Embed(source = "../../assets/splitter/splitter.exe", mimeType = "application/octet-stream")] private static const splitter_data:Class;
-		private static const splitter:Object = {"name": "splitter.exe", "data":splitter_data};
+		private static const splitter:Object = {"name": "splitter.exe", "data": splitter_data};
 
 		private static const DEBUG_INSTR_SETTING:String = "Include Debug Instructions";
 		private static const ALWAYS_COREMOD_SETTING:String = "Always submit coremod patches";
@@ -101,31 +108,50 @@ package Bezel
 		private const mainLoaderLoader:SWFFile = new SWFFile(mainLoaderFile);
 
 		/**
-         * The instance of this class.
+		 * The instance of this class.
 		 */
-		public static function get instance():Bezel { return _instance; }
+		public static function get instance():Bezel
+		{
+			return _instance;
+		}
+
 		/**
-         * MainLoaders may store references to game objects here. See your MainLoader for documentation on its gameObjects format.
+		 * MainLoaders may store references to game objects here. See your MainLoader for documentation on its gameObjects format.
 		 * Will never be null during or after the bind phase.
 		 */
-		public function get gameObjects():Object { return _gameObjects; }
+		public function get gameObjects():Object
+		{
+			return _gameObjects;
+		}
+
 		/**
-         * The MainLoader for the game. May be null for a game loaded without a MainLoader!
+		 * The MainLoader for the game. May be null for a game loaded without a MainLoader!
 		 */
-		public function get mainLoader():MainLoader { return _mainLoader; }
+		public function get mainLoader():MainLoader
+		{
+			return _mainLoader;
+		}
+
 		/**
-         * The KeybindManager used for the game
+		 * The KeybindManager used for the game
 		 */
-		public function get keybindManager():KeybindManager { return _keybindManager; }
+		public function get keybindManager():KeybindManager
+		{
+			return _keybindManager;
+		}
+
 		/**
-         * Last time mods were reloaded. Can be used to implement a reload timeout.
+		 * Last time mods were reloaded. Can be used to implement a reload timeout.
 		 */
-		public function get modsReloadedTimestamp():int { return _modsReloadedTimestamp; }
-		
+		public function get modsReloadedTimestamp():int
+		{
+			return _modsReloadedTimestamp;
+		}
+
 		/**
 		 * The unmodified game SWF
 		 */
-		bezel_internal static function get gameSwf(): File
+		bezel_internal static function get gameSwf():File
 		{
 			if (_gameSwf == null)
 			{
@@ -136,11 +162,11 @@ package Bezel
 			}
 			return _gameSwf;
 		}
-		
+
 		/**
 		 * The modified game SWF for Bezel to cache its results to.
 		 */
-		bezel_internal static function get moddedSwf(): File
+		bezel_internal static function get moddedSwf():File
 		{
 			if (_moddedSwf == null)
 			{
@@ -162,7 +188,7 @@ package Bezel
 			manager = getSettingManager("Bezel Mod Loader");
 
 			this._keybindManager = new KeybindManager();
-			
+
 			loadingStageTextField.selectable = false;
 			var textFormat:TextFormat = loadingStageTextField.defaultTextFormat;
 			textFormat.align = TextFormatAlign.CENTER;
@@ -231,7 +257,7 @@ package Bezel
 			{
 				TOOLS_FOLDER.createDirectory();
 			}
-			
+
 			for each (var tool:Object in [splitter])
 			{
 				var file:File = TOOLS_FOLDER.resolvePath(tool.name);
@@ -257,7 +283,7 @@ package Bezel
 				// We intentionally register this boolean later so that the MainLoader can see that we registered it, so make sure to catch the error if it occurs
 				includeDebugInstrs = manager.retrieveBoolean(DEBUG_INSTR_SETTING);
 			}
-			catch (e:*){}
+			catch (e:*) {}
 
 			this.lattice = new Lattice(gameSwf, moddedSwf, LATTICE_DEFAULT_ASM, LATTICE_DEFAULT_CLEAN_ASM, LATTICE_DEFAULT_COREMODS, includeDebugInstrs);
 
@@ -298,7 +324,7 @@ package Bezel
 
 		private function onSinglePatch(e:Event):void
 		{
-			updateProgress(++patchesApplied, lattice.numberOfPatches);
+			updateProgress(++ patchesApplied, lattice.numberOfPatches);
 		}
 
 		private function onReassembleStart(e:Event):void
@@ -315,7 +341,7 @@ package Bezel
 			addChild(DisplayObject(mainLoaderLoader.instance));
 			logger.log("Bezel", "MainLoader loaded from " + File.applicationDirectory.getRelativePath(mainLoaderFile));
 			coremods[coremods.length] = mainLoader.coremodInfo;
-			FunctionDeferrer.deferFunction(this.loadMods, [], this, true);
+			FunctionDeferrer.deferFunction(this.loadLibs, [], this, true);
 		}
 
 		private function onMainloaderLoadFail(e:Event):void
@@ -325,21 +351,21 @@ package Bezel
 		}
 
 		// After we have the dissassembled game, add the MainLoader (if it exists) and load mods
-		private function loadMainLoader(): void
+		private function loadMainLoader():void
 		{
 			if (mainLoaderFile.exists)
 			{
-				this.mainLoaderLoader.load(this.onMainloaderLoadSuccess, this.onMainloaderLoadFail, true);
+				this.mainLoaderLoader.load(this.onMainloaderLoadSuccess, this.onMainloaderLoadFail, SWFFile.MAINLOADER_DOMAIN);
 			}
 			else
 			{
 				logger.log("Bezel", "No MainLoader present! All mods and coremods will have to handle themselves, and full reloads are not possible!");
-				FunctionDeferrer.deferFunction(this.loadMods, [], this, true);
+				FunctionDeferrer.deferFunction(this.loadLibs, [], this, true);
 			}
 		}
 
 		// After we've loaded all mods and applied coremods & rebuilt the modded swf, we're ready to start the game
-		private function onGameBuilt(e:Event): void
+		private function onGameBuilt(e:Event):void
 		{
 			// Last argument tells the flash Loader to load the game into the same ApplicationDomain as Bezel is running in.
 			// This gives Bezel direct access to the game's classes (using getDefinitionByName).
@@ -347,18 +373,18 @@ package Bezel
 			this.updateProgress(0, 1);
 			if (lattice.swfBytes != null)
 			{
-				this.gameLoader.loadBytes(lattice.swfBytes, this.gameLoadSuccess, this.gameLoadFail, true);
+				this.gameLoader.loadBytes(lattice.swfBytes, this.gameLoadSuccess, this.gameLoadFail, SWFFile.MAINLOADER_DOMAIN);
 			}
 			else
 			{
-				this.gameLoader.load(this.gameLoadSuccess, this.gameLoadFail, true);
+				this.gameLoader.load(this.gameLoadSuccess, this.gameLoadFail, SWFFile.MAINLOADER_DOMAIN);
 			}
 
 			lattice.cleanup();
 		}
 
 		// Bind the game and Bezel to each other
-		private function gameLoadSuccess(game:SWFFile): void
+		private function gameLoadSuccess(game:SWFFile):void
 		{
 			this.stage.addChild(DisplayObject(game.instance));
 			var className:String = getQualifiedClassName(game.instance);
@@ -391,7 +417,7 @@ package Bezel
 			this.initialLoad = false;
 		}
 
-		private function gameLoadFail(e:ErrorEvent): void
+		private function gameLoadFail(e:ErrorEvent):void
 		{
 			this.logger.log("gameLoadFail", "Loading game failed");
 			throw new Error("Game load failed due to an error of type: " + e.type);
@@ -401,10 +427,10 @@ package Bezel
 		{
 			vecMods[i].instance.bind(this, gameObjects);
 			logger.log("bindMods", "Bound mod: " + vecMods[i].instance.MOD_NAME);
-			updateProgress(i+1, vecMods.length);
-			if (i+1 < vecMods.length)
+			updateProgress(i + 1, vecMods.length);
+			if (i + 1 < vecMods.length)
 			{
-				FunctionDeferrer.deferFunction(bindSingleMod, [vecMods, i+1], null, true);
+				FunctionDeferrer.deferFunction(bindSingleMod, [vecMods, i + 1], null, true);
 			}
 		}
 
@@ -416,7 +442,7 @@ package Bezel
 			}
 		}
 
-		private function bindModsAndLateRegisterSettingsAndKeybinds() : void
+		private function bindModsAndLateRegisterSettingsAndKeybinds():void
 		{
 			manager.registerBoolean(DEBUG_INSTR_SETTING, resetLattice, false, "Requires restart and may cause slowdown");
 			manager.registerBoolean(ALWAYS_COREMOD_SETTING, doNothingFunction, false, "Requires restart and may cause longer load times. Mostly useful for coremod devs.");
@@ -436,21 +462,157 @@ package Bezel
 			}
 		}
 
-		private function prepareFolders(): void
+		private function prepareFolders():void
 		{
-			if(!BEZEL_FOLDER.isDirectory)
+			if (!BEZEL_FOLDER.isDirectory)
 				BEZEL_FOLDER.createDirectory();
 			if (!LATTICE_FOLDER.isDirectory)
 				LATTICE_FOLDER.createDirectory();
+		}
+
+		private function loadSingleLib(libFiles:Vector.<String>, i:int):void
+		{
+			var newMod:SWFFile = new SWFFile(LIBS_FOLDER.resolvePath(libFiles[i]));
+			newMod.load(successfulLibLoad, failedLibLoad, SWFFile.LIB_DOMAIN);
+			if (i + 1 < libFiles.length)
+			{
+				FunctionDeferrer.deferFunction(loadSingleLib, [libFiles, i + 1], null, true);
+			}
+			else
+			{
+				_modsReloadedTimestamp = getTimer();
+			}
+		}
+
+		private function loadLibs():void
+		{
+			var libFiles:Vector.<String> = new <String>[];
+			if (!LIBS_FOLDER.exists)
+			{
+				logger.log("", "No libs folder found, not loading any libraries");
+			}
+			else
+			{
+				var fileList:Array = LIBS_FOLDER.getDirectoryListing();
+				for (var f:int = 0; f < fileList.length; f++)
+				{
+					var fileName:String = fileList[f].name;
+					// logger.log("loadMods", "Looking at " + fileName);
+					if (fileName.substring(fileName.length - 4, fileName.length) == ".swf")
+					{
+						libFiles[libFiles.length] = fileName;
+					}
+				}
+
+				waitingMods = progressTotal = libFiles.length;
+
+				updateProgress(0, progressTotal);
+				this.loadingStageTextField.text = LOADING_LIBS;
+			}
+
+			if (libFiles.length == 0)
+			{
+				FunctionDeferrer.deferFunction(this.loadMods, [], this, true);
+			}
+			else
+			{
+				FunctionDeferrer.hardDeferFunction(loadSingleLib, [libFiles, 0], null, true);
+			}
+		}
+
+		// Assuming the file loaded, add the library to tracked mods and libs. Check compatibility. Check if the library has a coremod and add the patches if so.
+		private function successfulLibLoad(libFile:SWFFile):void
+		{
+			var name:String;
+			if (!(libFile.instance is BezelMod))
+			{
+				if ("MOD_NAME" in libFile.instance)
+				{
+					name = " '" + libFile.instance.MOD_NAME + "' ";
+					logger.log("Compatibility", "Unknown type of SWF found. Is the mod" + name + "at '" + libFile.filePath + "' using the correct interface?");
+				}
+				else
+				{
+					name = libFile.filePath;
+					logger.log("Compatibility", "Unknown type of SWF found at '" + name + "'");
+				}
+				libFile.unload();
+			}
+			else
+			{
+				var mod:BezelMod = BezelMod(libFile.instance);
+				name = mod.MOD_NAME;
+				logger.log("successfulModLoad", "Loaded mod: " + name + " v" + mod.VERSION);
+				if (!bezelVersionCompatible(mod.BEZEL_VERSION))
+				{
+					logger.log("Compatibility", "Bezel version is incompatible! Mod compiled for : " + mod.BEZEL_VERSION);
+					var requiredVersion:String = mod.BEZEL_VERSION;
+					mod.unload();
+				}
+				else
+				{
+					if (name in mods)
+					{
+						logger.log("Loader", "Mod '" + name + "' is already registered.");
+						logger.log("Loader", "The first loaded '" + name + "' will be used over the one at " + libFile.filePath);
+					}
+					else
+					{
+						mods[name] = libFile;
+						this.addChild(DisplayObject(mod));
+
+						if (this.initialLoad)
+						{
+							if (mod is BezelCoreMod)
+							{
+								var coremod:BezelCoreMod = BezelCoreMod(mod);
+								this.coremods[this.coremods.length] = {"name": name, "version": coremod.COREMOD_VERSION, "load": coremod.loadCoreMod};
+							}
+						}
+						else
+						{
+							if (mod is BezelCoreMod)
+							{
+								logger.log("Mod Reload", "Coremod for " + name + " was not reloaded!");
+							}
+						}
+					}
+				}
+			}
+
+			if (!(name in mods))
+			{
+				throw new Error("An error occurred while loading " + libFile.filePath + ".\nSee log file for details.");
+			}
+
+			reduceWaitingLibs();
+			libs[libs.length] = name;
+		}
+
+		private function failedLibLoad(e:Event):void
+		{
+			logger.log("failedLoad", "Failed to load library: " + e.currentTarget.url);
+
+			reduceWaitingMods();
+		}
+
+		private function reduceWaitingLibs():void
+		{
+			waitingMods--;
+			updateProgress(progressTotal - waitingMods, progressTotal);
+			if (waitingMods == 0)
+			{
+				FunctionDeferrer.deferFunction(this.loadMods, [], this, true);
+			}
 		}
 
 		private function loadSingleMod(modFiles:Vector.<String>, i:int):void
 		{
 			var newMod:SWFFile = new SWFFile(MODS_FOLDER.resolvePath(modFiles[i]));
 			newMod.load(successfulModLoad, failedModLoad);
-			if (i+1 < modFiles.length)
+			if (i + 1 < modFiles.length)
 			{
-				FunctionDeferrer.deferFunction(loadSingleMod, [modFiles, i+1], null, true);
+				FunctionDeferrer.deferFunction(loadSingleMod, [modFiles, i + 1], null, true);
 			}
 			else
 			{
@@ -459,9 +621,9 @@ package Bezel
 		}
 
 		// Tries to load every .swf in /Mods/ directory as a mod
-		private function loadMods(): void
+		private function loadMods():void
 		{
-			var modFiles:Vector.<String> = new Vector.<String>();
+			var modFiles:Vector.<String> = new <String>[];
 			if (!MODS_FOLDER.exists)
 			{
 				logger.log("", "No mods folder found, not loading any mods");
@@ -471,10 +633,10 @@ package Bezel
 				var enabledMods:SettingManager = this.getSettingManager("Enabled Mods");
 
 				var fileList:Array = MODS_FOLDER.getDirectoryListing();
-				for(var f:int = 0; f < fileList.length; f++)
+				for (var f:int = 0; f < fileList.length; f++)
 				{
 					var fileName:String = fileList[f].name;
-					//logger.log("loadMods", "Looking at " + fileName);
+					// logger.log("loadMods", "Looking at " + fileName);
 					if (fileName.substring(fileName.length - 4, fileName.length) == ".swf")
 					{
 						enabledMods.registerBoolean(fileName, null, true, "Requires restart");
@@ -486,11 +648,11 @@ package Bezel
 				}
 
 				waitingMods = progressTotal = modFiles.length;
-				
+
 				updateProgress(0, progressTotal);
 				this.loadingStageTextField.text = LOADING_MODS;
 			}
-			
+
 			if (modFiles.length == 0)
 			{
 				this._modsReloadedTimestamp = getTimer();
@@ -510,20 +672,20 @@ package Bezel
 		}
 
 		// Assuming the file loaded, add the mod to tracked mods. Check compatibility. Check if the mod has a coremod and add the patches if so.
-		private function successfulModLoad(modFile:SWFFile): void
+		private function successfulModLoad(modFile:SWFFile):void
 		{
 			var name:String;
 			if (!(modFile.instance is BezelMod))
 			{
 				if ("MOD_NAME" in modFile.instance)
 				{
-					name = " \'" + modFile.instance.MOD_NAME + "\' ";
-					logger.log("Compatibility", "Unknown type of SWF found. Is the mod" + name + "at \'" + modFile.filePath + "\' using the correct interface?");
+					name = " '" + modFile.instance.MOD_NAME + "' ";
+					logger.log("Compatibility", "Unknown type of SWF found. Is the mod" + name + "at '" + modFile.filePath + "' using the correct interface?");
 				}
 				else
 				{
 					name = modFile.filePath;
-					logger.log("Compatibility", "Unknown type of SWF found at \'" + name + "\'");
+					logger.log("Compatibility", "Unknown type of SWF found at '" + name + "'");
 				}
 				modFile.unload();
 			}
@@ -542,8 +704,8 @@ package Bezel
 				{
 					if (name in mods)
 					{
-						logger.log("Loader", "Mod \'" + name + "\' is already registered.");
-						logger.log("Loader", "The first loaded \'" + name + "\' will be used over the one at " + modFile.filePath);
+						logger.log("Loader", "Mod '" + name + "' is already registered.");
+						logger.log("Loader", "The first loaded '" + name + "' will be used over the one at " + modFile.filePath);
 					}
 					else
 					{
@@ -568,15 +730,15 @@ package Bezel
 					}
 				}
 			}
-			
+
 			reduceWaitingMods();
-			
+
 			if (!(name in mods))
 			{
 				throw new Error("An error occurred while loading " + modFile.filePath + ".\nSee log file for details.");
 			}
 		}
-		
+
 		private function reduceWaitingMods():void
 		{
 			waitingMods--;
@@ -599,7 +761,7 @@ package Bezel
 		 * @param requiredVersion The version to check
 		 * @return Whether current Bezel version is compatible with the given version
 		 */
-		public static function bezelVersionCompatible(requiredVersion:String): Boolean
+		public static function bezelVersionCompatible(requiredVersion:String):Boolean
 		{
 			var bezelVer:Array = VERSION.split(".");
 			var thisVer:Array = requiredVersion.split(".");
@@ -609,7 +771,7 @@ package Bezel
 			{
 				if (bezelVer[1] > thisVer[1])
 					return true;
-				else if(bezelVer[1] == thisVer[1])
+				else if (bezelVer[1] == thisVer[1])
 				{
 					return bezelVer[2] >= thisVer[2];
 				}
@@ -618,7 +780,7 @@ package Bezel
 			return false;
 		}
 
-		private function failedModLoad(e:Event): void
+		private function failedModLoad(e:Event):void
 		{
 			logger.log("failedLoad", "Failed to load mod: " + e.currentTarget.url);
 
@@ -626,31 +788,31 @@ package Bezel
 		}
 
 		/**
-         * Gets a logger for the given mod ID
+		 * Gets a logger for the given mod ID
 		 * @param id Mod ID
 		 * @return Logger for the ID
 		 */
-		public function getLogger(id:String): Logger
+		public function getLogger(id:String):Logger
 		{
 			return Logger.getLogger(id);
 		}
 
 		/**
-         * Gets a setting manager for the given mod ID
+		 * Gets a setting manager for the given mod ID
 		 * @param id Mod ID
 		 * @return Manager for the ID
 		 */
-		public function getSettingManager(id:String): SettingManager
+		public function getSettingManager(id:String):SettingManager
 		{
 			return SettingManager.getManager(id);
 		}
 
 		/**
-         * Returns a mod's instance, if such a mod is loaded. Used for cross-mod interactions
+		 * Returns a mod's instance, if such a mod is loaded. Used for cross-mod interactions
 		 * @param	modName Name of the mod to retrive
 		 * @return  The mod loaded by the name "modName", or null if none exists
 		 */
-		public function getModByName(modName:String): Object
+		public function getModByName(modName:String):Object
 		{
 			if (this.mods[modName])
 				return this.mods[modName].instance;
@@ -658,18 +820,18 @@ package Bezel
 		}
 
 		/**
-         * Returns the version formatted for display in a game version string. Probably unnecessary for anything except MainLoaders
+		 * Returns the version formatted for display in a game version string. Probably unnecessary for anything except MainLoaders
 		 * @return Formatted version string
 		 */
-		public static function prettyVersion(): String
+		public static function prettyVersion():String
 		{
 			return 'Bezel v' + VERSION;
 		}
 
 		/**
-         * Unloads, then reloads every mod. Almost certainly should only be used by MainLoaders
+		 * Unloads, then reloads every mod. Almost certainly should only be used by MainLoaders
 		 */
-		mainloader_only function reloadAllMods(): void
+		mainloader_only function reloadAllMods():void
 		{
 			FunctionDeferrer.clear();
 			logger.log("eh_keyboardKeyDown", "Reloading all mods!");
@@ -679,18 +841,28 @@ package Bezel
 			{
 				mainLoader.deregisterOption(SettingManager.MOD_KEYBIND, null);
 			}
-			for each (var mod:SWFFile in mods)
+			for (var modName:String in mods)
 			{
-				var name:String = mod.instance.MOD_NAME;
-				mod.unload();
-				delete mods[name];
+				var mod:SWFFile = mods[modName];
+				if (libs.indexOf(modName) == -1)
+				{
+					mod.unload();
+					for (var coremod:int = 0; coremod < coremods.length; coremod++)
+					{
+						if (coremods[coremod].name == modName)
+						{
+							delete coremods[coremod];
+							break;
+						}
+					}
+					this.removeChild(DisplayObject(mod.instance));
+					delete mods[modName];
+				}
 			}
-			this.removeChildren();
-			this.addChild(DisplayObject(mainLoader));
 			loadMods();
 		}
 
-		private function doneModReload(): void
+		private function doneModReload():void
 		{
 			bindModsAndLateRegisterSettingsAndKeybinds();
 		}
@@ -723,7 +895,7 @@ package Bezel
 		// If we do, load them into Lattice, apply them, rebuild the modded swf.
 		// Either Bezel sees that the coremods are all the same and skips calling Lattice (deferring onGameBuilt)
 		// Or they are different and we call Lattice, which then raises REBUILD_DONE
-		private function doneModLoad(): void
+		private function doneModLoad():void
 		{
 			var differentCoremods:Boolean = false;
 			try
@@ -731,8 +903,8 @@ package Bezel
 				// We intentionally register this boolean later so that the MainLoader can see that we registered it, so make sure to catch the error if it occurs
 				differentCoremods = manager.retrieveBoolean(ALWAYS_COREMOD_SETTING);
 			}
-			catch (e:*){}
-			
+			catch (e:*) {}
+
 			differentCoremods = differentCoremods || this.coremods.length != this.prevCoremods.length;
 			if (!differentCoremods)
 			{
@@ -765,7 +937,7 @@ package Bezel
 		}
 
 		/**
-         * Triggers a full reload of Bezel, the game, and the MainLoader. Will not be called by Bezel itself, and must instead be called by
+		 * Triggers a full reload of Bezel, the game, and the MainLoader. Will not be called by Bezel itself, and must instead be called by
 		 * a MainLoader (and nearly certainly not a regular mod).
 		 */
 		mainloader_only function triggerFullReload():void
@@ -783,17 +955,17 @@ package Bezel
 			{
 				mainLoader.deregisterOption(SettingManager.MOD_KEYBIND, null);
 			}
-			for each (var mod:SWFFile in mods)
+			for (var modName:String in mods)
 			{
-				var name:String = mod.instance.MOD_NAME;
+				var mod:SWFFile = mods[modName];
 				mod.unload();
-				delete mods[name];
+				delete mods[modName];
 			}
 			this.removeChildren();
-		
+
 			this.stage.addChild(this); // Reparent this to the stage
 			this.stage.removeChild(DisplayObject(this.gameLoader.instance));
-	
+
 			clearEventListeners();
 			this._gameObjects = null;
 			this.mainLoader.cleanupForFullReload();
@@ -804,6 +976,7 @@ package Bezel
 			this.logger = null;
 			this.coremods.length = 0;
 			this.prevCoremods.length = 0;
+			this.libs.length = 0;
 			this.mainLoaderLoader.unload(true);
 			this.gameLoader.unload();
 			SettingManager.unregisterAllManagers();
@@ -813,7 +986,7 @@ package Bezel
 		private function updateProgress(current:int, total:int):void
 		{
 			this.loadingProgressTextField.text = current + " / " + total;
-			this.loadingProgressBar.scaleX = Number(current)/Number(total);
+			this.loadingProgressBar.scaleX = Number(current) / Number(total);
 		}
 
 		private const _listeners:Object = new Object();
@@ -888,7 +1061,7 @@ package Bezel
 					}
 				}
 			}
-			
+
 			super.removeEventListener(type, listener, useCapture);
 		}
 
@@ -914,7 +1087,6 @@ package Bezel
 			}
 		}
 
-		private static function doNothingFunction(...args):void
-		{}
+		private static function doNothingFunction(...args):void {}
 	}
 }

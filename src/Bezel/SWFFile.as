@@ -19,9 +19,14 @@ package Bezel
 	public class SWFFile
 	{
 		private static var mainLoaderDomain:ApplicationDomain = new ApplicationDomain(ApplicationDomain.currentDomain);
+		private static var libDomain:ApplicationDomain = new ApplicationDomain(mainLoaderDomain);
 		private var loader:Loader;
 		private var file:File;
 		public var instance:Object;
+
+		public static const MAINLOADER_DOMAIN:String = "mainloader";
+		public static const MOD_DOMAIN:String = "mod";
+		public static const LIB_DOMAIN:String = "lib";
 
 		/**
 		 * The path of the file as a string
@@ -48,7 +53,7 @@ package Bezel
 		 * @param failureCallback Function to call on load fail. Should take an Event argument.
 		 * @param intoMainLoaderDomain Where to load the file: into the main loader domain or its own. This should only be set to true for the main game loaded by Bezel.
 		 */
-		public function loadBytes(bytes:ByteArray, successCallback:Function, failureCallback:Function, intoMainLoaderDomain:Boolean = false):void
+		public function loadBytes(bytes:ByteArray, successCallback:Function, failureCallback:Function, domain:String = MOD_DOMAIN):void
 		{
 			this.loader = new Loader();
 
@@ -65,15 +70,24 @@ package Bezel
 			// There are three cases:
 			// 1. This is the MainLoader. Load it into a known domain to enable the below two.
 			// 2. This is the game. Game classes should be loaded into the MainLoader's ApplicationDomain (for type checking and anything else).
-			// 3. This is a normal mod. Load it into a child domain of the MainLoader, allowing it to access the types from the game and the MainLoader
+			// 3. This is a mod library. Load it into a child of the MainLoader and game, allowing it to access their types.
+			// 4. This is a normal mod. Load it into a child domain of the library domain, allowing it to access the types from them, the game, and the MainLoader.
 
-			if (intoMainLoaderDomain)
+			if (domain == MAINLOADER_DOMAIN)
 			{
 				context = new LoaderContext(true, mainLoaderDomain);
 			}
+			else if (domain == LIB_DOMAIN)
+			{
+				context = new LoaderContext(true, libDomain);
+			}
+			else if (domain == MOD_DOMAIN)
+			{
+				context = new LoaderContext(true, new ApplicationDomain(libDomain));
+			}
 			else
 			{
-				context = new LoaderContext(true, new ApplicationDomain(mainLoaderDomain));
+				throw new ArgumentError("Unknown domain '" + domain + "'");
 			}
 			context.checkPolicyFile = false;
 			context.allowCodeImport = true;
@@ -86,7 +100,7 @@ package Bezel
 		 * @param failureCallback Function to call on load fail. Should take an Event argument.
 		 * @param intoMainLoaderDomain Where to load the file: into the main loader domain or its own. This should only be set to true for the main game loaded by Bezel.
 		 */
-		public function load(successCallback:Function, failureCallback:Function, intoMainLoaderDomain:Boolean = false):void
+		public function load(successCallback:Function, failureCallback:Function, domain:String = MOD_DOMAIN):void
 		{
 			if (!file.exists)
 				throw new Error("SWF " + file.nativePath + " does not exist");
@@ -97,7 +111,7 @@ package Bezel
 			stream.readBytes(bytes);
 			stream.close();
 
-			loadBytes(bytes, successCallback, failureCallback, intoMainLoaderDomain);
+			loadBytes(bytes, successCallback, failureCallback, domain);
 		}
 
 		/**
@@ -118,6 +132,7 @@ package Bezel
 			if (resetMainLoaderIfApplicable && this.instance is MainLoader)
 			{
 				mainLoaderDomain = new ApplicationDomain(ApplicationDomain.currentDomain);
+				libDomain = new ApplicationDomain(libDomain);
 			}
 			// Stop all execution and unsubscribe events, let garbage collection occur
 			this.instance = null;

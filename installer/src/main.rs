@@ -239,6 +239,10 @@ fn main() {
         std::fs::create_dir("Mods")
             .unwrap_or_else(|e| wait_exit(Some(ErrorCode::CouldntMakeDir(e))));
     }
+    if !Path::new("Libs").exists() {
+        std::fs::create_dir("Libs")
+            .unwrap_or_else(|e| wait_exit(Some(ErrorCode::CouldntMakeDir(e))));
+    }
     if !Path::new("Bezel").exists() {
         std::fs::create_dir("Bezel")
             .unwrap_or_else(|e| wait_exit(Some(ErrorCode::CouldntMakeDir(e))));
