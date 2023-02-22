@@ -448,9 +448,12 @@ package Bezel
 			manager.registerBoolean(ALWAYS_COREMOD_SETTING, doNothingFunction, false, "Requires restart and may cause longer load times. Mostly useful for coremod devs.");
 
 			var vecMods:Vector.<SWFFile> = new Vector.<SWFFile>();
-			for each (var mod:SWFFile in mods)
+			for (var modName:String in mods)
 			{
-				vecMods[vecMods.length] = mod;
+				if (initialLoad || libs.indexOf(modName) == -1)
+				{
+					vecMods[vecMods.length] = mods[modName];
+				}
 			}
 
 			this.loadingStageTextField.text = BINDING_MODS;
