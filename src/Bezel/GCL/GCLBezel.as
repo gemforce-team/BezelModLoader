@@ -7,8 +7,9 @@ package Bezel.GCL
     import Bezel.Utils.Keybind;
     import Bezel.Utils.SettingManager;
 
-    import flash.display.MovieClip;
     import com.giab.games.gcl.gs.Main;
+
+    import flash.display.MovieClip;
 
     /**
      * The MainLoader for GemCraft: Frostborn Wrath.

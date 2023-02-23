@@ -1,5 +1,7 @@
 package Bezel.GCCS
 {
+    import Bezel.Bezel;
+
     import flash.display.MovieClip;
     import flash.text.TextField;
 
@@ -13,10 +15,8 @@ package Bezel.GCCS
 
         public function SettingsButtonShim(template:MovieClip)
         {
-            this.tf = new TextField();
+            this.tf = Bezel.Bezel.createTextBox(template.tf.getTextFormat());
             this.tf.text = "aaa";
-            this.tf.setTextFormat(template.tf.getTextFormat());
-            this.tf.defaultTextFormat = template.tf.getTextFormat();
             this.tf.y = template.tf.y;
             this.tf.height = template.tf.height;
             this.tf.selectable = false;
@@ -24,6 +24,7 @@ package Bezel.GCCS
             this.plate = new btnplate160x34_24();
 
             this.addChild(this.plate);
+            this.plate.scaleX = 1.5;
             this.addChild(this.tf);
             this.tf.width = this.plate.width;
             this.tf.visible = true;

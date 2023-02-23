@@ -129,10 +129,9 @@ package Bezel.GCCS
 
 		internal static function setVersion(mcmainmenu:McMainMenu):void
 		{
-			var versionText:TextField = new TextField();
+			var versionText:TextField = Bezel.Bezel.createTextBox(new TextFormat("Celtic Garamond for GemCraft", 10, 0xFFFFFF, null, null, null, null, null, "center"));
 			versionText.selectable = false;
 			versionText.text = Bezel.Bezel.prettyVersion();
-			versionText.setTextFormat(new TextFormat("Celtic Garamond for GemCraft", 10, 0xFFFFFF, null, null, null, null, null, "center"));
 			mcmainmenu.mcBottomTexts.addChild(versionText);
 			versionText.width = versionText.parent.width;
 			// var version:String = GV.main.scrMainMenu.mc.mcBottomTexts.getChildAt(0).text;

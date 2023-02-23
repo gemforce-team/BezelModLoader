@@ -1,5 +1,7 @@
 package Bezel.GCL
 {
+    import Bezel.Bezel;
+
     import flash.display.MovieClip;
     import flash.text.TextField;
 
@@ -12,9 +14,9 @@ package Bezel.GCL
 
         public function MoreSettingsButtonShim(template:MovieClip)
         {
-            this.tf = new TextField();
+            this.tf = Bezel.Bezel.createTextBox(template.tf.getTextFormat());
+            this.tf.defaultTextFormat.color = 0xFFFFFF;
             this.tf.text = "aaa";
-            this.tf.defaultTextFormat = template.tf.getTextFormat(0, 1);
             this.tf.y = template.tf.y;
             this.tf.height = template.tf.height;
             this.tf.mouseEnabled = false;

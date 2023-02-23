@@ -12,6 +12,7 @@ package Bezel.GCL
     import Bezel.GCL.Events.Persistence.IngameGemInfoPanelFormedEventArgs;
     import Bezel.GCL.Events.Persistence.IngameKeyDownEventArgs;
     import Bezel.GCL.Events.Persistence.IngamePreRenderInfoPanelEventArgs;
+    import Bezel.GCL.Events.PostInitiateEvent;
     import Bezel.GCL.Events.SaveSaveEvent;
     import Bezel.Utils.Keybind;
     import Bezel.mainloader_only;
@@ -27,8 +28,6 @@ package Bezel.GCL
     import flash.text.TextField;
     import flash.text.TextFormat;
     import flash.utils.getTimer;
-    import flash.text.Font;
-    import flash.utils.getDefinitionByName;
 
     use namespace mainloader_only;
 
@@ -52,11 +51,10 @@ package Bezel.GCL
 
         internal static function setVersion(mcmainmenu:McMainMenu):void
         {
-            var versionText:TextField = new TextField();
+            var versionText:TextField = Bezel.Bezel.createTextBox(new TextFormat("Celtic Garamond for GemCraft", 10, 0xFFFFFF, null, null, null, null, null, "center"));
             versionText.selectable = false;
             versionText.text = Bezel.Bezel.prettyVersion();
-            versionText.setTextFormat(new TextFormat("Celtic Garamond for GemCraft", 10, 0xFFFFFF, null, null, null, null, null, "center"));
-            versionText.x = -750;
+            versionText.x = -730;
             mcmainmenu.mcBottomTexts.addChild(versionText);
             versionText.width = versionText.parent.width;
         }
@@ -160,6 +158,11 @@ package Bezel.GCL
         internal static function ingameNewScene():void
         {
             Bezel.Bezel.instance.dispatchEvent(new IngameNewSceneEvent(EventTypes.INGAME_NEW_SCENE));
+        }
+
+        internal static function postInitiate(main:Main):void
+        {
+            Bezel.Bezel.instance.dispatchEvent(new PostInitiateEvent(main, EventTypes.POST_INITIATE));
         }
 
         private static function doHotkeyTransformation(e:IngameKeyDownEvent):void

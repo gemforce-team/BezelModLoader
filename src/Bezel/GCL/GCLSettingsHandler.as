@@ -4,14 +4,13 @@ package Bezel.GCL
     import Bezel.Utils.SettingManager;
 
     import com.giab.common.utils.MathToolbox;
-    import com.giab.games.gcl.gs.Main;
     import com.giab.games.gcl.gs.ctrl.CtrlStatistics;
+    import com.giab.games.gcl.gs.mcDyn.McInfoPanel;
     import com.giab.games.gcl.gs.mcDyn.McStatStrip;
     import com.giab.games.gcl.gs.mcDyn.McStatsTitlePanel;
     import com.giab.games.gcl.gs.mcStat.McStatistics;
 
     import flash.display.MovieClip;
-    import flash.display.Shape;
     import flash.display.Sprite;
     import flash.events.Event;
     import flash.events.MouseEvent;
@@ -20,7 +19,6 @@ package Bezel.GCL
     import flash.utils.describeType;
 
     import gcl_gs_fla.optionsChkbox_178;
-    import com.giab.games.gcl.gs.mcDyn.McInfoPanel;
 
     internal class GCLSettingsHandler
     {
@@ -122,20 +120,21 @@ package Bezel.GCL
 
         private static var onCustom:Boolean = false;
 
-        private static var hijackedStats:Object;
-        private static var hijackedStatsMc:MovieClip;
+        private static var _hijackedStats:Object;
+        private static var _hijackedStatsMc:MovieClip;
         private static var moreSettingsButton:MoreSettingsButtonShim;
 
         internal static function toggleCustomSettingsFromGame():void
         {
-            if (hijackedStatsMc == null)
+            if (_hijackedStatsMc == null)
             {
-                hijackedStatsMc = new McStatistics();
+                _hijackedStatsMc = new McStatistics();
             }
-            if (hijackedStats == null)
+            var hijackedStatsMc:McStatistics = McStatistics(_hijackedStatsMc);
+            if (_hijackedStats == null)
             {
-                hijackedStats = new CtrlStatistics(hijackedStatsMc as McStatistics, GCLGV.main);
-                hijackedStatsMc.btnDone.removeEventListener(MouseEvent.MOUSE_DOWN, hijackedStats.ehBtnDoneDown, true);
+                _hijackedStats = new CtrlStatistics(hijackedStatsMc, GCLGV.main);
+                hijackedStatsMc.btnDone.removeEventListener(MouseEvent.MOUSE_DOWN, CtrlStatistics(_hijackedStats).ehBtnDoneDown, true);
                 hijackedStatsMc.btnDone.addEventListener(MouseEvent.MOUSE_DOWN, hideCustomSettings, true, 0, true);
             }
             if (moreSettingsButton == null)
@@ -165,6 +164,9 @@ package Bezel.GCL
 
         private static function enterFrame(e:Event):void
         {
+            var hijackedStats:CtrlStatistics = CtrlStatistics(_hijackedStats);
+            var hijackedStatsMc:McStatistics = McStatistics(_hijackedStatsMc);
+
             hijackedStats.doEnterFrame();
 
             for (var i:int = 0; i < hijackedStats.statStrips.length; i++)
@@ -187,11 +189,14 @@ package Bezel.GCL
 
         private static function addMC(mc:MovieClip):void
         {
-            hijackedStats.statStrips.push(mc);
+            CtrlStatistics(_hijackedStats).statStrips.push(mc);
         }
 
         internal static function showCustomSettings(e:MouseEvent):void
         {
+            var hijackedStats:CtrlStatistics = CtrlStatistics(_hijackedStats);
+            var hijackedStatsMc:McStatistics = McStatistics(_hijackedStatsMc);
+
             onCustom = true;
             hijackedStats.initiate();
             hijackedStats.statStrips.length = 0;
@@ -382,6 +387,9 @@ package Bezel.GCL
 
         internal static function hideCustomSettings(e:MouseEvent):void
         {
+            var hijackedStats:CtrlStatistics = CtrlStatistics(_hijackedStats);
+            var hijackedStatsMc:McStatistics = McStatistics(_hijackedStatsMc);
+
             onCustom = false;
             GCLGV.main.removeEventListener(MouseEvent.MOUSE_WHEEL, hijackedStats.ehWheel, true);
             GCLGV.main.mcOptions.removeChild(hijackedStatsMc);
@@ -404,7 +412,13 @@ package Bezel.GCL
         {
             var optPanel:McStatStrip = vP as McStatStrip;
             var infoPanel:McInfoPanel = vIp as McInfoPanel;
+            var hijackedStatsMc:McStatistics = McStatistics(_hijackedStatsMc);
+
             infoPanel.removeAllTextfields();
+            if (IS_CHOOSING_KEYBIND)
+            {
+                return;
+            }
             for each (var setting:GCLSetting in newSettings)
             {
                 if (optPanel == setting.panel)

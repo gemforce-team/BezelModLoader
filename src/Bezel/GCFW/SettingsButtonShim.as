@@ -1,5 +1,7 @@
 package Bezel.GCFW
 {
+    import Bezel.Bezel;
+
     import GemCraftFrostbornWrath_fla.btnplate160x34_24;
 
     import flash.display.MovieClip;
@@ -13,10 +15,8 @@ package Bezel.GCFW
 
         public function SettingsButtonShim(template:MovieClip)
         {
-            this.tf = new TextField();
+            this.tf = Bezel.Bezel.createTextBox(template.tf.getTextFormat());
             this.tf.text = "aaa";
-            this.tf.setTextFormat(template.tf.getTextFormat());
-            this.tf.defaultTextFormat = template.tf.getTextFormat();
             this.tf.y = template.tf.y;
             this.tf.height = template.tf.height;
             this.tf.selectable = false;

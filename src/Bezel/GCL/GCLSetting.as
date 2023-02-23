@@ -3,18 +3,13 @@ package Bezel.GCL
     import Bezel.Utils.Keybind;
     import Bezel.Utils.SettingManager;
 
-    import com.giab.games.gcl.gs.mcDyn.McStatStrip;
-
     import flash.display.MovieClip;
-    import flash.display.Shape;
     import flash.display.Sprite;
     import flash.events.KeyboardEvent;
     import flash.events.MouseEvent;
     import flash.filters.ColorMatrixFilter;
     import flash.geom.Rectangle;
     import flash.ui.Keyboard;
-
-    import gcl_gs_fla.optionsChkbox_178;
 
     internal class GCLSetting
     {
@@ -153,7 +148,6 @@ package Bezel.GCL
 
         private function onRangeReleased(e:MouseEvent):void
         {
-            var knob:MovieClip = MovieClip(e.target.parent);
             knob.stopDrag();
             GCLGV.main.stage.removeEventListener(MouseEvent.MOUSE_UP, this.onRangeReleased, true);
 
@@ -215,7 +209,6 @@ package Bezel.GCL
             GCLGV.main.stage.addEventListener(MouseEvent.MOUSE_OUT, discardAllMouseInput, true, 10, true);
             GCLGV.main.stage.addEventListener(MouseEvent.MOUSE_WHEEL, discardAllMouseInput, true, 10, true);
             this.button.tf.text = "???";
-            this.button.tf.textColor = 0xFFFFFF;
             this.button.plate.filters = [new ColorMatrixFilter([
                         1, 0, 0, 0, 0,
                         0, .5, 0, 0, 0,

@@ -3,8 +3,6 @@ package Bezel.GCL
     import Bezel.Lattice.Lattice;
     import Bezel.mainloader_only;
 
-    import com.cff.anebe.ir.ASInstruction;
-
     public class GCLCoreMod
     {
         public static const VERSION:String = "1";

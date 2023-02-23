@@ -15,6 +15,7 @@ package Bezel.GCL.Events
 		public static const LOAD_SAVE:String = "loadSave";
 		public static const SAVE_SAVE:String = "saveSave";
 		public static const INGAME_NEW_SCENE:String = "ingameNewScene";
+		public static const POST_INITIATE:String = "postInitiate";
 
 		public function EventTypes()
 		{

@@ -1,5 +1,7 @@
 package Bezel.GCL
 {
+    import Bezel.Bezel;
+
     import flash.display.MovieClip;
     import flash.text.TextField;
     import flash.text.TextFormat;
@@ -26,9 +28,8 @@ package Bezel.GCL
             }
             this.addChild(this.plate);
 
-            this.tf = new TextField();
+            this.tf = Bezel.Bezel.createTextBox(new TextFormat("Celtic Garamond for GemCraft", 12, 0xFFFFFF, false, false, false, null, null, TextFormatAlign.CENTER));
             this.tf.mouseEnabled = false;
-            this.tf.defaultTextFormat = new TextFormat("Celtic Garamond for GemCraft", 12, 0xFFFFFF, false, false, false, null, null, TextFormatAlign.CENTER);
             this.tf.multiline = false;
             this.tf.width = this.width;
             this.tf.height = this.height / 2 + 4;

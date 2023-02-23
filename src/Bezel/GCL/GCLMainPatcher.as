@@ -6,7 +6,9 @@ package Bezel.GCL
     import com.cff.anebe.ir.ASInstruction;
     import com.cff.anebe.ir.ASMethod;
     import com.cff.anebe.ir.ASMethodBody;
+    import com.cff.anebe.ir.ASTrait;
     import com.cff.anebe.ir.multinames.ASQName;
+    import com.cff.anebe.ir.namespaces.PackageInternalNs;
     import com.cff.anebe.ir.namespaces.PackageNamespace;
     import com.cff.anebe.ir.traits.TraitMethod;
     import com.cff.anebe.ir.traits.TraitSlot;
@@ -17,6 +19,7 @@ package Bezel.GCL
         {
             addBezelVar(clazz);
             patchConstructor(clazz);
+            patchInitiateApplication(clazz);
         }
 
         // Both moves constructor logic to a new method and patches usage of uncaughtErrorHandler
@@ -41,6 +44,20 @@ package Bezel.GCL
         private function addBezelVar(clazz:ASClass):void
         {
             clazz.setInstanceTrait(TraitSlot(ASQName(PackageNamespace(""), "bezel"), ASQName(PackageNamespace("Bezel"), "Bezel")));
+        }
+
+        private function patchInitiateApplication(clazz:ASClass):void
+        {
+            var initiateApplicationTrait:ASTrait = clazz.getInstanceTrait(ASQName(PackageInternalNs("com.giab.games.gcl.gs"), "initiateApplication"));
+
+            initiateApplicationTrait.funcOrMethod.body.streamInstructions(true)
+                .insert(
+                ASInstruction.GetLex(ASQName(PackageInternalNs("Bezel.GCL"), "GCLEventHandlers")),
+                ASInstruction.GetLocal0(),
+                ASInstruction.CallProperty(ASQName(PackageInternalNs("Bezel.GCL"), "postInitiate"), 1)
+                );
+
+            clazz.setInstanceTrait(initiateApplicationTrait);
         }
     }
 }
