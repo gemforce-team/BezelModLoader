@@ -19,9 +19,9 @@ package Bezel.GCCS
 
     internal class GCCSSettingsHandler
     {
-        private static const newSettings:Vector.<GCCSSetting> = new Vector.<GCCSSetting>();
+        private static const newSettings:Vector.<GCCSSetting> = new <GCCSSetting>[];
 
-        private static var newMCs:Vector.<MovieClip> = new Vector.<MovieClip>();
+        private static var newMCs:Vector.<MovieClip> = new <MovieClip>[];
         private static var currentlyShowing:Boolean = false;
 
         internal static var IS_CHOOSING_KEYBIND:Boolean = false;
@@ -64,67 +64,65 @@ package Bezel.GCCS
             }
         }
 
+        private static function sortSettings(left:GCCSSetting, right:GCCSSetting):Number
+        {
+            // Sort keybinds first
+            if (left.mod == SettingManager.MOD_KEYBIND) // Keybinds always come second to last
+            {
+                if (right.mod == SettingManager.MOD_KEYBIND)
+                {
+                    if (left.name < right.name)
+                        return -1;
+                    if (left.name > right.name)
+                        return 1;
+                    return 0;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            else if (left.mod == SettingManager.MOD_ENABLED)
+            {
+                if (right.mod == SettingManager.MOD_ENABLED)
+                {
+                    if (left.name < right.name)
+                        return -1;
+                    if (left.name > right.name)
+                        return 1;
+                    return 0;
+                }
+                else if (right.mod == SettingManager.MOD_KEYBIND)
+                {
+                    return 1;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            else if (right.mod == SettingManager.MOD_KEYBIND || right.mod == SettingManager.MOD_ENABLED) // Both come after everything else
+            {
+                return 1;
+            }
+            if (left.mod < right.mod)
+                return -1;
+            if (left.mod > right.mod)
+                return 1;
+            if (left.name < right.name)
+                return -1;
+            if (left.name > right.name)
+                return 1;
+            return 0;
+        }
+
         internal static function toggleCustomSettingsFromGame():void
         {
             if (!currentlyShowing)
             {
                 var vY:int = 1630;
                 var currentPanelX:int = getNewPanelX(0);
-                newSettings.sort(function (left:GCCSSetting, right:GCCSSetting):Number
-                {
-                    // Sort keybinds first
-                    if (left.mod == SettingManager.MOD_KEYBIND) // Keybinds always come second to last
-                    {
-                        if (right.mod == SettingManager.MOD_KEYBIND)
-                        {
-                            if (left.name < right.name)
-                                return -1;
-                            if (left.name > right.name)
-                                return 1;
-                            return 0;
-                        }
-                        else if (right.mod == SettingManager.MOD_ENABLED) // Enabled mods always comes last
-                        {
-                            return -1;
-                        }
-                        else
-                        {
-                            return 1;
-                        }
-                    }
-                    else if (left.mod == SettingManager.MOD_ENABLED)
-                    {
-                        if (right.mod == SettingManager.MOD_ENABLED)
-                        {
-                            if (left.name < right.name)
-                                return -1;
-                            if (left.name > right.name)
-                                return 1;
-                            return 0;
-                        }
-                        else if (right.mod == SettingManager.MOD_KEYBIND)
-                        {
-                            return 1;
-                        }
-                        else
-                        {
-                            return 1;
-                        }
-                    }
-                    else if (right.mod == SettingManager.MOD_KEYBIND || right.mod == SettingManager.MOD_ENABLED) // Both come after everything else
-                    {
-                        return -1;
-                    }
-                    if (left.mod < right.mod)
-                        return -1;
-                    if (left.mod > right.mod)
-                        return 1;
-                    if (left.name < right.name)
-                        return -1;
-                    if (left.name > right.name)
-                        return 1;
-                    return 0;
-                });
+                newSettings.sort(sortSettings);
                 var currentName:String = null;
                 for each (var setting:GCCSSetting in newSettings)
                 {

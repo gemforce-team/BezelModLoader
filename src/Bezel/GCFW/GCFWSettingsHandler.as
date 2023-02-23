@@ -18,9 +18,9 @@ package Bezel.GCFW
 
     internal class GCFWSettingsHandler
     {
-        private static const newSettings:Vector.<GCFWSetting> = new Vector.<GCFWSetting>();
+        private static const newSettings:Vector.<GCFWSetting> = new <GCFWSetting>[];
 
-        private static const newMCs:Vector.<MovieClip> = new Vector.<MovieClip>();
+        private static const newMCs:Vector.<MovieClip> = new <MovieClip>[];
         private static var currentlyShowing:Boolean = false;
 
         internal static var IS_CHOOSING_KEYBIND:Boolean = false;
@@ -76,13 +76,9 @@ package Bezel.GCFW
                         return 1;
                     return 0;
                 }
-                else if (right.mod == SettingManager.MOD_ENABLED) // Enabled mods always comes last
-                {
-                    return -1;
-                }
                 else
                 {
-                    return 1;
+                    return -1;
                 }
             }
             else if (left.mod == SettingManager.MOD_ENABLED)
@@ -101,12 +97,12 @@ package Bezel.GCFW
                 }
                 else
                 {
-                    return 1;
+                    return -1;
                 }
             }
             else if (right.mod == SettingManager.MOD_KEYBIND || right.mod == SettingManager.MOD_ENABLED) // Both come after everything else
             {
-                return -1;
+                return 1;
             }
             if (left.mod < right.mod)
                 return -1;
