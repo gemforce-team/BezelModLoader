@@ -7,16 +7,14 @@ package Bezel.GCL
     import flash.text.TextFormat;
     import flash.text.TextFormatAlign;
 
-    import gcl_gs_fla.btnplate115x60_142;
-
     internal class SettingsButton extends MovieClip
     {
         public var plate:MovieClip;
         public var tf:TextField;
 
-        public function SettingsButton(width:Number = 0, height:Number = 0)
+        public function SettingsButton(template:MovieClip, width:Number = 0, height:Number = 0)
         {
-            this.plate = new btnplate115x60_142();
+            this.plate = new (template.plate.constructor as Class)();
             this.plate.mouseEnabled = false;
             if (height != 0)
             {

@@ -5,8 +5,6 @@ package Bezel.GCCS
     import flash.display.MovieClip;
     import flash.text.TextField;
 
-    import gc_cs_steam_fla.btnplate160x34_24;
-
     internal class SettingsButtonShim extends MovieClip
     {
         public var tf:TextField;
@@ -21,7 +19,7 @@ package Bezel.GCCS
             this.tf.height = template.tf.height;
             this.tf.selectable = false;
 
-            this.plate = new btnplate160x34_24();
+            this.plate = new (template.plate.constructor as Class)();
 
             this.addChild(this.plate);
             this.plate.scaleX = 1.5;

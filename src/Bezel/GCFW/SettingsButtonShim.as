@@ -2,8 +2,6 @@ package Bezel.GCFW
 {
     import Bezel.Bezel;
 
-    import GemCraftFrostbornWrath_fla.btnplate160x34_24;
-
     import flash.display.MovieClip;
     import flash.text.TextField;
 
@@ -21,10 +19,11 @@ package Bezel.GCFW
             this.tf.height = template.tf.height;
             this.tf.selectable = false;
 
-            this.plate = new btnplate160x34_24();
+            this.plate = new (template.plate.constructor as Class)();
 
             this.addChild(this.plate);
-            this.plate.scaleX = this.plate.scaleY = 1.5;
+            this.plate.scaleY = 1.5;
+            this.plate.scaleX = 2;
             this.addChild(this.tf);
             this.tf.width = this.plate.width;
             this.tf.visible = true;

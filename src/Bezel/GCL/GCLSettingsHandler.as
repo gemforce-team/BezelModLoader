@@ -18,8 +18,6 @@ package Bezel.GCL
     import flash.ui.Keyboard;
     import flash.utils.describeType;
 
-    import gcl_gs_fla.optionsChkbox_178;
-
     internal class GCLSettingsHandler
     {
         private static const newSettings:Vector.<GCLSetting> = new <GCLSetting>[];
@@ -239,7 +237,7 @@ package Bezel.GCL
                     boolStrip.xAbs = 34;
                     boolStrip.yAbs = yStart;
 
-                    var boolButton:optionsChkbox_178 = new optionsChkbox_178();
+                    var boolButton:MovieClip = new (GCLGV.main.mcOptions.btnScreenShaking.constructor as Class)();
                     boolButton.x = boolStrip.tfStatValue.x + boolStrip.tfStatValue.width / 2 - boolButton.width / 2;
                     boolButton.y = boolStrip.tfStatValue.y - 1;
                     boolButton.gotoAndStop(setting.currentVal() ? 2 : 1);
@@ -307,7 +305,7 @@ package Bezel.GCL
                     keybindStrip.xAbs = 34;
                     keybindStrip.yAbs = yStart;
 
-                    var keybindButton:SettingsButton = new SettingsButton(keybindStrip.tfStatValue.width, keybindStrip.height);
+                    var keybindButton:SettingsButton = new SettingsButton(hijackedStatsMc.btnSubmitScore, keybindStrip.tfStatValue.width, keybindStrip.height);
                     keybindButton.tf.text = (setting.currentVal()).toString().toUpperCase();
                     keybindButton.addEventListener(MouseEvent.MOUSE_DOWN, setting.onClicked, false, 0, true);
                     keybindButton.addEventListener(MouseEvent.MOUSE_OVER, hijackedStats.ehBtnMouseOver, false, 0, true);
@@ -334,7 +332,7 @@ package Bezel.GCL
                     numberStrip.xAbs = 34;
                     numberStrip.yAbs = yStart;
 
-                    var numberButton:SettingsButton = new SettingsButton(numberStrip.tfStatValue.width, numberStrip.height);
+                    var numberButton:SettingsButton = new SettingsButton(hijackedStatsMc.btnSubmitScore, numberStrip.tfStatValue.width, numberStrip.height);
                     numberButton.tf.text = setting.currentVal().toString();
                     numberButton.addEventListener(MouseEvent.MOUSE_DOWN, setting.onClicked, false, 0, true);
                     numberButton.addEventListener(MouseEvent.MOUSE_OVER, hijackedStats.ehBtnMouseOver, false, 0, true);
@@ -361,7 +359,7 @@ package Bezel.GCL
                     stringStrip.xAbs = 34;
                     stringStrip.yAbs = yStart;
 
-                    var stringButton:SettingsButton = new SettingsButton(stringStrip.tfStatValue.width, stringStrip.height);
+                    var stringButton:SettingsButton = new SettingsButton(hijackedStatsMc.btnSubmitScore, stringStrip.tfStatValue.width, stringStrip.height);
                     stringButton.tf.text = setting.currentVal().toString();
                     stringButton.addEventListener(MouseEvent.MOUSE_DOWN, setting.onClicked, false, 0, true);
                     stringButton.addEventListener(MouseEvent.MOUSE_OVER, hijackedStats.ehBtnMouseOver, false, 0, true);
