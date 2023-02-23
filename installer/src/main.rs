@@ -121,6 +121,11 @@ fn main() {
             "GemCraft Frostborn Wrath.swf",
             include_bytes!("../../obj/GCFWMainLoader.swf").as_slice(),
         ),
+        (
+            "GemCraft Labyrinth",
+            "gcl-gs.swf",
+            include_bytes!("../../obj/GCLMainLoader.swf").as_slice(),
+        ),
     ];
     // ANE needs to be extracted from the byte array
     let mut ane = zip::ZipArchive::new(Cursor::new(ane))

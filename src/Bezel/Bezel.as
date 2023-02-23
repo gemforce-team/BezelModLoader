@@ -447,7 +447,7 @@ package Bezel
 			manager.registerBoolean(DEBUG_INSTR_SETTING, resetLattice, false, "Requires restart and may cause slowdown");
 			manager.registerBoolean(ALWAYS_COREMOD_SETTING, doNothingFunction, false, "Requires restart and may cause longer load times. Mostly useful for coremod devs.");
 
-			var vecMods:Vector.<SWFFile> = new Vector.<SWFFile>();
+			var vecMods:Vector.<SWFFile> = new <SWFFile>[];
 			for (var modName:String in mods)
 			{
 				if (initialLoad || libs.indexOf(modName) == -1)
