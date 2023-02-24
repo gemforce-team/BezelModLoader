@@ -24,8 +24,8 @@ package Bezel.GCL
 
         private function patchConstructor(clazz:ASClass):void
         {
-            var newConstructor:ASMethod = new ASMethod(null, null, "com.giab.common.data:ENumber/ENumber", null, null, null,
-                new ASMethodBody(2, 1, 0, 1, new <ASInstruction>[
+            var newConstructor:ASMethod = new ASMethod(null, null, "", null, null, null,
+                new ASMethodBody(2, 1, 4, 5, new <ASInstruction>[
                     ASInstruction.GetLocal0(),
                     ASInstruction.PushScope(),
                     ASInstruction.GetLocal0(),
@@ -58,7 +58,7 @@ package Bezel.GCL
         {
             var newS:ASTrait = TraitMethod(ASQName(PackageNamespace(""), "s"),
                 new ASMethod(new <ASMultiname>[ASQName(PackageNamespace(""), "Number")], ASQName(PackageNamespace(""), "void"), "com.giab.common.data:ENumber/s", null, null, null,
-                new ASMethodBody(2, 1, 4, 5, new <ASInstruction>[
+                new ASMethodBody(2, 2, 4, 5, new <ASInstruction>[
                     ASInstruction.GetLocal0(),
                     ASInstruction.PushScope(),
                     ASInstruction.GetLocal0(),

@@ -65,6 +65,9 @@ package Bezel
 
 		private var manager:SettingManager;
 
+		private const gameLoader:SWFFile = new SWFFile(moddedSwf);
+		private const mainLoaderLoader:SWFFile = new SWFFile(MAINLOADER);
+
 		private static const DISASSEMBLING_GAME:String = "Disassembling Game...";
 		private static const LOADING_LIBS:String = "Loading Mod Libraries...";
 		private static const LOADING_MODS:String = "Loading Mods...";
@@ -94,20 +97,19 @@ package Bezel
 
 		/** The mods folder */
 		public static const MODS_FOLDER:File = File.applicationDirectory.resolvePath("Mods/");
+
+		/** The libraries folder */
 		public static const LIBS_FOLDER:File = File.applicationDirectory.resolvePath("Libs/");
 
-		private static const gameConfig:File = File.applicationDirectory.resolvePath("game-file.txt");
+		private static const GAME_CONFIG:File = File.applicationDirectory.resolvePath("game-file.txt");
 		private static const BEZEL_COREMODS:File = BEZEL_FOLDER.resolvePath("coremods.bzl");
-		private static const mainLoaderFile:File = File.applicationDirectory.resolvePath("Bezel/MainLoader.swf");
+		private static const MAINLOADER:File = File.applicationDirectory.resolvePath("Bezel/MainLoader.swf");
 
 		[Embed(source = "../../assets/splitter/splitter.exe", mimeType = "application/octet-stream")] private static const splitter_data:Class;
 		private static const splitter:Object = {"name": "splitter.exe", "data": splitter_data};
 
 		private static const DEBUG_INSTR_SETTING:String = "Include Debug Instructions";
 		private static const ALWAYS_COREMOD_SETTING:String = "Always submit coremod patches";
-
-		private const gameLoader:SWFFile = new SWFFile(moddedSwf);
-		private const mainLoaderLoader:SWFFile = new SWFFile(mainLoaderFile);
 
 		/**
 		 * The instance of this class.
@@ -158,7 +160,7 @@ package Bezel
 			if (_gameSwf == null)
 			{
 				var config:FileStream = new FileStream();
-				config.open(gameConfig, FileMode.READ);
+				config.open(GAME_CONFIG, FileMode.READ);
 				_gameSwf = File.applicationDirectory.resolvePath(config.readUTFBytes(config.bytesAvailable));
 				config.close();
 			}
@@ -362,7 +364,7 @@ package Bezel
 		{
 			_mainLoader = MainLoader(mainLoaderLoader.instance);
 			addChild(DisplayObject(mainLoaderLoader.instance));
-			logger.log("Bezel", "MainLoader loaded from " + File.applicationDirectory.getRelativePath(mainLoaderFile));
+			logger.log("Bezel", "MainLoader loaded from " + File.applicationDirectory.getRelativePath(MAINLOADER));
 			coremods[coremods.length] = mainLoader.coremodInfo;
 			FunctionDeferrer.deferFunction(this.loadLibs, [], this, true);
 		}
@@ -376,7 +378,7 @@ package Bezel
 		// After we have the dissassembled game, add the MainLoader (if it exists) and load mods
 		private function loadMainLoader():void
 		{
-			if (mainLoaderFile.exists)
+			if (MAINLOADER.exists)
 			{
 				this.mainLoaderLoader.load(this.onMainloaderLoadSuccess, this.onMainloaderLoadFail, SWFFile.MAINLOADER_DOMAIN);
 			}
