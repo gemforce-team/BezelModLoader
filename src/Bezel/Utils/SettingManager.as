@@ -321,6 +321,21 @@ package Bezel.Utils
         }
 
         /**
+         * Adds a setting with a button that does nothing except call the onClick function.
+         * Meant for interactions or more complex settings than can be handled with the basic ones.
+         * @param name Setting name
+         * @param onClick Function to call on setting click. Will be called with 0 arguments.
+         * @param description Extra description of setting to be displayed
+         */
+        public function registerButton(name:String, onClick:Function, description:String = null):void
+        {
+            if (Bezel.Bezel.instance.mainLoader != null)
+            {
+                Bezel.Bezel.instance.mainLoader.registerButtonForDisplay(id, name, onClick, description);
+            }
+        }
+
+        /**
          * Deregisters a setting.
          * @param name Setting to deregister. Null for all
          * @param del Whether to remove the setting from the save SETTINGS_FILE or not

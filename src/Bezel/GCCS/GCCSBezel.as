@@ -242,6 +242,11 @@ package Bezel.GCCS
 			GCCSSettingsHandler.registerNumberForDisplay(mod, name, min, max, onSet, currentValue, description);
 		}
 
+		public function registerButtonForDisplay(mod:String, name:String, onClick:Function, description:String = null):void
+		{
+			GCCSSettingsHandler.registerButtonForDisplay(mod, name, onClick, description);
+		}
+
 		public function cleanupForFullReload():void
 		{
 			GCCSEventHandlers.unregister();

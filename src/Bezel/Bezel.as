@@ -23,6 +23,8 @@ package Bezel
 	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
+	import flash.desktop.NativeProcess;
+	import flash.desktop.NativeProcessStartupInfo;
 
 	use namespace bezel_internal;
 	use namespace mainloader_only;
@@ -175,24 +177,24 @@ package Bezel
 			return _moddedSwf;
 		}
 
-        private static var CreateTextBox:Function;
+		private static var CreateTextBox:Function;
 
-        /**
-         * Creates a text box with the format given from within the context of the game.
-         * This allows using game fonts that may not have been registered yet.
-         * Can only be used during bind and later.
-         * @param format Format to use
-         * @return built TextField
-         */
-        public static function createTextBox(format:TextFormat):TextField
-        {
-            if (CreateTextBox == null)
-            {
-                CreateTextBox = (instance.gameLoader.instance as Sprite).loaderInfo.applicationDomain.getDefinition("Bezel.Helpers.CreateTextBox") as Function;
-            }
+		/**
+		 * Creates a text box with the format given from within the context of the game.
+		 * This allows using game fonts that may not have been registered yet.
+		 * Can only be used during bind and later.
+		 * @param format Format to use
+		 * @return built TextField
+		 */
+		public static function createTextBox(format:TextFormat):TextField
+		{
+			if (CreateTextBox == null)
+			{
+				CreateTextBox = (instance.gameLoader.instance as Sprite).loaderInfo.applicationDomain.getDefinition("Bezel.Helpers.CreateTextBox") as Function;
+			}
 
-            return CreateTextBox(format);
-        }
+			return CreateTextBox(format);
+		}
 
 		public function Bezel()
 		{
@@ -467,6 +469,15 @@ package Bezel
 		{
 			manager.registerBoolean(DEBUG_INSTR_SETTING, resetLattice, false, "Requires restart and may cause slowdown");
 			manager.registerBoolean(ALWAYS_COREMOD_SETTING, doNothingFunction, false, "Requires restart and may cause longer load times. Mostly useful for coremod devs.");
+
+			manager.registerButton("Open Storage Directory", function ():void
+			{
+				var process:NativeProcess = new NativeProcess();
+				var startup:NativeProcessStartupInfo = new NativeProcessStartupInfo();
+				startup.executable = new File("C:/Windows/explorer.exe");
+				startup.arguments = new <String>[File.applicationStorageDirectory.nativePath];
+				process.start(startup);
+			}, "Opens the directory where mod data is stored");
 
 			var vecMods:Vector.<SWFFile> = new <SWFFile>[];
 			for (var modName:String in mods)

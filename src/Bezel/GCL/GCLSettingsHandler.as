@@ -53,6 +53,11 @@ package Bezel.GCL
             newSettings[newSettings.length] = GCLSetting.makeString(mod, name, validator, onSet, currentValue, description);
         }
 
+        internal static function registerButtonForDisplay(mod:String, name:String, onClick:Function, description:String = null):void
+        {
+            newSettings[newSettings.length] = GCLSetting.makeButton(mod, name, onClick, description);
+        }
+
         internal static function deregisterOption(mod:String, name:String):void
         {
             for (var i:int = newSettings.length; i > 0; i--)
@@ -375,6 +380,37 @@ package Bezel.GCL
                     addMC(stringStrip);
 
                     yStart += stringStrip.height + 4;
+                }
+                else if (setting.type == GCLSetting.TYPE_BUTTON)
+                {
+                    var buttonStrip:McStatStrip = new McStatStrip();
+                    buttonStrip.tfStatName.mouseEnabled = false;
+                    buttonStrip.tfStatName.text = setting.name;
+                    buttonStrip.tfStatValue.visible = false;
+
+                    buttonStrip.xAbs = 34;
+                    buttonStrip.yAbs = yStart;
+
+                    var buttonButton:SettingsButton = new SettingsButton(hijackedStatsMc.btnSubmitScore, buttonStrip.tfStatValue.width, buttonStrip.height);
+                    buttonButton.tf.text = "~CLICK~";
+                    buttonButton.addEventListener(MouseEvent.MOUSE_DOWN, setting.onClicked, false, 0, true);
+                    buttonButton.addEventListener(MouseEvent.MOUSE_OVER, hijackedStats.ehBtnMouseOver, false, 0, true);
+                    buttonButton.addEventListener(MouseEvent.MOUSE_OUT, hijackedStats.ehBtnMouseOut, false, 0, true);
+
+                    buttonButton.x = buttonStrip.tfStatValue.x;
+
+                    buttonStrip.addChild(buttonButton);
+
+                    setting.panel = buttonStrip;
+                    setting.button = buttonButton;
+
+                    addMC(buttonStrip);
+
+                    yStart += buttonStrip.height + 4;
+                }
+                else
+                {
+                    throw new Error("Unrecognized option type when enabling settings");
                 }
             }
 

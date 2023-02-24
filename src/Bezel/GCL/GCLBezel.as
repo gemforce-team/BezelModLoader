@@ -176,6 +176,11 @@ package Bezel.GCL
             GCLSettingsHandler.registerNumberForDisplay(mod, name, min, max, onSet, currentValue, description);
         }
 
+        public function registerButtonForDisplay(mod:String, name:String, onClick:Function, description:String = null):void
+        {
+            GCLSettingsHandler.registerButtonForDisplay(mod, name, onClick, description);
+        }
+
         public function cleanupForFullReload():void
         {
             GCLEventHandlers.unregister();

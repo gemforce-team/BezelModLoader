@@ -52,6 +52,11 @@ package Bezel.GCFW
             newSettings[newSettings.length] = GCFWSetting.makeString(mod, name, validator, onSet, currentValue, description);
         }
 
+        internal static function registerButtonForDisplay(mod:String, name:String, onClick:Function, description:String = null):void
+        {
+            newSettings[newSettings.length] = GCFWSetting.makeButton(mod, name, onClick, description);
+        }
+
         internal static function deregisterOption(mod:String, name:String):void
         {
             for (var i:int = newSettings.length; i > 0; i--)
@@ -253,6 +258,38 @@ package Bezel.GCFW
 
                         addMC(stringPanel);
                         addMC(stringButton);
+                    }
+                    else if (setting.type == GCFWSetting.TYPE_BUTTON)
+                    {
+                        vY += 60;
+                        currentPanelX = getNewPanelX(0);
+                        var buttonButton:SettingsButtonShim = new SettingsButtonShim(GV.main.scrOptions.mc.btnClose);
+                        buttonButton.tf.text = "~CLICK~";
+                        buttonButton.addEventListener(MouseEvent.MOUSE_DOWN, setting.onClicked, true, 0, true);
+                        buttonButton.addEventListener(MouseEvent.MOUSE_OVER, onButtonMouseover, false, 0, true);
+                        buttonButton.addEventListener(MouseEvent.MOUSE_OUT, onButtonMouseout, false, 0, true);
+
+                        buttonButton.yReal = vY - 6;
+                        buttonButton.x = 1150;
+
+                        var buttonPanel:McOptPanel = new McOptPanel(setting.name, 500, vY, false);
+                        buttonPanel.removeChild(buttonPanel.btn);
+
+                        var buttonExtraSize:Sprite = new Sprite();
+                        buttonExtraSize.graphics.beginFill(0, 0);
+                        buttonExtraSize.graphics.drawRect(0, 0, 1, 1);
+                        buttonExtraSize.graphics.endFill();
+                        buttonExtraSize.width = (buttonButton.x + buttonButton.width) - 500;
+                        buttonExtraSize.height = buttonButton.height;
+
+                        buttonPanel.addChild(buttonExtraSize);
+                        buttonExtraSize.y = -6;
+
+                        setting.panel = buttonPanel;
+                        setting.button = buttonButton;
+
+                        addMC(buttonPanel);
+                        addMC(buttonButton);
                     }
                     else
                     {

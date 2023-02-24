@@ -79,6 +79,17 @@ package Bezel
 		function registerStringForDisplay(mod:String, name:String, validator:Function, onSet:Function, currentValue:Function, description:String = null):void;
 
 		/**
+		 * Adds options with a button that does nothing except call the onClick function to be
+		 * displayed on an in-game screen. Should very likely be called through SettingManager, not directly.
+		 * Meant for interactions or more complex settings than can be handled with the basic ones.
+		 * @param mod Origin mod name
+		 * @param name Setting name
+		 * @param onClick function to call on setting click
+		 * @param description Extra description of setting to be displayed
+		 */
+		function registerButtonForDisplay(mod:String, name:String, onClick:Function, description:String = null):void;
+
+		/**
 		 * Adds keybind options to be displayed on an in-game screen. Should very likely be called through KeybindManager, not directly.
 		 * @param	name Keybind name
 		 * @param	onSet Function to be called when an option is set. Takes the new value (as a Bezel.Utils.Keybind) as a parameter.

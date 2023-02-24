@@ -85,6 +85,7 @@ package Bezel.GCL
         public static const TYPE_KEYBIND:String = "keybind";
         public static const TYPE_NUMBER:String = "number";
         public static const TYPE_STRING:String = "string";
+        public static const TYPE_BUTTON:String = "button";
 
         public function GCLSetting(type:String = null, mod:String = null, name:String = null, onSet:Function = null, currentVal:Function = null, description:String = null, min:Number = NaN, max:Number = NaN, step:Number = NaN, validator:Function = null)
         {
@@ -126,6 +127,11 @@ package Bezel.GCL
         public static function makeString(mod:String, name:String, validator:Function, onSet:Function, currentVal:Function, description:String):GCLSetting
         {
             return new GCLSetting(TYPE_STRING, mod, name, onSet, currentVal, description, NaN, NaN, NaN, validator);
+        }
+
+        public static function makeButton(mod:String, name:String, onClick:Function, description:String):GCLSetting
+        {
+            return new GCLSetting(TYPE_BUTTON, mod, name, onClick, null, description);
         }
 
         private function discardAllMouseInput(e:MouseEvent):void
@@ -354,7 +360,26 @@ package Bezel.GCL
                         0, .5, 0, 0, 0,
                         0, 0, .5, 0, 0,
                         0, 0, 0, 1, 0])];
-            this.button.plate.gotoAndStop(4);
+        }
+
+        private function onButtonClicked(e:MouseEvent):void
+        {
+            this.button.plate.filters = [new ColorMatrixFilter([
+                        1, 0, 0, 0, 0,
+                        0, .5, 0, 0, 0,
+                        0, 0, .5, 0, 0,
+                        0, 0, 0, 1, 0])];
+
+            this.button.addEventListener(MouseEvent.MOUSE_OUT, resetPlateColor, false, 0, true);
+            this.button.addEventListener(MouseEvent.MOUSE_UP, resetPlateColor, false, 0, true);
+            onSet();
+        }
+
+        private function resetPlateColor(e:MouseEvent):void
+        {
+            this.button.removeEventListener(MouseEvent.MOUSE_OUT, resetPlateColor, false);
+            this.button.removeEventListener(MouseEvent.MOUSE_UP, resetPlateColor, false);
+            this.button.plate.filters = [];
         }
 
         public function onClicked(e:MouseEvent):void
@@ -371,6 +396,8 @@ package Bezel.GCL
                     return onRangeClicked(e);
                 case TYPE_STRING:
                     return onStringClicked(e);
+                case TYPE_BUTTON:
+                    return onButtonClicked(e);
             }
         }
     }

@@ -83,6 +83,7 @@ package Bezel.GCCS
         public static const TYPE_KEYBIND:String = "keybind";
         public static const TYPE_NUMBER:String = "number";
         public static const TYPE_STRING:String = "string";
+        public static const TYPE_BUTTON:String = "button";
 
         public function GCCSSetting(type:String = null, mod:String = null, name:String = null, onSet:Function = null, currentVal:Function = null, description:String = null, min:Number = NaN, max:Number = NaN, step:Number = NaN, validator:Function = null)
         {
@@ -124,6 +125,11 @@ package Bezel.GCCS
         public static function makeString(mod:String, name:String, validator:Function, onSet:Function, currentVal:Function, description:String):GCCSSetting
         {
             return new GCCSSetting(TYPE_STRING, mod, name, onSet, currentVal, description, NaN, NaN, NaN, validator);
+        }
+
+        public static function makeButton(mod:String, name:String, onClick:Function, description:String):GCCSSetting
+        {
+            return new GCCSSetting(TYPE_BUTTON, mod, name, onClick, null, description);
         }
 
         private function discardAllMouseInput(e:MouseEvent):void
@@ -344,6 +350,12 @@ package Bezel.GCCS
             this.button.plate.gotoAndStop(4);
         }
 
+        private function onButtonClicked(e:MouseEvent):void
+        {
+            this.button.plate.gotoAndStop(4);
+            onSet();
+        }
+
         public function onClicked(e:MouseEvent):void
         {
             switch (type)
@@ -358,6 +370,8 @@ package Bezel.GCCS
                     return onRangeClicked(e);
                 case TYPE_STRING:
                     return onStringClicked(e);
+                case TYPE_BUTTON:
+                    return onButtonClicked(e);
             }
         }
     }

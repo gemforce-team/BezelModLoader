@@ -52,6 +52,11 @@ package Bezel.GCCS
             newSettings[newSettings.length] = GCCSSetting.makeString(mod, name, validator, onSet, currentValue, description);
         }
 
+        internal static function registerButtonForDisplay(mod:String, name:String, onClick:Function, description:String = null):void
+        {
+            newSettings[newSettings.length] = GCCSSetting.makeButton(mod, name, onClick, description);
+        }
+
         internal static function deregisterOption(mod:String, name:String):void
         {
             for (var i:int = newSettings.length; i > 0; i--)
@@ -172,7 +177,7 @@ package Bezel.GCCS
                         currentPanelX = getNewPanelX(0);
                         var keybindButton:SettingsButtonShim = new SettingsButtonShim(GV.main.scrOptions.mc.btnClose);
                         keybindButton.tf.text = (setting.currentVal()).toString().toUpperCase();
-                        keybindButton.addEventListener(MouseEvent.CLICK, setting.onClicked, true, 0, true);
+                        keybindButton.addEventListener(MouseEvent.MOUSE_DOWN, setting.onClicked, true, 0, true);
                         keybindButton.addEventListener(MouseEvent.MOUSE_OVER, onButtonMouseover, false, 0, true);
                         keybindButton.addEventListener(MouseEvent.MOUSE_OUT, onButtonMouseout, false, 0, true);
 
@@ -204,11 +209,11 @@ package Bezel.GCCS
                         currentPanelX = getNewPanelX(0);
                         var numberButton:SettingsButtonShim = new SettingsButtonShim(GV.main.scrOptions.mc.btnClose);
                         numberButton.tf.text = setting.currentVal().toString();
-                        numberButton.addEventListener(MouseEvent.CLICK, setting.onClicked, true, 0, true);
+                        numberButton.addEventListener(MouseEvent.MOUSE_DOWN, setting.onClicked, true, 0, true);
                         numberButton.addEventListener(MouseEvent.MOUSE_OVER, onButtonMouseover, false, 0, true);
                         numberButton.addEventListener(MouseEvent.MOUSE_OUT, onButtonMouseout, false, 0, true);
 
-                        numberButton.yReal = vY - 6;
+                        numberButton.yReal = vY - 3;
                         numberButton.x = 625;
 
                         var numberPanel:McOptPanel = new McOptPanel(setting.name, 200, vY, false);
@@ -238,11 +243,11 @@ package Bezel.GCCS
                         stringButton.plate.scaleX = 3;
                         stringButton.tf.width = stringButton.plate.width;
                         stringButton.tf.text = setting.currentVal();
-                        stringButton.addEventListener(MouseEvent.CLICK, setting.onClicked, true, 0, true);
+                        stringButton.addEventListener(MouseEvent.MOUSE_DOWN, setting.onClicked, true, 0, true);
                         stringButton.addEventListener(MouseEvent.MOUSE_OVER, onButtonMouseover, false, 0, true);
                         stringButton.addEventListener(MouseEvent.MOUSE_OUT, onButtonMouseout, false, 0, true);
 
-                        stringButton.yReal = vY - 6;
+                        stringButton.yReal = vY - 3;
                         stringButton.x = 525;
 
                         var stringPanel:McOptPanel = new McOptPanel(setting.name, 100, vY, false);
@@ -263,6 +268,39 @@ package Bezel.GCCS
 
                         addMC(stringPanel);
                         addMC(stringButton);
+                    }
+                    else if (setting.type == GCCSSetting.TYPE_BUTTON)
+                    {
+                        vY += 40;
+                        currentPanelX = getNewPanelX(0);
+                        var buttonButton:SettingsButtonShim = new SettingsButtonShim(GV.main.scrOptions.mc.btnClose);
+                        buttonButton.tf.width = buttonButton.plate.width;
+                        buttonButton.tf.text = "~CLICK~";
+                        buttonButton.addEventListener(MouseEvent.MOUSE_DOWN, setting.onClicked, true, 0, true);
+                        buttonButton.addEventListener(MouseEvent.MOUSE_OVER, onButtonMouseover, false, 0, true);
+                        buttonButton.addEventListener(MouseEvent.MOUSE_OUT, onButtonMouseout, false, 0, true);
+
+                        buttonButton.yReal = vY - 3;
+                        buttonButton.x = 625;
+
+                        var buttonPanel:McOptPanel = new McOptPanel(setting.name, 200, vY, false);
+                        buttonPanel.removeChild(buttonPanel.btn);
+
+                        var buttonExtraSize:Sprite = new Sprite();
+                        buttonExtraSize.graphics.beginFill(0, 0);
+                        buttonExtraSize.graphics.drawRect(0, 0, 1, 1);
+                        buttonExtraSize.graphics.endFill();
+                        buttonExtraSize.width = (buttonButton.x + buttonButton.width) - 100;
+                        buttonExtraSize.height = buttonButton.height;
+
+                        buttonPanel.addChild(buttonExtraSize);
+                        buttonExtraSize.y = -6;
+
+                        setting.panel = buttonPanel;
+                        setting.button = buttonButton;
+
+                        addMC(buttonPanel);
+                        addMC(buttonButton);
                     }
                     else
                     {
