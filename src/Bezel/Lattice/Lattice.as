@@ -443,8 +443,12 @@ package Bezel.Lattice
                 var namespaces:Object = types[name.ns.type] || (types[name.ns.type] = new Object());
                 var classes:Object = namespaces[name.ns.name] || (namespaces[name.ns.name] = new Dictionary());
                 var disambiguated:Object = classes[name.ns.secondaryName] || (classes[name.ns.secondaryName] = new Object());
-                var clazz:ASClass = disambiguated[name.name] as ASClass || (disambiguated[name.name] = bytecodeEditor.GetClass(name));
-                if (clazz == null)
+                var clazz:ASClass;
+                try
+                {
+                    clazz = disambiguated[name.name] as ASClass || (disambiguated[name.name] = bytecodeEditor.GetClass(name));
+                }
+                catch (e:Error)
                 {
                     throw new Error("Class " + name + " does not exist in the partial reassembly to be patched by an instance of " + getQualifiedClassName(patcher));
                 }
@@ -462,13 +466,20 @@ package Bezel.Lattice
         {
             if (i < inserters.length)
             {
-                var newScript:ASScript = bytecodeEditor.CreateAndInsertScript(new ASMethod(null, null, "", null, null, null, new ASMethodBody(
-                    2, 1, 1, 2, new <ASInstruction>[
-                        ASInstruction.GetLocal0(),
-                        ASInstruction.PushScope(),
-                        ASInstruction.ReturnVoid()
-                    ]
-                    )));
+                try
+                {
+                    var newScript:ASScript = bytecodeEditor.CreateAndInsertScript(new ASMethod(null, null, "", null, null, null, new ASMethodBody(
+                        2, 1, 1, 2, new <ASInstruction>[
+                            ASInstruction.GetLocal0(),
+                            ASInstruction.PushScope(),
+                            ASInstruction.ReturnVoid()
+                        ]
+                        )));
+                }
+                catch (e:Error)
+                {
+                    throw new Error("Could not create script to be inserted by an instance of " + getQualifiedClassName(inserters[i]));
+                }
                 inserters[i].doInsert(newScript);
                 dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));
                 FunctionDeferrer.deferFunction(doSingleInserter, [i + 1], null, true);

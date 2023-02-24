@@ -11,6 +11,8 @@ package Bezel
 	import flash.utils.ByteArray;
 	import flash.events.AsyncErrorEvent;
 	import flash.events.SecurityErrorEvent;
+	import flash.events.UncaughtErrorEvent;
+	import flash.display.LoaderInfo;
 
 	/**
 	 * Represents an SWF file on disk
@@ -80,10 +82,14 @@ package Bezel
 			else if (domain == LIB_DOMAIN)
 			{
 				context = new LoaderContext(true, libDomain);
+
+				loader.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtLib, false, 0, true);
 			}
 			else if (domain == MOD_DOMAIN)
 			{
 				context = new LoaderContext(true, new ApplicationDomain(libDomain));
+
+				loader.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtMod, false, 0, true);
 			}
 			else
 			{
@@ -142,10 +148,81 @@ package Bezel
 			this.failedLoadCallback = null;
 		}
 
+		private function unloadWithoutUnload():void
+		{
+			this.loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, loadedSuccessfully);
+			this.loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, failedLoadCallback);
+			this.loader.contentLoaderInfo.removeEventListener(AsyncErrorEvent.ASYNC_ERROR, failedLoadCallback);
+			this.loader.contentLoaderInfo.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, failedLoadCallback);
+			// Make sure the mod cleans up its event subscribers and resources
+			// if (this.instance is BezelMod)
+			// {
+			// this.instance.unload();
+			// }
+			// Stop all execution and unsubscribe events, let garbage collection occur
+			this.instance = null;
+			this.loader.unloadAndStop(true);
+			this.loader = null;
+			this.successfulLoadCallback = null;
+			this.failedLoadCallback = null;
+		}
+
 		private function loadedSuccessfully(e:Event):void
 		{
 			this.instance = this.loader.content;
 			successfulLoadCallback(this);
+		}
+
+		private function onUncaughtLib(e:UncaughtErrorEvent):void
+		{
+			if (e.error is Error)
+			{
+				onUncaught("Library", e);
+			}
+		}
+
+		private function onUncaughtMod(e:UncaughtErrorEvent):void
+		{
+			if (e.error is Error)
+			{
+				onUncaught("Mod", e);
+			}
+		}
+
+		private function onUncaught(type:String, e:UncaughtErrorEvent):void
+		{
+			var error:Error = e.error as Error;
+			var logger:Logger = Bezel.Bezel.instance.getLogger("SWF Loader");
+
+			var logMe:String = type + " ";
+			try
+			{
+				logMe += "'" + ((e.target as LoaderInfo).content as BezelMod).MOD_NAME + "' ";
+			}
+			catch (e:*) {}
+
+			logMe += "from " + filePath + " threw a " + error.name;
+			if (error.errorID != 0)
+			{
+				logMe += " #" + error.errorID;
+			}
+			logMe += ": " + error.message + "\n" + error.getStackTrace();
+
+			logger.log("onUncaughtMod", logMe);
+			logger.log("onUncaughtMod", "Attempting to unload it...");
+
+			try
+			{
+				(this.instance as BezelMod).unload();
+			}
+			catch (e:*) {}
+
+			unloadWithoutUnload();
+
+			e.preventDefault();
+			e.stopImmediatePropagation();
+
+			throw new Error(logMe);
 		}
 	}
 }

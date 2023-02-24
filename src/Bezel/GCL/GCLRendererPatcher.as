@@ -17,6 +17,7 @@ package Bezel.GCL
         public function patchClass(clazz:ASClass):void
         {
             addGemInfoPanelFormedHook(clazz);
+            addPreRenderPanelHookAndRemoveHotkeys(clazz);
         }
 
         private function replaceHotkeyRenderCall(body:ASMethodBody, prefix:String, keybind:String, keybindName:String, keybindName2:String = null):void
@@ -99,7 +100,7 @@ package Bezel.GCL
             {
                 return instr.opcode == ASInstruction.OP_callpropvoid && (instr.args[0] as ASMultiname).name == "addChild";
             })
-                .backtrack(1)
+                .advance()
                 .then(function (instr:ASInstruction):void
             {
                 properLocalIndex = instr.localIndex();
@@ -108,11 +109,11 @@ package Bezel.GCL
             {
                 return instr.opcode == ASInstruction.OP_getproperty && (instr.args[0] as ASMultiname).name == "core";
             })
+                .advance()
                 .then(function (instr:ASInstruction):void
             {
                 body.redirectJumps(instr, firstNewInstr);
             })
-                .advance(2)
                 .insert(
                 firstNewInstr,
                 ASInstruction.EfficientGetLocal(properLocalIndex),
@@ -136,8 +137,11 @@ package Bezel.GCL
             body.streamInstructions()
                 .findNext(function (instr:ASInstruction):Boolean
             {
-                var ret:Boolean = instr.opcode == ASInstruction.OP_ifne;
-                return ret;
+                return instr.opcode == ASInstruction.OP_callpropvoid && (instr.args[0] as ASMultiname).name == "renderApparitionInfoPanel";
+            })
+                .findNext(function (instr:ASInstruction):Boolean
+            {
+                return instr.opcode == ASInstruction.OP_pushfalse;
             })
                 .then(function (instr:ASInstruction):void
             {

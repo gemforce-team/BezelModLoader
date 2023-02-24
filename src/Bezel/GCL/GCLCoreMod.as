@@ -8,8 +8,8 @@ package Bezel.GCL
         public static const VERSION:String = "1";
 
         private static const EVERY_FILE_EVERY_LINE_PATCHES:Vector.<Vector.<String>> = new <Vector.<String>>[
-                new <String>['callproperty.*"g"', 'getproperty QName(PrivateNamespace("", "com.giab.common.data:ENumber/instance"), "v")'],
-                new <String>['callpropvoid.*"s"', 'setproperty QName(PrivateNamespace("", "com.giab.common.data:ENumber/instance"), "v")']
+                new <String>['getproperty.*\ncallproperty.*"g"', 'getproperty QName(PrivateNamespace("", "com.giab.common.data:ENumber/instance"), "v")'],
+                new <String>['.*\ncallpropvoid.*"s"', 'setproperty QName(PrivateNamespace("", "com.giab.common.data:ENumber/instance"), "v")']
             ];
 
         internal static function installHooks(lattice:Lattice, doEnumberFix:Boolean):void
@@ -31,7 +31,7 @@ package Bezel.GCL
                     var fileContents:String = lattice.retrieveFile(filename);
                     for each (var everylinepatch:Vector.<String> in EVERY_FILE_EVERY_LINE_PATCHES)
                     {
-                        var re:RegExp = new RegExp(everylinepatch[0], "g");
+                        var re:RegExp = new RegExp(everylinepatch[0], "gm");
                         var result:Object = re.exec(fileContents);
                         var previousOffset:int = 0;
                         var previousLineOffset:int = 0;
@@ -39,7 +39,7 @@ package Bezel.GCL
                         {
                             var offset:int = result.index;
                             var lineOffset:int = previousLineOffset + fileContents.substr(previousOffset, offset - previousOffset).split('\n').length - 1;
-                            lattice.mainloader_only::DANGEROUS_patchFile(filename, lineOffset, 1, everylinepatch[1]);
+                            lattice.mainloader_only::DANGEROUS_patchFile(filename, lineOffset + 1, 1, everylinepatch[1]);
                             previousOffset = offset;
                             previousLineOffset = lineOffset;
                             result = re.exec(fileContents);
