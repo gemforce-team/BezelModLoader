@@ -71,9 +71,9 @@ package Bezel.GCL
 
         // Called immediately as a click event is fired by the base game
         // set continueDefault to false to prevent the base game's handler from running
-        internal static function ingameClickOnScene(event:MouseEvent, mouseX:Number, mouseY:Number, buildingX:Number, buildingY:Number):Boolean
+        internal static function ingameClickOnScene(event:MouseEvent, buildingX:Number, buildingY:Number):Boolean
         {
-            var eventArgs:IngameClickOnSceneEventArgs = new IngameClickOnSceneEventArgs(true, event, mouseX, mouseY, buildingX, buildingY);
+            var eventArgs:IngameClickOnSceneEventArgs = new IngameClickOnSceneEventArgs(true, event, event.stageX, event.stageY, buildingX, buildingY);
             Bezel.Bezel.instance.dispatchEvent(new IngameClickOnSceneEvent(EventTypes.INGAME_CLICK_ON_SCENE, eventArgs));
             return eventArgs.continueDefault;
         }

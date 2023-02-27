@@ -450,7 +450,7 @@ package Bezel.Lattice
                 }
                 catch (e:Error)
                 {
-                    throw new Error("Class " + name + " does not exist in the partial reassembly to be patched by an instance of " + getQualifiedClassName(patcher));
+                    throw new Error("Class " + name + " does not exist in the partial reassembly to be patched by an instance of " + getQualifiedClassName(patcher) + "\nError was: " + e.message);
                 }
                 patcher.patchClass(clazz);
                 dispatchEvent(new Event(LatticeEvent.SINGLE_PATCH_APPLIED));

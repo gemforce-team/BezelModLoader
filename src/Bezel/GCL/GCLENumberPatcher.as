@@ -32,7 +32,7 @@ package Bezel.GCL
                     ASInstruction.ConstructSuper(0),
                     ASInstruction.GetLocal0(),
                     ASInstruction.PushByte(0),
-                    ASInstruction.InitProperty(ASQName(PrivateNamespace("", "com.giab.common.data:ENumber/instance"), "v")),
+                    ASInstruction.InitProperty(ASQName(PrivateNamespace(null, "com.giab.common.data:ENumber/instance"), "v")),
                     ASInstruction.ReturnVoid(),
                 ]));
 
@@ -47,7 +47,7 @@ package Bezel.GCL
                     ASInstruction.GetLocal0(),
                     ASInstruction.PushScope(),
                     ASInstruction.GetLocal0(),
-                    ASInstruction.GetProperty(ASQName(PrivateNamespace("", "com.giab.common.data:ENumber/instance"), "v")),
+                    ASInstruction.GetProperty(ASQName(PrivateNamespace(null, "com.giab.common.data:ENumber/instance"), "v")),
                     ASInstruction.ReturnValue()
                 ])));
 
@@ -63,7 +63,7 @@ package Bezel.GCL
                     ASInstruction.PushScope(),
                     ASInstruction.GetLocal0(),
                     ASInstruction.GetLocal1(),
-                    ASInstruction.SetProperty(ASQName(PrivateNamespace("", "com.giab.common.data:ENumber/instance"), "v")),
+                    ASInstruction.SetProperty(ASQName(PrivateNamespace(null, "com.giab.common.data:ENumber/instance"), "v")),
                     ASInstruction.ReturnVoid()
                 ])));
 

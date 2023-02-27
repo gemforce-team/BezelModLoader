@@ -35,9 +35,7 @@ package Bezel.GCL
                 ASInstruction.GetLocal1(),
                 ASInstruction.GetLocal2(),
                 ASInstruction.GetLocal3(),
-                ASInstruction.GetLocal(4),
-                ASInstruction.GetLocal(5),
-                ASInstruction.CallProperty(ASQName(PackageInternalNs("Bezel.GCL"), "ingameClickOnScene"), 5),
+                ASInstruction.CallProperty(ASQName(PackageInternalNs("Bezel.GCL"), "ingameClickOnScene"), 3),
                 ASInstruction.IfTrue(jumpLabel),
                 ASInstruction.ReturnVoid(),
                 jumpLabel

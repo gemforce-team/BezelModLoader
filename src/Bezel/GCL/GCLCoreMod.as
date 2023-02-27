@@ -8,8 +8,8 @@ package Bezel.GCL
         public static const VERSION:String = "1";
 
         private static const EVERY_FILE_EVERY_LINE_PATCHES:Vector.<Vector.<String>> = new <Vector.<String>>[
-                new <String>['getproperty.*\ncallproperty.*"g"', 'getproperty QName(PrivateNamespace("", "com.giab.common.data:ENumber/instance"), "v")'],
-                new <String>['.*\ncallpropvoid.*"s"', 'setproperty QName(PrivateNamespace("", "com.giab.common.data:ENumber/instance"), "v")']
+                new <String>['getproperty.*\ncallproperty.*"g"', 'getproperty QName(PrivateNamespace(null, "com.giab.common.data:ENumber/instance"), "v")'],
+                new <String>['.*\ncallpropvoid.*"s"', 'setproperty QName(PrivateNamespace(null, "com.giab.common.data:ENumber/instance"), "v")']
             ];
 
         internal static function installHooks(lattice:Lattice, doEnumberFix:Boolean):void

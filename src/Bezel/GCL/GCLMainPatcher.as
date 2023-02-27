@@ -38,6 +38,14 @@ package Bezel.GCL
                 ]);
             clazz.setConstructor(constructor);
 
+            initFromBezel.body.streamInstructions()
+                .findNext(function (instr:ASInstruction):Boolean
+            {
+                return instr.opcode == ASInstruction.OP_constructsuper;
+            })
+                .backtrack(1)
+                .deleteNext(2);
+
             clazz.setInstanceTrait(TraitMethod(ASQName(PackageNamespace(""), "initFromBezel"), initFromBezel));
         }
 
