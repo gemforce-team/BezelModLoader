@@ -62,6 +62,7 @@ package Bezel
 		private const loadingStageTextField:TextField = new TextField();
 		private const loadingProgressTextField:TextField = new TextField();
 		private const loadingProgressBar:Sprite = new Sprite();
+		private const emptyLoadingBar:Sprite = new Sprite();
 
 		private var manager:SettingManager;
 
@@ -227,7 +228,7 @@ package Bezel
 
 			const emptyLoadingBarWidth:int = 4;
 
-			var emptyLoadingBar:Sprite = new Sprite();
+			emptyLoadingBar.graphics.clear();
 			emptyLoadingBar.graphics.lineStyle(emptyLoadingBarWidth, 0xFF0000, 1.0, true, "normal", "square", "miter");
 			emptyLoadingBar.graphics.lineTo(0, this.stage.stageHeight * .10);
 			emptyLoadingBar.graphics.lineTo(this.stage.stageWidth * .90, this.stage.stageHeight * .10);
@@ -425,7 +426,10 @@ package Bezel
 				throw new TypeError("This game class (" + className + ") does not match the main loader's supported class name (" + wantedName + ")");
 			}
 			game.instance.bezel = this;
-			removeChildren();
+			removeChild(loadingProgressBar);
+			removeChild(loadingProgressTextField);
+			removeChild(loadingStageTextField);
+			removeChild(emptyLoadingBar);
 			game.instance.addChild(this);
 			// Base game's init (main.initFromBezel())
 			game.instance.initFromBezel();
@@ -883,16 +887,23 @@ package Bezel
 				var mod:SWFFile = mods[modName];
 				if (libs.indexOf(modName) == -1)
 				{
+					logger.log("reloadAllMods", "Unloading mod " + modName);
+					try {
+						this.removeChild(DisplayObject(mod.instance));
+					}
+					catch (e:Error)
+					{
+						logger.log("reloadAllMods", "Mod " + modName + "'s main class was no longer a child of Bezel");
+					}
 					mod.unload();
 					for (var coremod:int = 0; coremod < coremods.length; coremod++)
 					{
 						if (coremods[coremod].name == modName)
 						{
-							delete coremods[coremod];
+							coremods.splice(coremod, 1);
 							break;
 						}
 					}
-					this.removeChild(DisplayObject(mod.instance));
 					delete mods[modName];
 				}
 			}
