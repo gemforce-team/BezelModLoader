@@ -36,7 +36,7 @@ package Bezel.GCL
             })
                 .then(function (instr:ASInstruction):void
             {
-                hotkeyFirstIdx = (instr.args[0] as String).search(re) + 9;
+                hotkeyFirstIdx = (instr.args[0] as String).search(re) + prefix.length;
                 hotkeyLastIdx = hotkeyFirstIdx + keybind.length;
 
                 origHotkeyString = instr.args[0] as String;
