@@ -52,6 +52,7 @@ package Bezel.GCCS
             var onRightClickTrait:ASTrait = clazz.getInstanceTrait(ASQName(PackageNamespace(""), "rightClickOnScene"));
             var body:ASMethodBody = onRightClickTrait.funcOrMethod.body;
             body.localCount += 4;
+            body.maxStack += 2;
 
             var jumpLabel:ASInstruction = ASInstruction.Label();
 
