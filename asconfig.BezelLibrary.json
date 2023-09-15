@@ -28,8 +28,15 @@
 		"external-library-path": [
 			"${BezelLibs}/gc-cs-steam.swc",
 			"${BezelLibs}/GemCraft.Frostborn.Wrath.swc",
+			"${BezelLibs}/gcl-gs.swc",
 			"${BezelLibs}/ANEBytecodeEditor.swc",
 			"${BezelLibs}/FRESteamWorks.swc"
+		]
+	},
+	"asdocOptions": {
+		"include": true,
+		"doc-sources": [
+			"src"
 		]
 	},
 	"config": "air",

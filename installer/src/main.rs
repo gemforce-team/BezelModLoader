@@ -66,7 +66,7 @@ fn sanitize_contents_path(path: &str) -> String {
         ret = ret.replace(orig, replacement);
     });
 
-    return ret;
+    ret
 }
 
 fn wait_exit<T: std::fmt::Display>(code: Option<T>) -> ! {

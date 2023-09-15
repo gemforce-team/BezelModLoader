@@ -28,6 +28,7 @@
 		"external-library-path": [
 			"${BezelLibs}/gc-cs-steam.swc",
 			"${BezelLibs}/GemCraft.Frostborn.Wrath.swc",
+			"${BezelLibs}/gcl-gs.swc",
 			"${BezelLibs}/ANEBytecodeEditor.swc",
 			"${BezelLibs}/FRESteamWorks.swc"
 		]
@@ -45,6 +46,11 @@
 			"file": "src/Bezel/GCCS/GCCSBezel.as",
 			"optimize": true,
 			"output": "obj/GCCSMainLoader.swf"
+		},
+		{
+			"file": "src/Bezel/GCL/GCLBezel.as",
+			"optimize": true,
+			"output": "obj/GCLMainLoader.swf"
 		}
 	],
 	"config": "air",
