@@ -82,7 +82,7 @@ package Bezel.Utils
 		 */
 		public function getHotkeyValue(name:String):Keybind
 		{
-			return this.configuredHotkeys[name];
+			return this.configuredHotkeys[name] || Keybind.invalidKeybind();
 		}
 
 		private function saveHotkeys():void

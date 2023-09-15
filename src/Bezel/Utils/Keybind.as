@@ -16,6 +16,8 @@ package Bezel.Utils
 		private var _shift:Boolean;
 		private var _stringRep:String;
 
+		private static const badKeybind:Keybind = new Keybind("a");
+
 		/**
 		 * The key (as in flash.ui.Keyboard)
 		 */
@@ -119,6 +121,10 @@ package Bezel.Utils
 		 */
 		public function matches(other:*):Boolean
 		{
+			if (_key == 0)
+			{
+				return false;
+			}
 			var e:KeyboardEvent;
 			if (other is KeyboardEvent)
 			{
@@ -146,6 +152,17 @@ package Bezel.Utils
 		public function toString():String
 		{
 			return this._stringRep;
+		}
+
+		internal static function invalidKeybind():Keybind
+		{
+			if (badKeybind._key != 0)
+			{
+				badKeybind._key = 0;
+				badKeybind._stringRep = "NULL";
+			}
+
+			return badKeybind;
 		}
 	}
 }
